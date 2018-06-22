@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dl.shop.order.dao.OrderMapper">
+  <resultMap id="BaseResultMap" type="com.dl.shop.order.model.Order">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="order_id" jdbcType="INTEGER" property="orderId" />
+    <result column="order_sn" jdbcType="VARCHAR" property="orderSn" />
+    <result column="parent_sn" jdbcType="VARCHAR" property="parentSn" />
+    <result column="user_id" jdbcType="INTEGER" property="userId" />
+    <result column="order_status" jdbcType="INTEGER" property="orderStatus" />
+    <result column="pay_status" jdbcType="INTEGER" property="payStatus" />
+    <result column="pay_id" jdbcType="INTEGER" property="payId" />
+    <result column="pay_code" jdbcType="VARCHAR" property="payCode" />
+    <result column="pay_name" jdbcType="VARCHAR" property="payName" />
+    <result column="pay_sn" jdbcType="VARCHAR" property="paySn" />
+    <result column="money_paid" jdbcType="DECIMAL" property="moneyPaid" />
+    <result column="ticket_amount" jdbcType="DECIMAL" property="ticketAmount" />
+    <result column="surplus" jdbcType="DECIMAL" property="surplus" />
+    <result column="user_surplus" jdbcType="DECIMAL" property="userSurplus" />
+    <result column="user_surplus_limit" jdbcType="DECIMAL" property="userSurplusLimit" />
+    <result column="third_party_paid" jdbcType="DECIMAL" property="thirdPartyPaid" />
+    <result column="user_bonus_id" jdbcType="INTEGER" property="userBonusId" />
+    <result column="bonus" jdbcType="DECIMAL" property="bonus" />
+    <result column="give_integral" jdbcType="INTEGER" property="giveIntegral" />
+    <result column="order_from" jdbcType="VARCHAR" property="orderFrom" />
+    <result column="add_time" jdbcType="INTEGER" property="addTime" />
+    <result column="pay_time" jdbcType="INTEGER" property="payTime" />
+    <result column="order_type" jdbcType="INTEGER" property="orderType" />
+    <result column="lottery_classify_id" jdbcType="INTEGER" property="lotteryClassifyId" />
+    <result column="lottery_play_classify_id" jdbcType="INTEGER" property="lotteryPlayClassifyId" />
+    <result column="match_time" jdbcType="TIMESTAMP" property="matchTime" />
+    <result column="winning_money" jdbcType="DECIMAL" property="winningMoney" />
+    <result column="pass_type" jdbcType="VARCHAR" property="passType" />
+    <result column="play_type" jdbcType="VARCHAR" property="playType" />
+    <result column="cathectic" jdbcType="INTEGER" property="cathectic" />
+    <result column="bet_num" jdbcType="VARCHAR" property="betNum" />
+    <result column="accept_time" jdbcType="INTEGER" property="acceptTime" />
+    <result column="ticket_time" jdbcType="INTEGER" property="ticketTime" />
+    <result column="forecast_money" jdbcType="DECIMAL" property="forecastMoney" />
+    <result column="issue" jdbcType="VARCHAR" property="issue" />
+    <result column="is_delete" jdbcType="INTEGER" property="isDelete" />
+    <result column="ticket_num" jdbcType="INTEGER" property="ticketNum" />
+    <result column="device_channel" jdbcType="VARCHAR" property="deviceChannel" />
+    <result column="award_time" jdbcType="VARCHAR" property="awardTime" />
+  </resultMap>
+  <resultMap id="userResultMap" type="com.dl.shop.order.model.User">
+    <id column="user_id" jdbcType="INTEGER" property="userId" />
+    <result column="user_name" jdbcType="VARCHAR" property="userName" />
+    <result column="mobile" jdbcType="VARCHAR" property="mobile" />
+  </resultMap>
+  
+  <resultMap id="consumerResultMap" type="com.dl.shop.order.model.DlChannelConsumer">
+    <id column="consumer_id" jdbcType="INTEGER" property="consumerId" />
+    <id column="channel_distributor_id" jdbcType="INTEGER" property="channelDistributorId" />
+    <id column="user_id" jdbcType="INTEGER" property="userId" />
+    <id column="add_time" jdbcType="INTEGER" property="addTime" />
+    <id column="frist_login_time" jdbcType="INTEGER" property="fristLoginTime" />
+    <result column="user_name" jdbcType="VARCHAR" property="userName" />
+    <result column="mobile" jdbcType="VARCHAR" property="mobile" />
+    <result column="device_code" jdbcType="VARCHAR" property="deviceCode" />
+  </resultMap>
+  
+  <resultMap id="distributorResultMap" type="com.dl.shop.order.model.DlChannelDistributor">
+    <id column="channel_distributor_id" jdbcType="INTEGER" property="channelDistributorId" />
+    <id column="channel_id" jdbcType="INTEGER" property="channelId" />
+    <id column="user_id" jdbcType="INTEGER" property="userId" />
+    <id column="add_time" jdbcType="INTEGER" property="addTime" />
+    <result column="channel_distributor_num" jdbcType="VARCHAR" property="channelDistributorNum" />
+    <result column="channel_name" jdbcType="VARCHAR" property="channelName" />
+    <result column="user_name" jdbcType="VARCHAR" property="userName" />
+    <result column="mobile" jdbcType="VARCHAR" property="mobile" />
+    <result column="device_code" jdbcType="VARCHAR" property="deviceCode" />
+    <result column="remark" jdbcType="VARCHAR" property="remark" />
+  </resultMap>
+  
+  <insert id="insertOrder" parameterType="com.dl.shop.order.model.Order" useGeneratedKeys="true" keyProperty="orderId">
+  		insert into dl_order (order_sn,parent_sn,user_id,order_status,pay_status,pay_id,pay_code,pay_name,pay_sn,
+  		money_paid,ticket_amount,surplus,user_surplus,user_surplus_limit,third_party_paid,user_bonus_id,bonus,give_integral,order_from,
+  		add_time,pay_time,order_type,lottery_classify_id,lottery_play_classify_id,match_time,winning_money,pass_type,play_type,cathectic,bet_num,
+  		accept_time,ticket_time,forecast_money,issue,is_delete,device_channel)
+  		values (#{orderSn},#{parentSn},#{userId},#{orderStatus},#{payStatus},#{payId},#{payCode},#{payName},#{paySn},
+  		#{moneyPaid},#{ticketAmount},#{surplus},#{userSurplus},#{userSurplusLimit},#{thirdPartyPaid},#{userBonusId},#{bonus},#{giveIntegral},
+  		#{orderFrom},#{addTime},#{payTime},#{orderType},#{lotteryClassifyId},#{lotteryPlayClassifyId},#{matchTime},#{winningMoney},#{passType},#{playType},#{cathectic},#{betNum},
+  		#{acceptTime},#{ticketTime},#{forecastMoney},#{issue},#{isDelete},#{deviceChannel})
+  </insert>
+  
+  <select id="getOrderInfoByOrderSn" resultMap="BaseResultMap">
+  	select order_id,  order_sn, parent_sn,user_id,order_status,pay_status,pay_id,pay_code,pay_name,pay_sn,
+  		money_paid,ticket_amount,surplus,user_surplus,user_surplus_limit,third_party_paid,user_bonus_id,bonus,give_integral,order_from,
+  		add_time,pay_time,order_type,lottery_classify_id,lottery_play_classify_id,match_time,winning_money,pass_type,
+  		play_type,cathectic,bet_num,forecast_money,is_delete,device_channel
+  	from dl_order
+  	where order_sn = #{orderSn}
+  </select>
+  <select id="getOrderInfoList" resultType="com.dl.order.dto.OrderInfoListDTO">
+        select
+            do.order_id orderId,
+	        do.order_sn orderSn,
+	        do.order_status orderStatus,
+	        do.money_paid moneyPaid,
+	        do.ticket_amount ticketAmount,
+	        do.pay_time payTime,
+	        do.match_time matchTime,
+	        do.winning_money winningMoney,
+	        do.lottery_play_classify_id lotteryPlayClassifyId,
+	        dlc.lottery_name lotteryName
+        from
+            dl_order do 
+        left join dl_lottery_classify dlc on do.lottery_classify_id = dlc.lottery_classify_id
+        where 
+            do.is_delete = 0 
+        and 
+            do.user_id = #{userId}
+        and 
+            do.lottery_classify_id = #{lotteryClassifyId}
+        and  
+            do.order_status in 
+            <foreach collection="statusList" item="item" index="index" open="(" separator="," close=")">
+            	#{item}
+            </foreach>
+        order by add_time desc
+  </select>
+  
+  <update id="updateOrderInfo">
+	 update dl_order 
+        <trim prefix="set" suffixOverrides=",">
+		  <if test="null != userSurplus and '' != userSurplus">user_surplus=#{userSurplus},</if>
+		  <if test="null != userSurplusLimit and '' != userSurplusLimit">user_surplus_limit=#{userSurplusLimit},</if>
+		  <if test="null != payTime and '' != payTime">pay_time=#{payTime},</if>
+		  <if test="null != payStatus and '' != payStatus">pay_status=#{payStatus},</if>
+		  <if test="null != orderStatus and '' != orderStatus">order_status=#{orderStatus},</if>
+		  <if test="null != payId and '' != payId">pay_id=#{payId},</if>
+		  <if test="null != payCode and '' != payCode">pay_code=#{payCode},</if>
+		  <if test="null != payName and '' != payName">pay_name=#{payName},</if>
+		  <if test="null != paySn and '' != paySn">pay_sn=#{paySn},</if>
+		  <if test="null != acceptTime and '' != acceptTime">accept_time=#{acceptTime},</if>
+		  <if test="null != ticketTime and '' != ticketTime">ticket_time=#{ticketTime},</if>
+		</trim>
+	 where order_sn=#{orderSn}
+  </update>
+  
+  <update id="updateOrderStatus" >
+	 update dl_order set pay_time=#{payTime},pay_status=#{payStatus},order_status=#{orderStatus}
+	 where order_sn=#{orderSn}
+  </update>
+  
+ <select id="selectOpenedAllRewardOrderList" resultType="com.dl.order.dto.OrderWithUserDTO">
+     select 
+     	ticket_amount betMoney,
+     	add_time betTime,
+        order_sn orderSn,
+        user_id userId,
+        winning_money realRewardMoney
+     from 
+        dl_order
+     where 
+        order_status = 6
+        and pay_status = 1
+        and is_delete = 0
+  </select>
+  
+  <select id="ordersListGoPrintLottery" resultMap="BaseResultMap">
+   select 
+        *
+     from 
+        dl_order
+     where 
+     order_status = 1 and pay_status=1 
+     order by pay_time 
+  </select>
+  
+  <select id="queryOrderSnListByStatus" parameterType = "com.dl.shop.order.model.Order" resultType="java.lang.String">
+	   select 
+	        order_sn
+	   from 
+	        dl_order
+	  	<where>
+		  	<if test="orderStatus != null">
+		        AND order_status = #{orderStatus}
+		    </if>
+		    <if test="payStatus != null">
+		        AND pay_status = #{payStatus}
+		    </if>
+		    <if test="isDelete != null">
+		        AND is_delete = #{isDelete}
+		    </if>
+	    </where>
+	     order by pay_time
+  </select>
+  
+  
+  <select id="queryOrderListBySelective" parameterType = "com.dl.shop.order.model.Order" resultMap="BaseResultMap">
+	   select 
+	        *
+	   from 
+	        dl_order
+	   where  third_party_paid &gt; 0
+		        AND order_status = 0
+		        AND pay_status = 0
+		        AND is_delete = 0
+		        AND (#{nowTime}-add_time) &gt; 300
+	     order by add_time
+  </select>
+  
+  <update id="updateOrderTicketInfo">
+  	update dl_order set 
+	  	accept_time = #{acceptTime},
+	  	<if test="ticketTime != null">
+	  	ticket_time = #{ticketTime},
+	  	</if>
+	  	<if test="forecastMoney != null and forecastMoney != ''">
+	  	forecast_money = #{forecastMoney},
+	  	</if>
+	  	order_status = #{orderStatus} 
+  	where order_sn = #{orderSn}
+  </update>
+  
+  <update id="updateWiningMoney">
+  	update dl_order set winning_money = #{winningMoney},order_status=#{orderStatus},award_time=#{awardTime} where order_sn = #{orderSn}
+  </update>
+  
+  
+  <!-- 列表(全部) -->
+	<select id="selectConsumers" resultMap="consumerResultMap">
+		SELECT
+			* 
+		FROM
+			dl_channel_consumer 
+		WHERE user_id in
+			<foreach collection="userIds" item="userId" index="index" open="(" separator="," close=")">
+            	#{userId}
+            </foreach>
+	</select>
+	
+	<select id="findAllUser" resultMap="userResultMap">
+		SELECT
+			a.user_id,
+			a.user_name,
+			a.mobile 
+		FROM dl_user a
+		WHERE user_id in
+		<foreach collection="userIds" item="userId" index="index" open="(" separator="," close=")">
+           	#{userId}
+         </foreach>
+	</select>
+	<select id="channelDistributorList" resultMap="distributorResultMap" >
+		SELECT
+			*
+		FROM dl_channel_distributor  
+		where channel_distributor_id in
+		<foreach collection="channelDistributorIds" item="channelDistributorId" index="index" open="(" separator="," close=")">
+           	#{channelDistributorId}
+         </foreach>
+	</select>
+  
+  	<insert id = "saveChannelOperation"   parameterType="com.dl.shop.order.model.ChannelOperationLog">
+	insert into 
+	dl_channel_option_log  
+	(	option_id,
+		user_id,
+		distributor_id,
+		channel_id,
+		option_time,
+		operation_node,
+		status,
+		user_name,
+		mobile,
+		 source,
+		option_amount)
+			values(
+			#{optionId},
+			#{userId},
+			#{distributorId},
+			#{channelId},
+			#{optionTime},
+			#{operationNode},
+			#{	status},
+			#{userName},
+			#{mobile},
+			#{source},
+			#{optionAmount}
+			)
+	</insert>
+  
+</mapper>

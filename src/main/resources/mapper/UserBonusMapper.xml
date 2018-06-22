@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dl.member.dao.UserBonusMapper">
+  <resultMap id="BaseResultMap" type="com.dl.member.model.UserBonus">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="user_bonus_id" jdbcType="INTEGER" property="userBonusId" />
+    <result column="user_id" jdbcType="INTEGER" property="userId" />
+    <result column="bonus_id" jdbcType="INTEGER" property="bonusId" />
+    <result column="bonus_sn" jdbcType="VARCHAR" property="bonusSn" />
+    <result column="bonus_price" jdbcType="DECIMAL" property="bonusPrice" />
+    <result column="receive_time" jdbcType="INTEGER" property="receiveTime" />
+    <result column="used_time" jdbcType="INTEGER" property="usedTime" />
+    <result column="start_time" jdbcType="INTEGER" property="startTime" />
+    <result column="end_time" jdbcType="INTEGER" property="endTime" />
+    <result column="add_time" jdbcType="INTEGER" property="addTime" />
+    <result column="order_sn" jdbcType="VARCHAR" property="orderSn" />
+    <result column="pay_log_id" jdbcType="INTEGER" property="payLogId" />
+    <result column="bonus_status" jdbcType="VARCHAR" property="bonusStatus" />
+    <result column="is_delete" jdbcType="INTEGER" property="isDelete" />
+    <result column="use_range" jdbcType="INTEGER" property="useRange" />
+    <result column="min_goods_amount" jdbcType="DECIMAL" property="minGoodsAmount" />
+    
+  </resultMap>
+  
+  
+  <select id="queryUserBonusIdsExpire" parameterType="java.lang.Integer" resultType="java.lang.Integer">
+	  SELECT user_bonus_id FROM dl_user_bonus WHERE  bonus_status = 0 AND end_time &lt;= #{now}
+  </select>
+    
+   <update id ="updateBatchUserBonusExpire" parameterType="java.util.List" >
+      update  dl_user_bonus set bonus_status = 2 where user_bonus_id in 
+          <foreach collection="list" index="index" item="item" open="(" separator="," close=")"> 
+			#{item}  
+          </foreach >
+   </update > 
+  
+</mapper>

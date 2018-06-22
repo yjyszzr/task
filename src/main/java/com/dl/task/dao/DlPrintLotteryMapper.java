@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.dl.base.mapper.Mapper;
 import com.dl.task.model.DlPrintLottery;
+import com.dl.task.model.LotteryPrint;
 import com.dl.task.model.LotteryThirdApiLog;
 
 public interface DlPrintLotteryMapper extends Mapper<DlPrintLottery> {
@@ -20,4 +21,8 @@ public interface DlPrintLotteryMapper extends Mapper<DlPrintLottery> {
 	public List<DlPrintLottery> getPrintIngLotterys();
 	//更新出票信息
 	public int updateLotteryPrintByCallBack(DlPrintLottery print);
+	
+	public List<LotteryPrint> lotteryPrintsByUnCompare();
+	
+	public int updateBatchLotteryPrint(LotteryPrint lotteryPrint);
 }
