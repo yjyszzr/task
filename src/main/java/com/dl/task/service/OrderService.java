@@ -1,66 +1,42 @@
 package com.dl.task.service;
 
-import io.jsonwebtoken.lang.Collections;
-
-import java.math.BigDecimal;
-import java.math.RoundingMode;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-<<<<<<< HEAD
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.LinkedList;
-=======
->>>>>>> branch 'master' of http://39.107.121.76/back/task.git
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
+
 import javax.annotation.Resource;
-import lombok.extern.slf4j.Slf4j;
+
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.alibaba.fastjson.JSON;
-<<<<<<< HEAD
 import com.dl.base.enums.RespStatusEnum;
 import com.dl.base.exception.ServiceException;
-=======
-import com.dl.base.enums.SNBusinessCodeEnum;
->>>>>>> branch 'master' of http://39.107.121.76/back/task.git
 import com.dl.base.result.BaseResult;
 import com.dl.base.result.ResultGenerator;
 import com.dl.base.service.AbstractService;
 import com.dl.base.util.DateUtil;
-<<<<<<< HEAD
-=======
-import com.dl.base.util.SNGenerator;
->>>>>>> branch 'master' of http://39.107.121.76/back/task.git
 import com.dl.task.core.ProjectConstant;
+import com.dl.task.dao.DlPrintLotteryMapper;
 import com.dl.task.dao.OrderDetailMapper;
 import com.dl.task.dao.OrderMapper;
-<<<<<<< HEAD
-import com.dl.task.dto.OrderDTO;
-import com.dl.task.dto.OrderWithUserDTO;
-import com.dl.task.dto.UserIdAndRewardDTO;
-=======
 import com.dl.task.dao.UserAccountMapper;
 import com.dl.task.dao.UserBonusMapper;
 import com.dl.task.dao.UserMapper;
+import com.dl.task.dto.OrderDTO;
+import com.dl.task.dto.OrderWithUserDTO;
+import com.dl.task.dto.UserIdAndRewardDTO;
 import com.dl.task.model.DlPrintLottery;
->>>>>>> branch 'master' of http://39.107.121.76/back/task.git
 import com.dl.task.model.Order;
-<<<<<<< HEAD
 import com.dl.task.param.OrderSnParam;
-=======
-import com.dl.task.model.User;
-import com.dl.task.model.UserAccount;
-import com.dl.task.model.UserBonus;
->>>>>>> branch 'master' of http://39.107.121.76/back/task.git
 import com.dl.task.param.UpdateOrderInfoParam;
-import com.dl.task.param.UserIdAndRewardListParam;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
@@ -73,11 +49,8 @@ public class OrderService extends AbstractService<Order> {
 	private OrderDetailMapper orderDetailMapper;
 	
 	@Resource
-<<<<<<< HEAD
 	private	UserAccountService userAccountService;
 
-=======
-	private DlPrintLotteryMapper dlPrintLotteryMapper;
 //	TODO 胡贺东 消息
 //	@Resource 
 //	private IUserMessageService userMessageService;
@@ -88,7 +61,8 @@ public class OrderService extends AbstractService<Order> {
 	private UserAccountMapper userAccountMapper;
 	@Resource
 	private UserMapper userMapper;
->>>>>>> branch 'master' of http://39.107.121.76/back/task.git
+	private DlPrintLotteryMapper dlPrintLotteryMapper;
+
 	/**
 	 * 更新订单状态
 	 * 
@@ -107,7 +81,6 @@ public class OrderService extends AbstractService<Order> {
 		log.info("-----------%%%%-----------更新订单状态结果:" + rst);
 		return ResultGenerator.genSuccessResult("订单支付数据更新成功");
 	}
-<<<<<<< HEAD
 	
 	/**
 	 * 根据订单编号查询订单数据
@@ -122,8 +95,17 @@ public class OrderService extends AbstractService<Order> {
 		OrderDTO orderDTO = new OrderDTO();
 		if (null == order) {
 			return orderDTO;
-=======
-
+		}
+		try {
+			BeanUtils.copyProperties(orderDTO, order);
+		} catch (IllegalAccessException | InvocationTargetException e) {
+			log.error("订单id：" + order.getOrderId() + "，查询订单失败");
+			e.printStackTrace();
+			throw new ServiceException(RespStatusEnum.FAIL.getCode(), "订单列表查询失败");
+		}
+		return orderDTO;
+	}
+	
 	//更新待出票订单状态及出票赔率信息
 	public void refreshOrderPrintStatus() {
 		List<Order> orders = orderMapper.ordersListNoFinishAllPrintLottery();
@@ -186,7 +168,7 @@ public class OrderService extends AbstractService<Order> {
 						return ;
 					}
 					User user = new User();
-//					调整为不可提现余额
+					//						调整为不可提现余额
 					user.setUserMoneyLimit(refundMoney);
 					user.setUserId(userId);
 					int cnt = userMapper.updateInDBUserMoneyAndUserMoneyLimit(user);
@@ -215,21 +197,8 @@ public class OrderService extends AbstractService<Order> {
 				}
 			}
 			log.info("refreshOrderPrintStatus实际更新状态的订单数：" + n);
-//			this.goLotteryMessage(rollOrders);
->>>>>>> branch 'master' of http://39.107.121.76/back/task.git
+			//				this.goLotteryMessage(rollOrders);
 		}
-<<<<<<< HEAD
-		try {
-			BeanUtils.copyProperties(orderDTO, order);
-		} catch (IllegalAccessException | InvocationTargetException e) {
-			log.error("订单id：" + order.getOrderId() + "，查询订单失败");
-			e.printStackTrace();
-			throw new ServiceException(RespStatusEnum.FAIL.getCode(), "订单列表查询失败");
-		}
-		return orderDTO;
-	}
-=======
-	}
 
 //	TODO 胡贺东 暂时不考虑消息
 //	@Async
@@ -262,7 +231,7 @@ public class OrderService extends AbstractService<Order> {
 //		addParam.setParams(params);
 //		userMessageService.add(addParam);
 //	}
->>>>>>> branch 'master' of http://39.107.121.76/back/task.git
+
 
 	public void addRewardMoneyToUsers() {
 		List<OrderWithUserDTO> orderWithUserDTOs = orderMapper.selectOpenedAllRewardOrderList();
