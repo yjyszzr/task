@@ -33,6 +33,7 @@ import com.dl.base.util.DateUtil;
 import com.dl.base.util.JSONHelper;
 import com.dl.base.util.MD5Utils;
 import com.dl.task.core.ProjectConstant;
+import com.dl.task.dao.DlLeagueMatchResultMapper;
 import com.dl.task.dao.DlPrintLotteryMapper;
 import com.dl.task.dao.LotteryMatchMapper;
 import com.dl.task.dao.PeriodRewardDetailMapper;
@@ -59,6 +60,9 @@ public class DlPrintLotteryService {
 	
     @Resource
     private DlPrintLotteryMapper dlPrintLotteryMapper;
+    
+    @Resource
+    private DlLeagueMatchResultMapper dlLeagueMatchResultMapper;
     
     @Resource
     private PeriodRewardDetailMapper  periodRewardDetailMapper;
@@ -366,7 +370,7 @@ public class DlPrintLotteryService {
 		List<String> playCodes = new ArrayList<String>(unPlayCodes.size());
 		playCodes.addAll(unPlayCodes);
 		List<String> canCelPlayCodes = lotteryMatchMapper.getCancelMatches(playCodes);
-		List<DlLeagueMatchResult> matchResults = matchResultService.queryMatchResultsByPlayCodes(playCodes);
+		List<DlLeagueMatchResult> matchResults = dlLeagueMatchResultMapper.queryMatchResultsByPlayCodes(playCodes);
 		if(CollectionUtils.isEmpty(matchResults) && Collections.isEmpty(canCelPlayCodes)) {
 			log.info("updatePrintLotteryCompareStatus 准备获取赛事结果的场次数："+playCodes.size() +" 没有获取到相应的赛事结果信息也没有取消的赛事");
 			return;

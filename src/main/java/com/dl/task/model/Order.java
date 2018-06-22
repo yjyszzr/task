@@ -5,6 +5,8 @@ import java.util.Date;
 
 import javax.persistence.*;
 
+import tk.mybatis.mapper.annotation.ColumnType;
+
 @Table(name = "dl_order")
 public class Order {
     /**
@@ -33,10 +35,15 @@ public class Order {
     private Integer userId;
 
     /**
-     * 订单状态:0-待开奖,1-未中奖,2-已中奖
+     * 订单状态:订单状态:0-待付款,1-待出票,2-出票失败3-待开奖4-未中将5-已中奖6-派奖中7-审核中8-支付失败
      */
     @Column(name = "order_status")
     private Integer orderStatus;
+    //订单出票状态:1-待出票,2-部分出票失败已退款 3-全部出票失败已退款 4 出票成功 
+    @Column(name="print_lottery_status")
+    private Integer printLotteryStatus;
+    @Column(name="print_lottery_refund_amount")
+    private BigDecimal printLotteryRefundAmount;
 
     /**
      * 支付状态
@@ -777,6 +784,22 @@ public class Order {
 
 	public void setTicketNum(Integer ticketNum) {
 		this.ticketNum = ticketNum;
+	}
+
+	public Integer getPrintLotteryStatus() {
+		return printLotteryStatus;
+	}
+
+	public void setPrintLotteryStatus(Integer printLotteryStatus) {
+		this.printLotteryStatus = printLotteryStatus;
+	}
+
+	public BigDecimal getPrintLotteryRefundAmount() {
+		return printLotteryRefundAmount;
+	}
+
+	public void setPrintLotteryRefundAmount(BigDecimal printLotteryRefundAmount) {
+		this.printLotteryRefundAmount = printLotteryRefundAmount;
 	}
     
 }

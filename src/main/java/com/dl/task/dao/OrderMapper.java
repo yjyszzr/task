@@ -22,7 +22,12 @@ public interface OrderMapper extends Mapper<Order> {
 	public int updateWiningMoney(Order order);
 	 //根据期次获取中奖用户及奖金
 	public List<OrderWithUserDTO> selectOpenedAllRewardOrderList();
-	
+	//待出票订单列表
+	public List<Order> ordersListGoPrintLottery();
+	//订单更新为待开奖
+	public int updateOrderStatus1To3(Order order);
+	//订单更新为出票失败
+	public int updateOrderStatus1To2(Order order);
 	
 	
 	
@@ -61,13 +66,7 @@ public interface OrderMapper extends Mapper<Order> {
 
 	
 
-	/**
-	 * 待出票订单列表
-	 * 
-	 * @return
-	 */
-	public List<Order> ordersListGoPrintLottery();
-
+	
 	/**
 	 * 查询符合条件的订单号
 	 * 
@@ -100,4 +99,5 @@ public interface OrderMapper extends Mapper<Order> {
 	public List<DlChannelDistributor> channelDistributorList(@Param("channelDistributorIds") List<Integer> channelDistributorIds);
 
 	public void saveChannelOperation(ChannelOperationLog channelOperationLog);
+	
 }

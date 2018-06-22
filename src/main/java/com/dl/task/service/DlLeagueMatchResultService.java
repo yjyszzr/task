@@ -40,6 +40,19 @@ public class DlLeagueMatchResultService extends AbstractService<DlLeagueMatchRes
     @Resource
     private LotteryMatchMapper dlMatchMapper;
 
+    //获取指定赛事的比赛结果
+    public List<DlLeagueMatchResult> queryMatchResultsByPlayCodes(List<String> playCodes){
+		if(CollectionUtils.isEmpty(playCodes)) {
+			return new ArrayList<DlLeagueMatchResult>();
+		}
+		List<DlLeagueMatchResult> matchResultList = dlLeagueMatchResultMapper.queryMatchResultsByPlayCodes(playCodes);
+		if(matchResultList.size() == 0) {
+			return new ArrayList<DlLeagueMatchResult>();
+		}
+		return matchResultList;
+	}
+    
+    
     public void refreshMatchResultsFromZC(List<String> changciIds) {
 		if(Collections.isEmpty(changciIds)) {
 			return;
@@ -323,14 +336,4 @@ public class DlLeagueMatchResultService extends AbstractService<DlLeagueMatchRes
 		return matchResultList;
 	}
 	
-	public List<DlLeagueMatchResult> queryMatchResultsByPlayCodes(List<String> playCodes){
-		if(CollectionUtils.isEmpty(playCodes)) {
-			return new ArrayList<DlLeagueMatchResult>();
-		}
-		List<DlLeagueMatchResult> matchResultList = dlLeagueMatchResultMapper.queryMatchResultsByPlayCodes(playCodes);
-		if(matchResultList.size() == 0) {
-			return new ArrayList<DlLeagueMatchResult>();
-		}
-		return matchResultList;
-	}
 }

@@ -49,7 +49,7 @@ public class LotteryRewardService {
 
 	
 	/**
-	 * 根据开奖期次更新订单的状态，中奖金额 等
+	 * 更新待开奖的订单状态及中奖金额
 	 * @param issue
 	 */
 	public String updateOrderAfterOpenReward() {
@@ -64,17 +64,13 @@ public class LotteryRewardService {
 		while(orderSnList.size() > 0) {
 			int num = orderSnList.size()>20?20:orderSnList.size();
 			List<String> subList = orderSnList.subList(0, num);
-			List<DlPrintLottery> dlOrderDataDTOs = dlPrintLotteryMapper.getPrintLotteryListByOrderSns(subList);
+			List<DlPrintLottery> dlOrderDataDTOs = dlPrintLotteryMapper.getPrintLotteryListByGoOpenRewardOrderSns(subList);
 			log.info("获取可开奖彩票信息："+dlOrderDataDTOs.size());
 			if(CollectionUtils.isNotEmpty(dlOrderDataDTOs)) {
 				Map<String, Double> map = new HashMap<String, Double>();
 				Set<String> unOrderSns = new HashSet<String>();
 				List<DlPrintLottery> errorPrints = new ArrayList<DlPrintLottery>(0);
 				for(DlPrintLottery dto: dlOrderDataDTOs) {
-					Integer status = dto.getStatus();
-					if(2==status) {
-						continue;
-					}
 					int printStatus = dto.getPrintStatus();
 					String printSp = dto.getPrintSp();
 					if(printStatus == ProjectConstant.PRINT_STATUS_SUCCESS || StringUtils.isNotBlank(printSp)) {//出票成功
@@ -92,7 +88,7 @@ public class LotteryRewardService {
 						double realReward = realRewardMoney == null?0:realRewardMoney.doubleValue();
 						double1 = double1==null?realReward:(double1+realReward);
 						map.put(orderSn, double1);
-					}else if(1==status && printStatus == ProjectConstant.PRINT_STATUS_FAIL){
+					}else if(printStatus == ProjectConstant.PRINT_STATUS_FAIL){
 						errorPrints.add(dto);
 					}
 				}

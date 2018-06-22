@@ -40,6 +40,7 @@ public class TaskSchedule {
 	
 	
 	/**
+	 * 第一步：
 	 * 出票任务 （每5分钟执行一次）
 	 * 调用第三方接口出票定时任务
 	 * 定时的对出票中的进行查询结果
@@ -60,27 +61,7 @@ public class TaskSchedule {
     }
 	
 	/**
-	 * 将出票信息回写到订单
-	 */
-	@Scheduled(cron = "0 0/5 * * * ?")
-	public void updateOrderInfo() {
-		log.info("更新彩票信息，彩票对奖开始");
-		//dlPrintLotteryService.updatePrintLotteryCompareStatus();
-		log.info("更新彩票信息，彩票对奖结束");
-		
-	}
-	
-	/**
-	 * 订单出票结果 ,这里暂时主要处理出票失败的订单
-	 */
-	@Scheduled(cron = "0 0/1 * * * ?")
-	public void refreshOrderPrintStatus() {
-		log.info("开始执行更新订单出票结果任务");
-		orderService.refreshOrderPrintStatus();
-		log.info("结束执行更新订单出票结果任务");
-	}
-	
-	/**
+	 * 第二步：
 	 * 对出票数据进行兑奖，更新彩票信息
 	 */
 	@Scheduled(cron = "0 0/5 * * * ?")
@@ -92,6 +73,20 @@ public class TaskSchedule {
 	}
 	
 	/**
+	 * 第三步：
+	 * 订单出票结果更新
+	 * 将出票信息回写到订单
+	 * 
+	 */
+	@Scheduled(cron = "0 0/1 * * * ?")
+	public void refreshOrderPrintStatus() {
+		log.info("开始执行更新订单出票结果任务");
+		orderService.refreshOrderPrintStatus();
+		log.info("结束执行更新订单出票结果任务");
+	}
+	
+	/**
+	 * 第四步：
 	 * 更新待开奖的订单状态及中奖金额
 	 * 
 	 */
