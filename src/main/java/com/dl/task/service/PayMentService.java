@@ -25,11 +25,16 @@ import com.dl.shop.payment.dto.RspOrderQueryDTO;
 import com.dl.shop.payment.enums.PayEnums;
 import com.dl.shop.payment.param.RollbackOrderAmountParam;
 import com.dl.shop.payment.param.RollbackThirdOrderAmountParam;
+import com.dl.task.core.ProjectConstant;
 import com.dl.task.dao.OrderMapper;
 import com.dl.task.dao.PayMentMapper;
+import com.dl.task.dto.SurplusPaymentCallbackDTO;
 import com.dl.task.model.Order;
 import com.dl.task.model.PayLog;
 import com.dl.task.model.PayMent;
+import com.dl.task.param.SurplusPayParam;
+import com.dl.task.param.UpdateOrderInfoParam;
+import com.dl.task.param.UserBonusParam;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -43,6 +48,18 @@ public class PayMentService extends AbstractService<PayMent> {
     
     @Resource
     private OrderMapper orderMapper;
+    
+    @Resource
+    private PayLogService payLogService;
+    
+    @Resource
+    private UserBonusService userBonusService;
+    
+    @Resource
+    private UserAccountService userAccountService;
+    
+    @Resource
+    private OrderService  orderService;
 
     /**
      * 处理支付超时订单
@@ -51,9 +68,9 @@ public class PayMentService extends AbstractService<PayMent> {
 		logger.info("开始执行混合支付超时订单任务");
 		List<Order> orderList = orderMapper.queryOrderListBySelective(DateUtil.getCurrentTimeLong());
     	
-    	logger.info("---------混合支付超时订单数："+orderList.size());
+    	logger.info("混合支付超时订单数："+orderList.size());
     	if(orderList.size() == 0) {
-    		logger.info("---------没有混合支付超时订单,定时任务结束");
+    		logger.info("没有混合支付超时订单,定时任务结束");
     		return;
     	}
     	
@@ -90,7 +107,7 @@ public class PayMentService extends AbstractService<PayMent> {
     		UserBonusParam userbonusParam = new UserBonusParam();
     		userbonusParam.setUserBonusId(userBonusId);
     		userbonusParam.setOrderSn(or.getOrderSn());
-    		userAccountService.rollbackChangeUserAccountByCreateOrder(userbonusParam);
+    		userBonusService.rollbackChangeUserAccountByCreateOrder(userbonusParam);
     	}
    	
     	UpdateOrderInfoParam updateOrderInfoParam = new UpdateOrderInfoParam();
@@ -108,7 +125,6 @@ public class PayMentService extends AbstractService<PayMent> {
     	updatepayLog.setIsPaid(ProjectConstant.IS_PAID_FAILURE);
     	updatepayLog.setOrderSn(or.getOrderSn());
     	payLogService.updatePayLogByOrderSn(updatepayLog);
-
     }
     	
 
