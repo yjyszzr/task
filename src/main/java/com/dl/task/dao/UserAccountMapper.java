@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 package com.dl.task.dao;
 
 import java.math.BigDecimal;
@@ -26,4 +27,19 @@ public interface UserAccountMapper extends Mapper<UserAccount> {
 
 	List<UserAccount> findByUserIdsAndType(@Param("list") List<String> userIds, @Param("data") String data, @Param("type") int type);
 
+=======
+package com.dl.task.dao;
+
+import java.util.List;
+
+import com.dl.base.mapper.Mapper;
+import com.dl.task.model.UserAccount;
+
+public interface UserAccountMapper extends Mapper<UserAccount> {
+
+	List<UserAccount> queryUserAccountBySelective(UserAccount userAccount);
+
+	int insertUserAccount(UserAccount userAccount);
+
+>>>>>>> branch 'master' of http://39.107.121.76/back/task.git
 }

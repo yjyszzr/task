@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 package com.dl.task.dao;
 
 import java.util.List;
@@ -39,4 +40,21 @@ public interface UserMapper extends Mapper<User> {
 	int updateUserMoneyForCashCoupon(User user);
 
 	List<String> getClientIds(@Param("userIds") List<Integer> userIds);
+=======
+package com.dl.task.dao;
+
+import com.dl.base.mapper.Mapper;
+import com.dl.task.model.User;
+
+public interface UserMapper extends Mapper<User> {
+
+	/**
+	 * 在数据库中更新用户账户资金
+	 * 
+	 * @param user
+	 * @return
+	 */
+	int updateInDBUserMoneyAndUserMoneyLimit(User user);
+
+>>>>>>> branch 'master' of http://39.107.121.76/back/task.git
 }
