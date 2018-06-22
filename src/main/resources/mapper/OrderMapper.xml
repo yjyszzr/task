@@ -44,6 +44,8 @@
     <result column="ticket_num" jdbcType="INTEGER" property="ticketNum" />
     <result column="device_channel" jdbcType="VARCHAR" property="deviceChannel" />
     <result column="award_time" jdbcType="VARCHAR" property="awardTime" />
+    <result column="print_lottery_status" jdbcType="INTEGER" property="printLotteryStatus" />
+    <result column="print_lottery_refund_amount" jdbcType="DECIMAL" property="printLotteryRefundAmount" />
   </resultMap>
   <resultMap id="userResultMap" type="com.dl.shop.order.model.User">
     <id column="user_id" jdbcType="INTEGER" property="userId" />
@@ -75,6 +77,12 @@
     <result column="remark" jdbcType="VARCHAR" property="remark" />
   </resultMap>
   
+  <sql id="orderFields">
+        order_id,  order_sn, parent_sn,user_id,order_status,pay_status,pay_id,pay_code,pay_name,pay_sn,
+  		money_paid,ticket_amount,surplus,user_surplus,user_surplus_limit,third_party_paid,user_bonus_id,bonus,give_integral,order_from,
+  		add_time,pay_time,order_type,lottery_classify_id,lottery_play_classify_id,match_time,winning_money,pass_type,
+  		play_type,cathectic,bet_num,forecast_money,is_delete,device_channel,award_time,print_lottery_status,print_lottery_refund_amount
+  </sql>
   <select id="queryOrderSnListUnOpenReward" resultType="java.lang.String">
 	   select order_sn
 	   from dl_order
@@ -86,6 +94,46 @@
   	update dl_order set winning_money = #{winningMoney},order_status=#{orderStatus},award_time=#{awardTime} 
   	where order_status=3 and order_sn = #{orderSn}
   </update>
+  
+  <select id="ordersListGoPrintLottery" resultMap="BaseResultMap">
+   select 
+       <include refid="orderFields"></include>
+     from 
+        dl_order
+     where order_status = 1 and pay_status=1 
+     order by pay_time 
+  </select>
+  
+  <update id="updateOrderStatus1To3">
+  	update dl_order 
+  	set order_status=3,print_lottery_status=#{printLotteryStatus},print_lottery_refund_amount=#{printLotteryRefundAmount}
+  	where order_status=1 and order_sn = #{orderSn}
+  </update>
+  
+  <update id="updateOrderStatus1To2">
+  	update dl_order 
+  	set order_status=2,print_lottery_status=#{printLotteryStatus},print_lottery_refund_amount=#{printLotteryRefundAmount}
+  	where order_status=1 and order_sn = #{orderSn}
+  </update>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
   
   
   <insert id="insertOrder" parameterType="com.dl.shop.order.model.Order" useGeneratedKeys="true" keyProperty="orderId">
@@ -172,16 +220,6 @@
         order_status = 6
         and pay_status = 1
         and is_delete = 0
-  </select>
-  
-  <select id="ordersListGoPrintLottery" resultMap="BaseResultMap">
-   select 
-        *
-     from 
-        dl_order
-     where 
-     order_status = 1 and pay_status=1 
-     order by pay_time 
   </select>
   
   <select id="queryOrderSnListByStatus" parameterType = "com.dl.shop.order.model.Order" resultType="java.lang.String">

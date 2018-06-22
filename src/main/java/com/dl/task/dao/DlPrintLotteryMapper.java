@@ -6,7 +6,6 @@ import org.apache.ibatis.annotations.Param;
 
 import com.dl.base.mapper.Mapper;
 import com.dl.task.model.DlPrintLottery;
-import com.dl.task.model.LotteryPrint;
 import com.dl.task.model.LotteryThirdApiLog;
 
 public interface DlPrintLotteryMapper extends Mapper<DlPrintLottery> {
@@ -28,7 +27,9 @@ public interface DlPrintLotteryMapper extends Mapper<DlPrintLottery> {
 	//更新彩票兑奖结果
 	public int updatePrintLotteryCompareInfo(DlPrintLottery lotteryPrint);
 	//通过订单获取对应的彩票
-	public List<DlPrintLottery> getPrintLotteryListByOrderSns(@Param("orderSns")List<String> orderSns);
+	public List<DlPrintLottery> getPrintLotteryListByGoOpenRewardOrderSns(@Param("orderSns")List<String> orderSns);
 	//更新printstatus=17的订单staus=2
 	public void updatePrintLotteryFailStatus(DlPrintLottery lotteryPrint);
+	//获取订单下的所有标
+	public List<DlPrintLottery> printLotterysByOrderSn(@Param("orderSn")String orderSn);
 }

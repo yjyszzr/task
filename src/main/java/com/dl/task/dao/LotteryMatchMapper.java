@@ -10,6 +10,22 @@ import com.dl.task.model.LotteryMatch;
 
 public interface LotteryMatchMapper extends Mapper<LotteryMatch> {
 	
+	//获取取消的赛事编码
+	public List<String> getCancelMatches(@Param("playCodes") List<String> playCodes);
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	//------------------------
 	/**
 	 * 插入赛事数据，返回赛事id
 	 * @param lotteryMatch
@@ -102,11 +118,5 @@ public interface LotteryMatchMapper extends Mapper<LotteryMatch> {
 	 */
 	public List<LeagueInfoDTO> getFilterConditionsSomeDay(@Param("dateStr") String dateStr);
 
-	/**
-	 * 获取取消的赛事编码
-	 * @param playCodes
-	 * @return
-	 */
-	public List<String> getCancelMatches(@Param("playCodes") List<String> playCodes);
 	
 }

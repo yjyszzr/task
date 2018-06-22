@@ -99,7 +99,7 @@
   	where compare_status = 0 and print_lottery_id = #{printLotteryId}
   </update>
   
-   <select id="getPrintLotteryListByOrderSns" resultMap="BaseResultMap">
+   <select id="getPrintLotteryListByGoOpenRewardOrderSns" resultMap="BaseResultMap">
   	select 
   	<include refid="allFields"></include>
   	from dl_print_lottery 
@@ -108,6 +108,12 @@
 		#{orderSn}
      </foreach>
      order by order_sn
+  </select>
+   <select id="printLotterysByOrderSn" resultMap="BaseResultMap">
+  	select 
+  	<include refid="allFields"></include>
+  	from dl_print_lottery 
+  	where order_sn=#{orderSn} 
   </select>
   
   <update id="updatePrintLotteryFailStatus">
