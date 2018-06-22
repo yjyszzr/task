@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dl.task.dao.UserAccountMapper">
+  <resultMap id="BaseResultMap" type="com.dl.task.model.UserAccount">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="account_sn" jdbcType="VARCHAR" property="accountSn" />
+    <result column="user_id" jdbcType="INTEGER" property="userId" />
+    <result column="admin_user" jdbcType="VARCHAR" property="adminUser" />
+    <result column="amount" jdbcType="DECIMAL" property="amount" />
+    <result column="cur_balance" jdbcType="DECIMAL" property="curBalance" />
+    <result column="add_time" jdbcType="INTEGER" property="addTime" />
+    <result column="last_time" jdbcType="INTEGER" property="lastTime" />
+    <result column="process_type" jdbcType="INTEGER" property="processType" />
+    <result column="order_sn" jdbcType="VARCHAR" property="orderSn" />
+    <result column="parent_sn" jdbcType="VARCHAR" property="parentSn" />
+    <result column="pay_id" jdbcType="VARCHAR" property="payId" />
+    <result column="payment_name" jdbcType="VARCHAR" property="paymentName" />
+    <result column="third_part_name" jdbcType="VARCHAR" property="thirdPartName" />
+    <result column="user_surplus" jdbcType="VARCHAR" property="userSurplus" />
+    <result column="user_surplus_limit" jdbcType="VARCHAR" property="userSurplusLimit" />
+    <result column="third_part_paid" jdbcType="VARCHAR" property="thirdPartPaid" />
+    <result column="note" jdbcType="LONGVARCHAR" property="note" />
+    <result column="status" jdbcType="VARCHAR" property="status" />
+    
+  </resultMap>
+  
+  <select id="queryUserAccountBySelective" parameterType="com.dl.member.model.UserAccount"  resultMap="BaseResultMap">
+  		SELECT *  FROM dl_user_account 
+	  	<where>
+		  	<if test="userId != null">
+		        AND user_id = #{userId}
+		    </if>
+		    <if test="processType != null">
+		        AND process_type = #{processType}
+		    </if>
+		    <if test="id != null">
+		        AND id = #{id}
+		    </if>
+		    <if test="accountSn != null">
+		        AND account_sn = #{accountSn}
+		    </if>
+		    <if test="orderSn != null">
+		        AND order_sn = #{orderSn}
+		    </if>
+	    </where>
+  		ORDER BY add_time DESC
+  </select>
+  
+  <insert id="insertUserAccount">
+  	INSERT INTO 
+  	dl_user_account(account_sn,user_id,admin_user,amount,
+  	cur_balance,add_time,last_time,process_type,
+  	payment_name,order_sn,parent_sn,note,pay_id,third_part_name,
+  	user_surplus,user_surplus_limit,third_part_paid,status)
+  	VALUES(#{accountSn},#{userId},#{adminUser},#{amount},
+  	#{curBalance},#{addTime},#{lastTime},#{processType},
+  	#{paymentName},#{orderSn},#{parentSn},
+  	#{note},#{payId},#{thirdPartName},#{userSurplus},
+  	#{userSurplusLimit},#{thirdPartPaid},#{status});
+  </insert> 
+  
+</mapper>
