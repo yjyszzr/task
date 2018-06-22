@@ -2,20 +2,17 @@ package com.dl.task.schedule;
 
 import java.time.LocalTime;
 import java.time.ZoneId;
-
 import javax.annotation.Resource;
-
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
-
 import com.dl.base.param.EmptyParam;
 import com.dl.shop.payment.api.IpaymentService;
 import com.dl.task.service.DlPrintLotteryService;
 import com.dl.task.service.LotteryRewardService;
 import com.dl.task.service.OrderService;
+import com.dl.task.service.PayMentService;
 import com.dl.task.service.UserBonusService;
-
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -36,7 +33,10 @@ public class TaskSchedule {
 	private OrderService orderService;
 	
 	@Resource
-	private IpaymentService paymentService;
+	private PayMentService paymentService;	
+	
+	@Resource
+	private IpaymentService ipaymentService;
 	
 	
 	/**
@@ -140,8 +140,7 @@ public class TaskSchedule {
 	@Scheduled(cron = "0 0/2 * * * ?")
     public void dealBeyondPayTimeOrderOut() {
 		log.info("开始执行混合支付超时订单任务");
-		EmptyParam emptyParam = new EmptyParam();
-		paymentService.dealBeyondPayTimeOrderOut(emptyParam);
+		paymentService.dealBeyondPayTimeOrderOut();
 		log.info("结束执行支混合付超时订单任务");
 	}	
 	
@@ -151,7 +150,7 @@ public class TaskSchedule {
 	@Scheduled(fixedRate = 1000*5)
     public void timerOrderQueryScheduled() {
 		EmptyParam emptyParam = new EmptyParam();
-		paymentService.timerCheckCashReq(emptyParam);
+		ipaymentService.timerCheckCashReq(emptyParam);
 	}
 	
 	/**
@@ -160,6 +159,6 @@ public class TaskSchedule {
 	@Scheduled(fixedRate = 1000*20)
     public void timerCheckCashReq() {
 		EmptyParam emptyParam = new EmptyParam();
-		paymentService.timerCheckCashReq(emptyParam);
-	}		
+		ipaymentService.timerOrderQueryScheduled(emptyParam);
+	}	
 }

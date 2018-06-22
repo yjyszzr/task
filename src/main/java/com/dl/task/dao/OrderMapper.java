@@ -83,6 +83,8 @@ public interface OrderMapper extends Mapper<Order> {
 	public List<Order> queryOrderListBySelective(@Param("nowTime") Integer nowTime);
 
 	int updateOrderStatus(Order order);
+	
+	int updateOrderStatusVerified(@Param("orderSn") String orderSn);
 
 	/**
 	 * 更新出票相关信息

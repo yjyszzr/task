@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dl.member.dao.UserAccountMapper">
+  <resultMap id="BaseResultMap" type="com.dl.member.model.UserAccount">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="account_sn" jdbcType="VARCHAR" property="accountSn" />
+    <result column="user_id" jdbcType="INTEGER" property="userId" />
+    <result column="admin_user" jdbcType="VARCHAR" property="adminUser" />
+    <result column="amount" jdbcType="DECIMAL" property="amount" />
+    <result column="cur_balance" jdbcType="DECIMAL" property="curBalance" />
+    <result column="add_time" jdbcType="INTEGER" property="addTime" />
+    <result column="last_time" jdbcType="INTEGER" property="lastTime" />
+    <result column="process_type" jdbcType="INTEGER" property="processType" />
+    <result column="order_sn" jdbcType="VARCHAR" property="orderSn" />
+    <result column="parent_sn" jdbcType="VARCHAR" property="parentSn" />
+    <result column="pay_id" jdbcType="VARCHAR" property="payId" />
+    <result column="payment_name" jdbcType="VARCHAR" property="paymentName" />
+    <result column="third_part_name" jdbcType="VARCHAR" property="thirdPartName" />
+    <result column="user_surplus" jdbcType="VARCHAR" property="userSurplus" />
+    <result column="user_surplus_limit" jdbcType="VARCHAR" property="userSurplusLimit" />
+    <result column="third_part_paid" jdbcType="VARCHAR" property="thirdPartPaid" />
+    <result column="note" jdbcType="LONGVARCHAR" property="note" />
+    <result column="status" jdbcType="VARCHAR" property="status" />
+    
+  </resultMap>
+  
+  <select id="queryUserAccountBySelective" parameterType="com.dl.member.model.UserAccount"  resultMap="BaseResultMap">
+  		SELECT *  FROM dl_user_account 
+	  	<where>
+		  	<if test="userId != null">
+		        AND user_id = #{userId}
+		    </if>
+		    <if test="processType != null">
+		        AND process_type = #{processType}
+		    </if>
+		    <if test="id != null">
+		        AND id = #{id}
+		    </if>
+		    <if test="accountSn != null">
+		        AND account_sn = #{accountSn}
+		    </if>
+		    <if test="orderSn != null">
+		        AND order_sn = #{orderSn}
+		    </if>
+	    </where>
+  		ORDER BY add_time DESC
+  </select>
+  
+  <select id="queryUserAccountCurMonth" parameterType="java.lang.Integer"  resultMap="BaseResultMap">
+  		select *  from dl_user_account 
+  		where DATE_FORMAT(FROM_UNIXTIME(add_time), '%Y-%m') = date_format(now(),'%Y-%m') 
+  		and user_id = #{userId};
+  </select>
+  
+  <select id="countBackMoneyByProcessTyepByOrderSns"   resultType="DECIMAL">
+  		select sum(amount)  from dl_user_account 
+  		where process_type = 6 and user_id = #{userId} and order_sn in
+  		<foreach collection="list" index="index" item="item" open="(" separator="," close=")">  
+	         #{item}  
+	    </foreach>  		
+  </select>
+  
+  <select id="queryUserAccountRewardByOrdersn" parameterType="java.util.List"  resultType="java.lang.String">
+  		select order_sn  from dl_user_account 
+  		where process_type = 1 and  order_sn in
+  		<foreach collection="list" index="index" item="item" open="(" separator="," close=")">  
+	         #{item}  
+	    </foreach>
+  </select>
+  <select id="findByUserIdsAndType"   resultMap="BaseResultMap">
+  		select *  from dl_user_account 
+  		where process_type = 3 and  user_id in
+  		<foreach collection="list" index="index" item="item" open="(" separator="," close=")">  
+	         #{item}  
+	    </foreach>
+	         and
+			DATE_FORMAT( FROM_UNIXTIME( add_time ), '%Y-%m-%d' ) = #{data};
+  </select>
+
+ <sql id="key">
+      <trim suffixOverrides=",">
+        <if test="accountSn!=null">
+            account_sn,
+        </if>
+        <if test="userId!=null">
+            user_id,
+        </if>
+        <if test="adminUser!=null">
+            admin_user,
+        </if>
+        <if test="amount!=null">
+            amount,
+        </if>
+        <if test="curBalance!=null">
+            cur_balance,
+        </if>
+        <if test="addTime!=null">
+            add_time,
+        </if>
+        <if test="lastTime!=null">
+            last_time,
+        </if>
+        <if test="processType!=null">
+            process_type,
+        </if>
+        <if test="paymentName">
+            payment_name,
+        </if>
+        <if test="orderSn!=null">
+            order_sn,
+        </if>
+        <if test="parentSn!=null">
+            parent_sn,
+        </if>
+        <if test="note">
+            note,
+        </if>
+        <if test="payId">
+            pay_id,
+        </if>
+        <if test="thirdPartName">
+            third_part_name,
+        </if>
+        <if test="userSurplus!=null">
+            user_surplus,
+        </if>   
+         <if test="userSurplusLimit!=null">
+            user_surplus_limit,
+        </if>  
+        <if test="status!=null">
+            status,
+        </if>                             
+      </trim>
+    </sql>
+
+
+    <sql id="value">
+      <trim suffixOverrides=",">
+        <if test="accountSn!=null">
+            #{accountSn},
+        </if>
+        <if test="userId!=null">
+            #{userId},
+        </if>
+        <if test="adminUser!=null">
+            #{adminUser},
+        </if>
+        <if test="amount!=null">
+            #{amount},
+        </if>
+        <if test="curBalance!=null">
+            #{curBalance},
+        </if>
+        <if test="addTime!=null">
+            #{addTime},
+        </if>
+        <if test="lastTime!=null">
+            #{lastTime},
+        </if>
+        <if test="processType!=null">
+            #{processType},
+        </if>
+        <if test="paymentName">
+            #{paymentName},
+        </if>
+        <if test="orderSn!=null">
+            #{orderSn},
+        </if>
+        <if test="parentSn!=null">
+            #{parentSn},
+        </if>
+        <if test="note">
+            #{note},
+        </if>
+        <if test="payId">
+            #{payId},
+        </if>
+        <if test="thirdPartName">
+            #{thirdPartName},
+        </if>
+        <if test="userSurplus!=null">
+             #{userSurplus},
+        </if>   
+         <if test="userSurplusLimit!=null">
+            #{userSurplusLimit},
+        </if>  
+        <if test="status!=null">
+            #{status},
+        </if>                             
+      </trim>
+    </sql>
+    
+  <insert id="insertUserAccountBySelective">
+  	INSERT INTO dl_user_account(<include refid="key"/>) values(<include refid="value"/>);
+  </insert>
+  
+  <insert id="insertUserAccount">
+  	INSERT INTO 
+  	dl_user_account(account_sn,user_id,admin_user,amount,
+  	cur_balance,add_time,last_time,process_type,
+  	payment_name,order_sn,parent_sn,note,pay_id,third_part_name,
+  	user_surplus,user_surplus_limit,third_part_paid,status)
+  	VALUES(#{accountSn},#{userId},#{adminUser},#{amount},
+  	#{curBalance},#{addTime},#{lastTime},#{processType},
+  	#{paymentName},#{orderSn},#{parentSn},
+  	#{note},#{payId},#{thirdPartName},#{userSurplus},
+  	#{userSurplusLimit},#{thirdPartPaid},#{status});
+  </insert> 
+  
+  <update id="updateUserAccountBySelective" parameterType="com.dl.member.model.UserAccount">
+  	UPDATE dl_user_account 
+		 <trim prefix="set" suffixOverrides=",">
+		  <if test="payId!=null">pay_id=#{payId},</if>
+		  <if test="status!=null">status=#{status},</if>
+		 </trim>
+    WHERE account_sn = #{accountSn} and user_id=#{userId}
+  </update>
+  
+</mapper>

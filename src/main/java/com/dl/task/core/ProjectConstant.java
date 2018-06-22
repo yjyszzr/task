@@ -570,10 +570,6 @@ public final class ProjectConstant {
     public static final String STATUS_FAILURE = "2";
 	public static final String STATUS_SUCC = "1";
 	public static final String STATUS_UNCOMPLETE = "0";
-    
-    
-    
-    
-    
+	
 
 }
