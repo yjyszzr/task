@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.dl.shop.order.dao.OrderMapper">
-  <resultMap id="BaseResultMap" type="com.dl.shop.order.model.Order">
+<mapper namespace="com.dl.task.dao.OrderMapper">
+  <resultMap id="BaseResultMap" type="com.dl.task.model.Order">
     <!--
       WARNING - @mbg.generated
     -->
@@ -75,6 +75,19 @@
     <result column="remark" jdbcType="VARCHAR" property="remark" />
   </resultMap>
   
+  <select id="queryOrderSnListUnOpenReward" resultType="java.lang.String">
+	   select order_sn
+	   from dl_order
+	   where order_status=3 AND pay_status=1 AND is_delete=0
+	   order by pay_time
+  </select>
+  
+  <update id="updateWiningMoney">
+  	update dl_order set winning_money = #{winningMoney},order_status=#{orderStatus},award_time=#{awardTime} 
+  	where order_status=3 and order_sn = #{orderSn}
+  </update>
+  
+  
   <insert id="insertOrder" parameterType="com.dl.shop.order.model.Order" useGeneratedKeys="true" keyProperty="orderId">
   		insert into dl_order (order_sn,parent_sn,user_id,order_status,pay_status,pay_id,pay_code,pay_name,pay_sn,
   		money_paid,ticket_amount,surplus,user_surplus,user_surplus_limit,third_party_paid,user_bonus_id,bonus,give_integral,order_from,
@@ -146,7 +159,7 @@
 	 where order_sn=#{orderSn}
   </update>
   
- <select id="selectOpenedAllRewardOrderList" resultType="com.dl.order.dto.OrderWithUserDTO">
+ <select id="selectOpenedAllRewardOrderList" resultMap="BaseResultMap">
      select 
      	ticket_amount betMoney,
      	add_time betTime,
@@ -215,10 +228,6 @@
 	  	</if>
 	  	order_status = #{orderStatus} 
   	where order_sn = #{orderSn}
-  </update>
-  
-  <update id="updateWiningMoney">
-  	update dl_order set winning_money = #{winningMoney},order_status=#{orderStatus},award_time=#{awardTime} where order_sn = #{orderSn}
   </update>
   
   

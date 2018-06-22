@@ -332,7 +332,7 @@ public class DlPrintLotteryService {
 	 * 定时任务：更新彩票信息
 	 */
 	public void updatePrintLotteryCompareStatus() {
-		List<LotteryPrint> lotteryPrints = dlPrintLotteryMapper.lotteryPrintsByUnCompare();
+		List<DlPrintLottery> lotteryPrints = dlPrintLotteryMapper.lotteryPrintsByUnCompare();
 		if(lotteryPrints == null) {
 			log.info("updatePrintLotteryCompareStatus 没有获取到需要更新状态的彩票数据");
 			return;
@@ -340,8 +340,8 @@ public class DlPrintLotteryService {
 		log.info("updatePrintLotteryCompareStatus 获取到需要更新状态的彩票数据，size="+lotteryPrints.size());
 		//获取没有赛事结果比较的playcodes
 		Set<String> unPlayCodes = new HashSet<String>();
-		List<LotteryPrint> endPrints = new ArrayList<LotteryPrint>(lotteryPrints.size());
-		for(LotteryPrint print: lotteryPrints) {
+		List<DlPrintLottery> endPrints = new ArrayList<DlPrintLottery>(lotteryPrints.size());
+		for(DlPrintLottery print: lotteryPrints) {
 			List<String> playCodes = this.printStakePlayCodes(print);
 			String comparedStakes = print.getComparedStakes();
 			List<String> comparedPlayCodes = null;
@@ -386,7 +386,7 @@ public class DlPrintLotteryService {
 			}
 		}
 		//
-		List<LotteryPrint> updates = new ArrayList<LotteryPrint>(lotteryPrints.size());
+		List<DlPrintLottery> updates = new ArrayList<DlPrintLottery>(lotteryPrints.size());
 		for(String playCode: playCodes) {
 			boolean isCancel = false;
 			if(canCelPlayCodes.contains(playCode)) {
@@ -396,7 +396,7 @@ public class DlPrintLotteryService {
 			if(!isCancel && CollectionUtils.isEmpty(matchResultList)) {
 				continue;
 			}
-			for(LotteryPrint print: lotteryPrints) {
+			for(DlPrintLottery print: lotteryPrints) {
 				String stakes = print.getStakes();
 				String comparedStakes = print.getComparedStakes()==null?"":print.getComparedStakes();
 				//判断是否对比过
@@ -405,7 +405,7 @@ public class DlPrintLotteryService {
 						comparedStakes +=",";
 					}
 					comparedStakes += playCode;
-					LotteryPrint updatePrint = new LotteryPrint();
+					DlPrintLottery updatePrint = new DlPrintLottery();
 					updatePrint.setPrintLotteryId(print.getPrintLotteryId());
 					updatePrint.setComparedStakes(comparedStakes);
 					String[] stakesarr = stakes.split(";");
@@ -453,9 +453,11 @@ public class DlPrintLotteryService {
 					String reward = print.getRewardStakes();
 					if(sbuf.length() > 0) {
 						reward = StringUtils.isBlank(reward)?sbuf.substring(1, sbuf.length()):(reward+sbuf.toString());
-						updatePrint.setRewardStakes(reward);
 					}
-					
+					updatePrint.setRewardStakes(reward);
+					updatePrint.setRealRewardMoney(print.getRealRewardMoney());
+					updatePrint.setCompareStatus(print.getCompareStatus());
+							
 					//彩票对票结束 
 					if(stakePlayCodes.size() == comparedStakes.split(",").length) {
 						updatePrint.setCompareStatus(ProjectConstant.FINISH_COMPARE);
@@ -473,20 +475,18 @@ public class DlPrintLotteryService {
 								return list;
 							}).collect(Collectors.toList());
 							List<Double> rewardList = new ArrayList<Double>();
-							/*this.groupByRewardList(Double.valueOf(2 * print.getTimes()), Integer.valueOf(print.getBetType()) / 10,winSPList, rewardList);
-							double rewardSum = rewardList.stream().reduce(0.00, Double::sum);*/
 							//2018-06-04计算税
 							this.groupByRewardList(2.0, Integer.valueOf(print.getBetType()) / 10,winSPList, rewardList);
 							double rewardSum = rewardList.stream().reduce(0.00, Double::sum)*print.getTimes();
 							updatePrint.setRealRewardMoney(BigDecimal.valueOf(rewardSum));
 							// 保存第三方给计算的单张彩票的价格
-							PeriodRewardDetail periodRewardDetail = new PeriodRewardDetail();
+							/*PeriodRewardDetail periodRewardDetail = new PeriodRewardDetail();
 							periodRewardDetail.setTicketId(print.getTicketId());
 							List<PeriodRewardDetail> tickets = periodRewardDetailMapper.queryPeriodRewardDetailBySelective(periodRewardDetail);
 							if (!CollectionUtils.isEmpty(tickets)) {
 								BigDecimal thirdPartRewardMoney = BigDecimal.valueOf(tickets.get(0).getReward());
 								updatePrint.setThirdPartRewardMoney(thirdPartRewardMoney);
-							}
+							}*/
 						}
 					}
 					//添加
@@ -494,8 +494,7 @@ public class DlPrintLotteryService {
 				}//判断是否对比过over
 			}//over prints for
 		}//over playcode for
-		this.updateBatchLotteryPrint(updates);
-		this.updateBatchLotteryPrint(endPrints);
+		this.updatePrintLotteryCompareInfo(updates);
 	}
 	
 	/**
@@ -503,7 +502,7 @@ public class DlPrintLotteryService {
 	 * @param print
 	 * @return
 	 */
-	private List<String> printStakePlayCodes(LotteryPrint print) {
+	private List<String> printStakePlayCodes(DlPrintLottery print) {
 		String stakes = print.getStakes();
 		String[] split = stakes.split(";");
 		List<String> playCodes = new ArrayList<String>(split.length);
@@ -519,14 +518,14 @@ public class DlPrintLotteryService {
 	 * 高速批量更新LotteryPrint 10万条数据 18s
 	 * @param list
 	 */
-	public void updateBatchLotteryPrint(List<LotteryPrint> list) {
+	public void updatePrintLotteryCompareInfo(List<DlPrintLottery> list) {
 		log.info("updateBatchLotteryPrint 准备更新彩票信息到数据库：size" + list.size());
 		int num = 0;
-		for(LotteryPrint print: list) {
+		for(DlPrintLottery print: list) {
 			if(null == print.getRealRewardMoney()) {
 				print.setRealRewardMoney(BigDecimal.ZERO);
 			}
-			int n = dlPrintLotteryMapper.updateBatchLotteryPrint(print);
+			int n = dlPrintLotteryMapper.updatePrintLotteryCompareInfo(print);
 			if(n > 0) {
 				num += n;
 			}

@@ -15,6 +15,20 @@ import com.dl.task.model.User;
 import com.dl.task.param.UpdateOrderInfoParam;
 
 public interface OrderMapper extends Mapper<Order> {
+	
+	//查询未开奖的订单
+	public List<String> queryOrderSnListUnOpenReward();
+	 //更新中奖金额
+	public int updateWiningMoney(Order order);
+	 //根据期次获取中奖用户及奖金
+	public List<OrderWithUserDTO> selectOpenedAllRewardOrderList();
+	
+	
+	
+	
+	
+	
+	//---------------------------------
 	/**
 	 * 保存订单数据
 	 * 
@@ -45,13 +59,7 @@ public interface OrderMapper extends Mapper<Order> {
 	 */
 	public Order getOrderInfoByOrderSn(@Param("orderSn") String orderSn);
 
-	/**
-	 * 根据期次获取中奖用户及奖金
-	 * 
-	 * @param issue
-	 * @return
-	 */
-	public List<OrderWithUserDTO> selectOpenedAllRewardOrderList();
+	
 
 	/**
 	 * 待出票订单列表
@@ -83,13 +91,7 @@ public interface OrderMapper extends Mapper<Order> {
 	 */
 	public int updateOrderTicketInfo(Order order);
 
-	/**
-	 * 更新中奖金额
-	 * 
-	 * @param order
-	 * @return
-	 */
-	public int updateWiningMoney(Order order);
+	
 
 	public List<DlChannelConsumer> selectConsumers(@Param("userIds") List<Integer> userIds);
 

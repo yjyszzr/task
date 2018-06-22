@@ -2,9 +2,6 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.dl.task.dao.DlPrintLotteryMapper">
   <resultMap id="BaseResultMap" type="com.dl.task.model.DlPrintLottery">
-    <!--
-      WARNING - @mbg.generated
-    -->
     <id column="print_lottery_id" jdbcType="INTEGER" property="printLotteryId" />
     <result column="order_sn" jdbcType="VARCHAR" property="orderSn" />
     <result column="ticket_id" jdbcType="VARCHAR" property="ticketId" />
@@ -83,4 +80,40 @@
   	insert into dl_third_api_log(api_name,api_type,api_param,api_result,api_desc)
   	values(#{apiName},#{apiType},#{apiParam},#{apiResult},#{apiDesc})
   </insert>
+  
+   <select id="lotteryPrintsByUnCompare" resultMap="BaseResultMap">
+  	select 
+  	<include refid="allFields"></include>
+  	from dl_print_lottery 
+  	where game='T51' and status=1 
+  	and (compare_status = 0 or compare_status is null or compare_status = '')
+  	and stakes is not null and stakes != ''
+  </select>
+  
+  <update id="updatePrintLotteryCompareInfo">
+  	UPDATE dl_print_lottery  
+  	SET reward_stakes = #{rewardStakes},
+  	real_reward_money = #{realRewardMoney},
+  	compare_status = #{compareStatus}, 
+  	compared_stakes = #{comparedStakes} 
+  	where compare_status = 0 and print_lottery_id = #{printLotteryId}
+  </update>
+  
+   <select id="getPrintLotteryListByOrderSns" resultMap="BaseResultMap">
+  	select 
+  	<include refid="allFields"></include>
+  	from dl_print_lottery 
+  	where status=1 and order_sn in 
+  	 <foreach collection="orderSns" item="orderSn" index="index" open="(" separator="," close=")">
+		#{orderSn}
+     </foreach>
+     order by order_sn
+  </select>
+  
+  <update id="updatePrintLotteryFailStatus">
+    update dl_print_lottery set 
+  	error_code='55555', 
+  	status=2 
+  	where print_status=17 and ticket_id=#{ticketId}
+  </update>
 </mapper>
