@@ -66,4 +66,10 @@ public class ChannelOperationLog {
 	 */
 	@Column(name = "option_amount")
 	private BigDecimal optionAmount;
+	
+	/**
+	 * 订单号 
+	 */
+	@Column(name = "order_sn")
+	private String orderSn;
 }

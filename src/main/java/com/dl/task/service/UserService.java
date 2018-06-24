@@ -21,6 +21,13 @@ import com.dl.base.util.DateUtil;
 import com.dl.base.util.RandomUtil;
 import com.dl.base.util.RegexUtil;
 import com.dl.base.util.SessionUtil;
+import com.dl.shop.payment.param.UserIdParam;
+import com.dl.task.core.ProjectConstant;
+import com.dl.task.dao.DlMessageMapper;
+import com.dl.task.dao.UserBonusMapper;
+import com.dl.task.dao.UserMapper;
+import com.dl.task.model.DlChannelConsumer;
+import com.dl.task.model.DlChannelDistributor;
 import com.dl.task.model.User;
 
 import lombok.extern.slf4j.Slf4j;

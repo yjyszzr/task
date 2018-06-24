@@ -23,12 +23,14 @@ public interface OrderMapper extends Mapper<Order> {
 	 //根据期次获取中奖用户及奖金
 	public List<OrderWithUserDTO> selectOpenedAllRewardOrderList();
 	//待出票订单列表
-	public List<Order> ordersListGoPrintLottery();
+	public List<Order> ordersListNoFinishAllPrintLottery();
 	//订单更新为待开奖
 	public int updateOrderStatus1To3(Order order);
 	//订单更新为出票失败
 	public int updateOrderStatus1To2(Order order);
-	
+	//
+	public ChannelOperationLog getChannelOperationByOrderSn(@Param("orderSn") String orderSn);
+
 	
 	
 	
@@ -82,6 +84,8 @@ public interface OrderMapper extends Mapper<Order> {
 	public List<Order> queryOrderListBySelective(@Param("nowTime") Integer nowTime);
 
 	int updateOrderStatus(Order order);
+	
+	int updateOrderStatusVerified(@Param("orderSn") String orderSn);
 
 	/**
 	 * 更新出票相关信息

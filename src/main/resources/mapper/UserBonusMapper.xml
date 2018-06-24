@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.dl.member.dao.UserBonusMapper">
-  <resultMap id="BaseResultMap" type="com.dl.member.model.UserBonus">
+<mapper namespace="com.dl.task.dao.UserBonusMapper">
+  <resultMap id="BaseResultMap" type="com.dl.task.model.UserBonus">
     <!--
       WARNING - @mbg.generated
     -->
@@ -27,6 +27,10 @@
   
   <select id="queryUserBonusIdsExpire" parameterType="java.lang.Integer" resultType="java.lang.Integer">
 	  SELECT user_bonus_id FROM dl_user_bonus WHERE  bonus_status = 0 AND end_time &lt;= #{now}
+  </select>
+  <select id="updateBonusUnuseByUserBonusId" parameterType="com.dl.task.model.UserBonus" resultType="java.lang.Integer">
+	  update  dl_user_bonus set bonus_status = 0,order_sn='',used_time=#{usedTime} 
+	  where user_bonus_id= #{userBonusId} and user_id=#{userId}
   </select>
     
    <update id ="updateBatchUserBonusExpire" parameterType="java.util.List" >

@@ -16,51 +16,8 @@ public interface OrderDetailMapper extends Mapper<OrderDetail> {
 	public List<OrderDetail> unMatchResultOrderDetails();
 	//更新订单详情的比赛结果
 	public int updateMatchResult(OrderDetail detail);
-	
-	/**
-	 * 
-	 * @param orderId
-	 * @param userId
-	 * @return
-	 */
-	public List<OrderDetail> selectByOrderId(@Param("orderId")Integer orderId, @Param("userId")Integer userId);
-	
-	
-	/**
-	 * 查询用户某天所下的订单中包含比赛id集合
-	 * @param orderId
-	 * @param userId
-	 * @return
-	 */
-	public List<String> selectMatchIdsInSomeDayOrder(@Param("dateStr") String dateStr, @Param("userId")Integer userId);
-	
-
-
-	/**
-	 * 获取玩法名称
-	 * @param lotteryClassifyId
-	 * @return
-	 */
-	public List<PlayTypeName> getPlayTypes(@Param("lotteryClassifyId")Integer lotteryClassifyId);
-	/**
-	 * 获取玩法内容
-	 * @param playCode
-	 * @param playType
-	 * @return
-	 */
-//	public String getPlayContent(@Param("playCode")String playCode, @Param("playType")Integer playType);
-
-
-	public void updateTicketData(OrderDetail orderDetail);
-	/**
-	 * 
-	 * @param classifyId
-	 * @param playClassifyId
-	 * @return  status, redirectUrl
-	 */
-	public LotteryPlayClassifyTemp lotteryPlayClassifyStatusAndUrl(@Param("classifyId") int classifyId, @Param("playClassifyId") int playClassifyId);
-
-
-	public LotteryClassifyTemp lotteryClassify(@Param("classifyId")Integer lotteryClassifyId);
-	
+	//获取订单下的所有详情记录
+	public List<OrderDetail> queryListByOrderSn(@Param("orderSn")String orderSn);
+	//更新赔率信息
+	public int updateTicketData(OrderDetail orderDetail);
 }

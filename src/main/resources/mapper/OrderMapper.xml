@@ -95,15 +95,15 @@
   	where order_status=3 and order_sn = #{orderSn}
   </update>
   
-  <select id="ordersListGoPrintLottery" resultMap="BaseResultMap">
+  <select id="ordersListNoFinishAllPrintLottery" resultMap="BaseResultMap">
    select 
-       <include refid="orderFields"></include>
+        *
      from 
         dl_order
-     where order_status = 1 and pay_status=1 
+     where 
+     print_lottery_status = 1 and pay_status=1 
      order by pay_time 
   </select>
-  
   <update id="updateOrderStatus1To3">
   	update dl_order 
   	set order_status=3,print_lottery_status=#{printLotteryStatus},print_lottery_refund_amount=#{printLotteryRefundAmount}
@@ -331,4 +331,9 @@
 			)
 	</insert>
   
+  <select id="getChannelOperationByOrderSn" resultType="com.dl.shop.order.model.ChannelOperationLog">
+  	select 
+  		*
+  	from dl_channel_option_log where order_sn = #{orderSn}
+  </select>
 </mapper>

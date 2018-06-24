@@ -37,12 +37,21 @@
   	where ticket_data is not null and match_result is null and ticket_data !=''
   </select>
   
+  <select id = "queryListByOrderSn" resultMap="BaseResultMap">
+  	select  <include refid="detailFields"></include>
+  	from dl_order_detail 
+  	where order_sn=#{orderSn}
+  </select>
+  
   <update id="updateMatchResult">
   	update dl_order_detail 
   	set match_result = #{matchResult} 
   	where order_detail_id = #{orderDetailId}
   </update>
   
+   <update id="updateTicketData">
+  	update dl_order_detail set ticket_data = #{ticketData} where order_detail_id = #{orderDetailId}
+  </update>
   
   
   
