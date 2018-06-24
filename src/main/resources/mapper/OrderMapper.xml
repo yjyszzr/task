@@ -106,7 +106,12 @@
   </select>
   <update id="updateOrderStatus1To3">
   	update dl_order 
-  	set order_status=3,print_lottery_status=#{printLotteryStatus},print_lottery_refund_amount=#{printLotteryRefundAmount}
+  	set order_status=3,
+  	accept_time=#{acceptTime},
+  	ticket_time=#{ticketTime},
+  	forecast_money=#{forecastMoney},
+  	print_lottery_status=#{printLotteryStatus},
+  	print_lottery_refund_amount=#{printLotteryRefundAmount}
   	where order_status=1 and order_sn = #{orderSn}
   </update>
   

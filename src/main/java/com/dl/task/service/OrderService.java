@@ -158,7 +158,7 @@ public class OrderService extends AbstractService<Order> {
 			List<Order> rollOrders = new ArrayList<Order>(orders.size());
 			for (Order order : orders) {
 				Integer userId = order.getUserId();
-				if(userId == null) {//?????
+				if(userId == null) {//?????有没有必要
 					continue;
 				}
 				List<DlPrintLottery> printLotterys = dlPrintLotteryMapper.printLotterysByOrderSn(order.getOrderSn());
