@@ -12,6 +12,11 @@ import com.dl.task.model.PlayTypeName;
 
 public interface OrderDetailMapper extends Mapper<OrderDetail> {
 	
+	//获取 没有赛事结果 的订单详情
+	public List<OrderDetail> unMatchResultOrderDetails();
+	//更新订单详情的比赛结果
+	public int updateMatchResult(OrderDetail detail);
+	
 	/**
 	 * 
 	 * @param orderId
@@ -31,12 +36,6 @@ public interface OrderDetailMapper extends Mapper<OrderDetail> {
 	
 
 
-	/**
-	 * 获取 没有赛事结果 的订单详情
-	 * @return
-	 */
-	public List<OrderDetail> unMatchResultOrderDetails();
-	
 	/**
 	 * 获取玩法名称
 	 * @param lotteryClassifyId

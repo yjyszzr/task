@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dl.task.dao.OrderDetailMapper">
+  <resultMap id="BaseResultMap" type="com.dl.task.model.OrderDetail">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="order_detail_id" jdbcType="INTEGER" property="orderDetailId" />
+    <result column="user_id" jdbcType="INTEGER" property="userId" />
+    <result column="order_id" jdbcType="INTEGER" property="orderId" />
+    <result column="order_sn" jdbcType="VARCHAR" property="orderSn" />
+    <result column="match_id" jdbcType="INTEGER" property="matchId" />
+    <result column="changci" jdbcType="VARCHAR" property="changci" />
+    <result column="issue" jdbcType="VARCHAR" property="issue" />
+    <result column="match_team" jdbcType="VARCHAR" property="matchTeam" />
+    <result column="match_result" jdbcType="VARCHAR" property="matchResult" />
+    <result column="ticket_data" jdbcType="VARCHAR" property="ticketData" />
+    <result column="ticket_status" jdbcType="INTEGER" property="ticketStatus" />
+    <result column="give_integral" jdbcType="INTEGER" property="giveIntegral" />
+    <result column="lottery_classify_id" jdbcType="INTEGER" property="lotteryClassifyId" />
+    <result column="lottery_play_classify_id" jdbcType="INTEGER" property="lotteryPlayClassifyId" />
+    <result column="is_guess" jdbcType="INTEGER" property="isGuess" />
+    <result column="is_dan" jdbcType="INTEGER" property="isDan" />
+    <result column="match_time" jdbcType="TIMESTAMP" property="matchTime" />
+    <result column="add_time" jdbcType="INTEGER" property="addTime" />
+    <result column="fix_odds" jdbcType="VARCHAR" property="fixedodds" />
+  </resultMap>
+  
+  <sql id="detailFields">
+  order_detail_id,user_id,order_id,order_sn,match_id,changci,issue,match_team,match_result,ticket_data,ticket_status,
+  give_integral,lottery_classify_id,lottery_play_classify_id,is_guess,is_dan,match_time,add_time,fix_odds
+  </sql>
+  
+  <select id = "unMatchResultOrderDetails" resultMap="BaseResultMap">
+  	select  <include refid="detailFields"></include>
+  	from dl_order_detail 
+  	where ticket_data is not null and match_result is null and ticket_data !=''
+  </select>
+  
+  <update id="updateMatchResult">
+  	update dl_order_detail 
+  	set match_result = #{matchResult} 
+  	where order_detail_id = #{orderDetailId}
+  </update>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <select id="selectByOrderId" resultType="com.dl.shop.order.model.OrderDetail">
+        select
+            dod.match_id matchId,
+            dod.changci changci,
+            dod.match_team matchTeam,
+            dod.match_result matchResult,
+            dod.ticket_data ticketData,
+            dod.ticket_status ticketStatus,
+            dod.give_integral giveIntegral,
+            dod.lottery_classify_id lotteryClassifyId,
+            dod.lottery_play_classify_id lotteryPlayClassifyId,
+            dod.is_guess isGuess,
+            dod.add_time addTime,
+            dod.is_dan isDan,
+            dod.match_time matchTime,
+            dod.fix_odds fixedodds,
+            dod.issue issue,
+            dod.lottery_play_classify_id playType
+        from
+            dl_order_detail dod 
+        where 
+            dod.order_id = #{orderId}
+        and 
+            dod.user_id = #{userId}
+  </select>
+  
+  <select id="selectMatchIdsInSomeDayOrder"  resultType="java.lang.String">
+      select match_id from dl_order_detail od
+      left join dl_order o
+	  on od.order_id = o.order_id     
+      where str_to_date(od.match_time,'%Y-%m-%d') = #{dateStr} and od.user_id = #{userId} and o.pay_status = 1
+  </select>
+  
+  <select id = "unMatchResultOrderDetails" resultMap="BaseResultMap">
+  	select * from dl_order_detail where ticket_data is not null and match_result is null and ticket_data !=''
+  </select>
+  
+  <select id="getPlayTypes" resultType="com.dl.shop.order.model.PlayTypeName">
+  	select lottery_play_classify_id playType, play_name playName from dl_lottery_play_classify where lottery_classify_id=#{lotteryClassifyId}
+  </select>
+  
+  <select id="getPlayContent" resultType="string">
+		select play_content 
+		from dl_match_play mp left join dl_match m on mp.match_id = m.match_id 
+		where mp.play_type=#{playType} and m.match_sn=#{playCode}
+  </select>
+  
+  <update id="updateTicketData">
+  	update dl_order_detail set ticket_data = #{ticketData} where order_detail_id = #{orderDetailId}
+  </update>
+  
+  <select id="lotteryPlayClassifyStatusAndUrl" resultType="com.dl.shop.order.model.LotteryPlayClassifyTemp">
+  	select status status, redirect_url redirectUrl from dl_lottery_play_classify where lottery_classify_id=#{classifyId} and lottery_play_classify_id=#{playClassifyId}
+  </select>
+  
+  <select id="lotteryClassify" resultType="com.dl.shop.order.model.LotteryClassifyTemp">
+  	select lottery_name lotteryName, lottery_img lotteryImg from dl_lottery_classify where lottery_classify_id=#{classifyId} 
+  </select>
+</mapper>
