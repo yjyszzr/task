@@ -1,19 +1,13 @@
 package com.dl.task.service;
-import com.dl.shop.payment.dto.PayLogDTO;
-import com.dl.shop.payment.enums.PayEnums;
-import com.dl.task.dao.PayLogMapper;
-import com.dl.task.model.PayLog;
-import com.dl.base.result.BaseResult;
-import com.dl.base.result.ResultGenerator;
-import com.dl.base.service.AbstractService;
-import com.dl.base.util.DateUtil;
-import com.dl.base.util.SessionUtil;
+import javax.annotation.Resource;
 
-import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.Resource;
+import com.dl.base.service.AbstractService;
+import com.dl.base.util.DateUtil;
+import com.dl.task.dao.PayLogMapper;
+import com.dl.task.model.PayLog;
 
 @Service
 @Transactional
@@ -68,15 +62,5 @@ public class PayLogService extends AbstractService<PayLog> {
 	
 	public int updatePayLogByOrderSn(PayLog payLog) {
 		return payLogMapper.updatePayLogByOrderSn(payLog);
-	}
-	
-	public BaseResult<PayLogDTO> queryPayLogByPayLogId(Integer payLogId) {
-		PayLog payLog = payLogMapper.findPayLogByPayLogId(payLogId);
-		if(null == payLog) {
-			return ResultGenerator.genResult(PayEnums.PAY_DBDATA_IS_NOT_IN.getcode(),PayEnums.PAY_DBDATA_IS_NOT_IN.getMsg());
-		}
-		PayLogDTO payLogDTO = new PayLogDTO();
-		BeanUtils.copyProperties(payLog, payLogDTO);
-		return ResultGenerator.genSuccessResult("success", payLogDTO);
 	}
 }

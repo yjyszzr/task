@@ -30,7 +30,6 @@ import com.dl.base.service.AbstractService;
 import com.dl.base.util.DateUtil;
 import com.dl.base.util.JSONHelper;
 import com.dl.base.util.SNGenerator;
-import com.dl.shop.payment.api.IpaymentService;
 import com.dl.task.core.ProjectConstant;
 import com.dl.task.dao.LotteryWinningLogTempMapper;
 import com.dl.task.dao.OrderMapper;
@@ -62,9 +61,6 @@ public class UserAccountService extends AbstractService<UserAccount> {
 
 	@Resource
 	private UserService userService;
-
-	@Resource
-	private IpaymentService payMentService;
 
 	@Resource
 	private SysConfigService sysConfigService;

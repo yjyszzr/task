@@ -2,18 +2,21 @@ package com.dl.task.schedule;
 
 import java.time.LocalTime;
 import java.time.ZoneId;
+
 import javax.annotation.Resource;
+
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
+
 import com.dl.base.param.EmptyParam;
-import com.dl.shop.payment.api.IpaymentService;
 import com.dl.task.service.DlPrintLotteryService;
 import com.dl.task.service.LotteryRewardService;
 import com.dl.task.service.OrderService;
 import com.dl.task.service.PayMentService;
 import com.dl.task.service.UserBonusService;
-import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Configuration
@@ -34,9 +37,9 @@ public class TaskSchedule {
 	
 	@Resource
 	private PayMentService paymentService;	
-	
-	@Resource
-	private IpaymentService ipaymentService;
+//	TODO 胡贺东 带移动
+//	@Resource
+//	private IpaymentService ipaymentService;
 	
 	
 	/**
@@ -145,7 +148,8 @@ public class TaskSchedule {
 	@Scheduled(fixedRate = 1000*5)
     public void timerOrderQueryScheduled() {
 		EmptyParam emptyParam = new EmptyParam();
-		ipaymentService.timerCheckCashReq(emptyParam);
+//		TODO 胡贺东 带移动
+//		ipaymentService.timerCheckCashReq(emptyParam);
 	}
 	
 	/**
@@ -154,6 +158,7 @@ public class TaskSchedule {
 	@Scheduled(fixedRate = 1000*20)
     public void timerCheckCashReq() {
 		EmptyParam emptyParam = new EmptyParam();
-		ipaymentService.timerOrderQueryScheduled(emptyParam);
+//		TODO 胡贺东 带移动
+//		ipaymentService.timerOrderQueryScheduled(emptyParam);
 	}	
 }
