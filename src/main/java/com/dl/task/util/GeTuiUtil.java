@@ -7,6 +7,15 @@ import org.springframework.stereotype.Component;
 
 import com.dl.base.util.JSONHelper;
 import com.dl.task.configurer.GeTuiConfig;
+import com.gexin.rp.sdk.base.IPushResult;
+import com.gexin.rp.sdk.base.impl.SingleMessage;
+import com.gexin.rp.sdk.base.impl.Target;
+import com.gexin.rp.sdk.base.payload.APNPayload;
+import com.gexin.rp.sdk.exceptions.RequestException;
+import com.gexin.rp.sdk.http.IGtPush;
+import com.gexin.rp.sdk.template.LinkTemplate;
+import com.gexin.rp.sdk.template.TransmissionTemplate;
+import com.gexin.rp.sdk.template.style.Style0;
 
 @Component
 public class GeTuiUtil {

@@ -24,4 +24,8 @@ public interface UserMapper extends Mapper<User> {
 	 * 查询多个用户的当前余额
 	 */
 	List<User> queryUserByUserIds(@Param("userIds") List<Integer> userIds);
+	
+	User queryUserByUserId(Integer userId);
+	
+	List<String> getClientIds(@Param("userIds") List<Integer> userIds);
 }

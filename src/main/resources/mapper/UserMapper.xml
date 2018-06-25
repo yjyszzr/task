@@ -57,4 +57,13 @@
 			#{item}
 		</foreach>
   </select>
+  <select id="queryUserByUserId" resultMap="BaseResultMap">
+  	 	SELECT * FROM dl_user WHERE user_id =#{userId}
+  </select>
+  <select id="getClientIds" resultType="string">
+  	select DISTINCT push_key from dl_user where user_id IN
+  	<foreach collection="userIds" index="index" item="item" open="(" separator="," close=")">
+		#{item}
+	</foreach>
+  </select>s
 </mapper>

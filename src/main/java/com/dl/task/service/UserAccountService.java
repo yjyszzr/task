@@ -314,8 +314,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
 		if (null == userId) {
 			return ResultGenerator.genFailResult("该笔订单" + surplusPayParam.getOrderSn() + "userId为空，无法回滚账户");
 		}
-
-		User user = userService.findById(userId);
+		User user = userMapper.queryUserByUserId(userId);
 		if (null == user) {
 			return ResultGenerator.genFailResult("没有这个用户的用户id，无法回滚账户");
 		}
@@ -360,7 +359,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
 		userAccountParam.setAccountSn(accountSn);
 		userAccountParam.setUserId(userId);
 		userAccountParam.setAmount(order.getUserSurplus().add(order.getUserSurplusLimit()));
-		User curUser = userService.findById(userId);
+		User curUser = userMapper.queryUserByUserId(userId);
 		BigDecimal curBalance = curUser.getUserMoney().add(user.getUserMoneyLimit());
 		userAccountParam.setCurBalance(curBalance);
 		userAccountParam.setProcessType(ProjectConstant.ACCOUNT_ROLLBACK);

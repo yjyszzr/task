@@ -19,6 +19,8 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -72,8 +74,6 @@ import com.dl.task.param.MessageAddParam;
 import com.dl.task.param.OrderSnParam;
 import com.dl.task.param.UpdateOrderInfoParam;
 
-import lombok.extern.slf4j.Slf4j;
-
 @Slf4j
 @Service
 public class OrderService extends AbstractService<Order> {
@@ -87,9 +87,8 @@ public class OrderService extends AbstractService<Order> {
 	@Resource
 	private	UserAccountService userAccountService;
 
-//	TODO 胡贺东 消息
-//	@Resource 
-//	private IUserMessageService userMessageService;
+	@Resource 
+	private DlMessageService dlMessageService;
 	@Resource
 	private UserBonusMapper userBonusMapper;
 
@@ -437,8 +436,7 @@ public class OrderService extends AbstractService<Order> {
 			params.add(messageAddParam);
 		}
 		addParam.setParams(params);
-//		TODO 胡贺东 消息先暂时不发送
-//		userMessageService.add(addParam);
+		dlMessageService.add(addParam);
 	}
 	//更新订单的比赛结果
 	public void updateOrderMatchResult() {

@@ -15,18 +15,22 @@ import com.dl.base.result.ResultGenerator;
 import com.dl.base.service.AbstractService;
 import com.dl.base.util.DateUtil;
 import com.dl.task.dao.DlMessageMapper;
+import com.dl.task.dao.UserMapper;
 import com.dl.task.model.DlMessage;
 import com.dl.task.param.AddMessageParam;
 import com.dl.task.param.MessageAddParam;
 import com.dl.task.util.GeTuiMessage;
+import com.dl.task.util.GeTuiUtil;
 
 @Service
 @Transactional
 public class DlMessageService extends AbstractService<DlMessage> {
     @Resource
     private DlMessageMapper dlMessageMapper;
-
-    
+    @Resource
+    private GeTuiUtil geTuiUtil;
+    @Resource
+    private UserMapper userMapper;
     public BaseResult<String> add(@RequestBody AddMessageParam addParam) {
     	List<MessageAddParam> params = addParam.getParams();
     	List<Integer> lotteryFailUserIds = new ArrayList<Integer>(params.size());
@@ -51,7 +55,7 @@ public class DlMessageService extends AbstractService<DlMessage> {
     	}
     	//出票失败提示
     	if(CollectionUtils.isNotEmpty(lotteryFailUserIds)) {
-    		List<String> clientIds = userService.getClientIds(lotteryFailUserIds);
+    		List<String> clientIds = userMapper.getClientIds(lotteryFailUserIds);
     		for(String clientId : clientIds) {
     			GeTuiMessage getuiMessage = new GeTuiMessage(CommonConstants.FORMAT_PRINTLOTTERY_PUSH_TITLE, CommonConstants.FORMAT_PRINTLOTTERY_PUSH_DESC, DateUtil.getCurrentTimeLong());
     			geTuiUtil.pushMessage(clientId, getuiMessage);
