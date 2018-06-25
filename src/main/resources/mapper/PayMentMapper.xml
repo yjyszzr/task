@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.dl.shop.payment.dao.PayMentMapper">
-  <resultMap id="BaseResultMap" type="com.dl.shop.payment.model.PayMent">
+<mapper namespace="com.dl.task.dao.PayMentMapper">
+  <resultMap id="BaseResultMap" type="com.dl.task.model.PayMent">
     <!--
       WARNING - @mbg.generated
     -->
