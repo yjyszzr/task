@@ -27,7 +27,7 @@
     
   </resultMap>
   
-  <select id="queryUserAccountBySelective" parameterType="com.dl.member.model.UserAccount"  resultMap="BaseResultMap">
+  <select id="queryUserAccountBySelective" parameterType="com.dl.task.model.UserAccount"  resultMap="BaseResultMap">
   		SELECT *  FROM dl_user_account 
 	  	<where>
 		  	<if test="userId != null">

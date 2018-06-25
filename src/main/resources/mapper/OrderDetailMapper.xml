@@ -48,7 +48,7 @@
   	set match_result = #{matchResult} 
   	where order_detail_id = #{orderDetailId}
   </update>
-  <select id="selectByOrderId" resultType="com.dl.shop.order.model.OrderDetail">
+  <select id="selectByOrderId" resultType="com.dl.task.model.OrderDetail">
         select
             dod.match_id matchId,
             dod.changci changci,
@@ -81,11 +81,11 @@
       where str_to_date(od.match_time,'%Y-%m-%d') = #{dateStr} and od.user_id = #{userId} and o.pay_status = 1
   </select>
   
-  <select id = "unMatchResultOrderDetails" resultMap="BaseResultMap">
-  	select * from dl_order_detail where ticket_data is not null and match_result is null and ticket_data !=''
-  </select>
+<!--   <select id = "unMatchResultOrderDetails" resultMap="BaseResultMap"> -->
+<!--   	select * from dl_order_detail where ticket_data is not null and match_result is null and ticket_data !='' -->
+<!--   </select> -->
   
-  <select id="getPlayTypes" resultType="com.dl.shop.order.model.PlayTypeName">
+  <select id="getPlayTypes" resultType="com.dl.task.model.PlayTypeName">
   	select lottery_play_classify_id playType, play_name playName from dl_lottery_play_classify where lottery_classify_id=#{lotteryClassifyId}
   </select>
   
@@ -99,11 +99,11 @@
   	update dl_order_detail set ticket_data = #{ticketData} where order_detail_id = #{orderDetailId}
   </update>
   
-  <select id="lotteryPlayClassifyStatusAndUrl" resultType="com.dl.shop.order.model.LotteryPlayClassifyTemp">
+  <select id="lotteryPlayClassifyStatusAndUrl" resultType="com.dl.task.model.LotteryPlayClassifyTemp">
   	select status status, redirect_url redirectUrl from dl_lottery_play_classify where lottery_classify_id=#{classifyId} and lottery_play_classify_id=#{playClassifyId}
   </select>
   
-  <select id="lotteryClassify" resultType="com.dl.shop.order.model.LotteryClassifyTemp">
+  <select id="lotteryClassify" resultType="com.dl.task.model.LotteryClassifyTemp">
   	select lottery_name lotteryName, lottery_img lotteryImg from dl_lottery_classify where lottery_classify_id=#{classifyId} 
   </select>
 </mapper>

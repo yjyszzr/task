@@ -47,13 +47,13 @@
     <result column="print_lottery_status" jdbcType="INTEGER" property="printLotteryStatus" />
     <result column="print_lottery_refund_amount" jdbcType="DECIMAL" property="printLotteryRefundAmount" />
   </resultMap>
-  <resultMap id="userResultMap" type="com.dl.shop.order.model.User">
+  <resultMap id="userResultMap" type="com.dl.task.model.User">
     <id column="user_id" jdbcType="INTEGER" property="userId" />
     <result column="user_name" jdbcType="VARCHAR" property="userName" />
     <result column="mobile" jdbcType="VARCHAR" property="mobile" />
   </resultMap>
   
-  <resultMap id="consumerResultMap" type="com.dl.shop.order.model.DlChannelConsumer">
+  <resultMap id="consumerResultMap" type="com.dl.task.model.DlChannelConsumer">
     <id column="consumer_id" jdbcType="INTEGER" property="consumerId" />
     <id column="channel_distributor_id" jdbcType="INTEGER" property="channelDistributorId" />
     <id column="user_id" jdbcType="INTEGER" property="userId" />
@@ -64,7 +64,7 @@
     <result column="device_code" jdbcType="VARCHAR" property="deviceCode" />
   </resultMap>
   
-  <resultMap id="distributorResultMap" type="com.dl.shop.order.model.DlChannelDistributor">
+  <resultMap id="distributorResultMap" type="com.dl.task.model.DlChannelDistributor">
     <id column="channel_distributor_id" jdbcType="INTEGER" property="channelDistributorId" />
     <id column="channel_id" jdbcType="INTEGER" property="channelId" />
     <id column="user_id" jdbcType="INTEGER" property="userId" />
@@ -121,7 +121,7 @@
   	where order_status=1 and order_sn = #{orderSn}
   </update>
   
-  <insert id="insertOrder" parameterType="com.dl.shop.order.model.Order" useGeneratedKeys="true" keyProperty="orderId">
+  <insert id="insertOrder" parameterType="com.dl.task.model.Order" useGeneratedKeys="true" keyProperty="orderId">
   		insert into dl_order (order_sn,parent_sn,user_id,order_status,pay_status,pay_id,pay_code,pay_name,pay_sn,
   		money_paid,ticket_amount,surplus,user_surplus,user_surplus_limit,third_party_paid,user_bonus_id,bonus,give_integral,order_from,
   		add_time,pay_time,order_type,lottery_classify_id,lottery_play_classify_id,match_time,winning_money,pass_type,play_type,cathectic,bet_num,
@@ -140,7 +140,7 @@
   	from dl_order
   	where order_sn = #{orderSn}
   </select>
-  <select id="getOrderInfoList" resultType="com.dl.order.dto.OrderInfoListDTO">
+  <select id="getOrderInfoList" resultType="com.dl.task.dto.OrderInfoDTO">
         select
             do.order_id orderId,
 	        do.order_sn orderSn,
@@ -207,7 +207,7 @@
         and is_delete = 0
   </select>
   
-  <select id="queryOrderSnListByStatus" parameterType = "com.dl.shop.order.model.Order" resultType="java.lang.String">
+  <select id="queryOrderSnListByStatus" parameterType = "com.dl.task.model.Order" resultType="java.lang.String">
 	   select 
 	        order_sn
 	   from 
@@ -227,7 +227,7 @@
   </select>
   
   
-  <select id="queryOrderListBySelective" parameterType = "com.dl.shop.order.model.Order" resultMap="BaseResultMap">
+  <select id="queryOrderListBySelective" parameterType = "com.dl.task.model.Order" resultMap="BaseResultMap">
 	   select 
 	        *
 	   from 
@@ -287,7 +287,7 @@
          </foreach>
 	</select>
   
-  	<insert id = "saveChannelOperation"   parameterType="com.dl.shop.order.model.ChannelOperationLog">
+  	<insert id = "saveChannelOperation"   parameterType="com.dl.task.model.ChannelOperationLog">
 	insert into 
 	dl_channel_option_log  
 	(	option_id,
@@ -316,7 +316,7 @@
 			)
 	</insert>
   
-  <select id="getChannelOperationByOrderSn" resultType="com.dl.shop.order.model.ChannelOperationLog">
+  <select id="getChannelOperationByOrderSn" resultType="com.dl.task.model.ChannelOperationLog">
   	select 
   		*
   	from dl_channel_option_log where order_sn = #{orderSn}

@@ -65,5 +65,5 @@
   	<foreach collection="userIds" index="index" item="item" open="(" separator="," close=")">
 		#{item}
 	</foreach>
-  </select>s
+  </select>
 </mapper>
