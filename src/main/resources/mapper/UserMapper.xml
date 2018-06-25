@@ -40,10 +40,9 @@
     <result column="device_channel" jdbcType="VARCHAR" property="deviceChannel" />
   </resultMap>
   
-    <update id="updateInDBUserMoneyAndUserMoneyLimit">
+    <update id="updateInDBUserMoneyLimit">
   	UPDATE dl_user 
-  	set user_money=user_money + #{userMoney},
-  		user_money_limit=user_money_limit + #{userMoneyLimit}
+  	set user_money_limit=user_money_limit + #{userMoneyLimit}
   	WHERE user_id = #{userId}
   </update>
   

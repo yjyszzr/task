@@ -225,11 +225,10 @@ public class OrderService extends AbstractService<Order> {
 						continue ;
 					}
 					User user = new User();
-					//						调整为不可提现余额
-					user.setUserMoney(userMoney);
+					//调整为不可提现余额
 					user.setUserMoneyLimit(refundMoney);
 					user.setUserId(userId);
-					int cnt = userMapper.updateInDBUserMoneyAndUserMoneyLimit(user);
+					int cnt = userMapper.updateInDBUserMoneyLimit(user);
 					log.info("[rollbackUserMoneyOrderFailure]" + " userId:" + userId + " amt:" + refundMoney +" result cnt:" + cnt);
 					//===========记录退款流水====================
 					UserAccount userAccountParamByType = new UserAccount();
