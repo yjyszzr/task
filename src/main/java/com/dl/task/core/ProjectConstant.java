@@ -18,7 +18,7 @@ public final class ProjectConstant {
     public static final String CONTROLLER_PACKAGE = BASE_PACKAGE + ".web";//Controller所在包
 
     public static final String MAPPER_INTERFACE_REFERENCE = BASE_PACKAGE + ".mapper.Mapper";//Mapper插件基础接口的完全限定名
-    public static final String MAPPER_BASE = "com.pgt.base.mapper.Mapper";//Mapper插件基础接口的完全限定名
+    public static final String MAPPER_BASE = "com.dl.base.mapper.Mapper";//Mapper插件基础接口的完全限定名
 
     //状态 0-售卖中 1-售卖结束
     public final static Integer MATCH_PLAY_STATUS_SELLING = 0; //售卖中
