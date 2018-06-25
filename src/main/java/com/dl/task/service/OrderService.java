@@ -417,9 +417,6 @@ public class OrderService extends AbstractService<Order> {
 		AddMessageParam addParam = new AddMessageParam();
 		List<MessageAddParam> params = new ArrayList<MessageAddParam>(orders.size());
 		for (Order order : orders) {
-			if (2 != order.getOrderStatus()) {
-				continue;
-			}
 			// 消息
 			MessageAddParam messageAddParam = new MessageAddParam();
 			messageAddParam.setTitle(CommonConstants.FORMAT_PRINTLOTTERY_TITLE);
@@ -440,7 +437,8 @@ public class OrderService extends AbstractService<Order> {
 			params.add(messageAddParam);
 		}
 		addParam.setParams(params);
-		userMessageService.add(addParam);
+//		TODO 胡贺东 消息先暂时不发送
+//		userMessageService.add(addParam);
 	}
 	//更新订单的比赛结果
 	public void updateOrderMatchResult() {
@@ -560,39 +558,6 @@ public class OrderService extends AbstractService<Order> {
 			orderDetailMapper.updateMatchResult(detail);
 		}
 	}
-
-//	TODO 胡贺东 暂时不考虑消息
-//	@Async
-//	private void goLotteryMessage(List<Order> orders) {
-//		AddMessageParam addParam = new AddMessageParam();
-//		List<MessageAddParam> params = new ArrayList<MessageAddParam>(orders.size());
-//		for (Order order : orders) {
-//			if (2 != order.getOrderStatus()) {
-//				continue;
-//			}
-//			// 消息
-//			MessageAddParam messageAddParam = new MessageAddParam();
-//			messageAddParam.setTitle(CommonConstants.FORMAT_PRINTLOTTERY_TITLE);
-//			messageAddParam.setContent(CommonConstants.FORMAT_PRINTLOTTERY_CONTENT);
-//			messageAddParam.setContentDesc(CommonConstants.FORMAT_PRINTLOTTERY_CONTENT_DESC);
-//			messageAddParam.setSender(-1);
-//			messageAddParam.setMsgType(0);
-//			messageAddParam.setReceiver(order.getUserId());
-//			messageAddParam.setReceiveMobile("");
-//			messageAddParam.setObjectType(3);
-//			messageAddParam.setMsgUrl("");
-//			messageAddParam.setSendTime(DateUtil.getCurrentTimeLong());
-//			String ticketAmount = order.getTicketAmount().toString();
-//			Integer addTime = order.getAddTime();
-//			LocalDateTime loclaTime = LocalDateTime.ofEpochSecond(addTime, 0, ZoneOffset.of("+08:00"));
-//			String format = loclaTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:dd"));
-//			messageAddParam.setMsgDesc(MessageFormat.format(CommonConstants.FORMAT_PRINTLOTTERY_MSG_DESC, ticketAmount, format));
-//			params.add(messageAddParam);
-//		}
-//		addParam.setParams(params);
-//		userMessageService.add(addParam);
-//	}
-
 
 	public void addRewardMoneyToUsers() {
 		List<OrderWithUserDTO> orderWithUserDTOs = orderMapper.selectOpenedAllRewardOrderList();

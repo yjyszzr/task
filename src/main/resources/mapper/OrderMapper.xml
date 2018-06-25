@@ -121,26 +121,6 @@
   	where order_status=1 and order_sn = #{orderSn}
   </update>
   
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
   <insert id="insertOrder" parameterType="com.dl.shop.order.model.Order" useGeneratedKeys="true" keyProperty="orderId">
   		insert into dl_order (order_sn,parent_sn,user_id,order_status,pay_status,pay_id,pay_code,pay_name,pay_sn,
   		money_paid,ticket_amount,surplus,user_surplus,user_surplus_limit,third_party_paid,user_bonus_id,bonus,give_integral,order_from,
@@ -341,4 +321,11 @@
   		*
   	from dl_channel_option_log where order_sn = #{orderSn}
   </select>
+ 
+  <update id="updateOrderStatusRewarded"> 
+   update dl_order set order_status = 5 WHERE order_sn in
+		<foreach collection="orderSnList" item="orderSn" index="index" open="(" separator="," close=")">
+           	#{orderSn}
+        </foreach>
+  </update>
 </mapper>

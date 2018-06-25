@@ -1,4 +1,6 @@
 package com.dl.task.service;
+import io.jsonwebtoken.lang.Collections;
+
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -14,6 +16,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
+
+import net.sf.json.JSONObject;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -43,15 +47,10 @@ import com.dl.task.dto.DlToStakeDTO;
 import com.dl.task.dto.DlToStakeDTO.BackOrderDetail;
 import com.dl.task.model.DlLeagueMatchResult;
 import com.dl.task.model.DlPrintLottery;
-import com.dl.task.model.LotteryPrint;
 import com.dl.task.model.LotteryThirdApiLog;
-import com.dl.task.model.PeriodRewardDetail;
 import com.dl.task.param.DlQueryStakeParam;
 import com.dl.task.param.DlToStakeParam;
 import com.dl.task.param.DlToStakeParam.PrintTicketOrderParam;
-
-import io.jsonwebtoken.lang.Collections;
-import net.sf.json.JSONObject;
 
 @Service
 @Transactional
@@ -307,16 +306,6 @@ public class DlPrintLotteryService {
 						}
 					}
 					lotteryPrints.add(lotteryPrint);
-					/*if(printSp != null) {
-						LotteryPrintParam lotteryPrintParam = new LotteryPrintParam();
-						lotteryPrintParam.setOrderSn(lotteryPrint.getOrderSn());
-						lotteryPrintParam.setAcceptTime(lotteryPrint.getAcceptTime());
-						if(printTime != null) {
-							lotteryPrintParam.setTicketTime(DateUtil.getCurrentTimeLong(printTime.getTime()/1000));
-						}
-						lotteryPrintParam.setPrintSp(printSp);
-						lotteryPrintParams.add(lotteryPrintParam);
-					}*/
 				}
 			}
 			log.info("goQueryStake orders size=" + orders.length +" -> updateLotteryPrintByCallBack size:"+lotteryPrints.size());
@@ -325,9 +314,6 @@ public class DlPrintLotteryService {
 					dlPrintLotteryMapper.updateLotteryPrintByCallBack(print);
 				}
 			}
-			/*if(CollectionUtils.isNotEmpty(lotteryPrintParams)) {
-				orderService.updateOrderInfoByPrint(lotteryPrintParams);
-			}*/
 		}
 	}
 	

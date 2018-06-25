@@ -19,5 +19,9 @@ public class UserIdAndRewardDTO {
     
     @ApiModelProperty(value = "不需要传递：当前用户的可提现余额")
     private BigDecimal userMoney;
-
+    @ApiModelProperty(value = "投注金额")
+    private String betMoney;
+    
+    @ApiModelProperty(value = "投注时间")
+    private String betTime;
 }

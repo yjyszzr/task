@@ -48,24 +48,6 @@
   	set match_result = #{matchResult} 
   	where order_detail_id = #{orderDetailId}
   </update>
-  
-   <update id="updateTicketData">
-  	update dl_order_detail set ticket_data = #{ticketData} where order_detail_id = #{orderDetailId}
-  </update>
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
   <select id="selectByOrderId" resultType="com.dl.shop.order.model.OrderDetail">
         select
             dod.match_id matchId,

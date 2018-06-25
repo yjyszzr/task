@@ -1,7 +1,6 @@
 package com.dl.task.service;
 
 import java.math.BigDecimal;
-import java.text.DecimalFormat;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -9,54 +8,46 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+
 import javax.annotation.Resource;
-import org.apache.commons.beanutils.BeanUtils;
+
+import lombok.extern.slf4j.Slf4j;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import tk.mybatis.mapper.entity.Condition;
+
 import com.alibaba.fastjson.JSON;
 import com.dl.base.constant.CommonConstants;
-import com.dl.base.enums.AccountEnum;
 import com.dl.base.enums.SNBusinessCodeEnum;
-import com.dl.base.exception.ServiceException;
 import com.dl.base.result.BaseResult;
 import com.dl.base.result.ResultGenerator;
 import com.dl.base.service.AbstractService;
 import com.dl.base.util.DateUtil;
 import com.dl.base.util.JSONHelper;
 import com.dl.base.util.SNGenerator;
-import com.dl.base.util.SessionUtil;
 import com.dl.shop.payment.api.IpaymentService;
-import com.dl.shop.payment.dto.PayLogDTO;
-import com.dl.shop.payment.dto.UserWithdrawDetailDTO;
-import com.dl.shop.payment.param.WithDrawSnAndUserIdParam;
-import com.dl.shop.payment.param.WithDrawSnParam;
 import com.dl.task.core.ProjectConstant;
 import com.dl.task.dao.LotteryWinningLogTempMapper;
+import com.dl.task.dao.OrderMapper;
 import com.dl.task.dao.UserAccountMapper;
 import com.dl.task.dao.UserMapper;
-import com.dl.task.dto.OrderDTO;
 import com.dl.task.dto.SurplusPaymentCallbackDTO;
 import com.dl.task.dto.SysConfigDTO;
 import com.dl.task.dto.UserIdAndRewardDTO;
 import com.dl.task.model.DlMessage;
 import com.dl.task.model.LotteryWinningLogTemp;
+import com.dl.task.model.Order;
 import com.dl.task.model.User;
 import com.dl.task.model.UserAccount;
-import com.dl.task.param.OrderSnListParam;
-import com.dl.task.param.OrderSnParam;
 import com.dl.task.param.SurplusPayParam;
 import com.dl.task.util.GeTuiMessage;
 import com.dl.task.util.GeTuiUtil;
-import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.PageInfo;
 import com.google.common.base.Joiner;
-import lombok.extern.slf4j.Slf4j;
-import tk.mybatis.mapper.entity.Condition;
-import tk.mybatis.mapper.entity.Example.Criteria;
 
 @Service
 @Slf4j
@@ -66,12 +57,11 @@ public class UserAccountService extends AbstractService<UserAccount> {
 
 	@Resource
 	private UserMapper userMapper;
+	@Resource
+	private OrderMapper orderMapper;
 
 	@Resource
 	private UserService userService;
-
-	@Resource
-	private OrderService orderService;
 
 	@Resource
 	private IpaymentService payMentService;
@@ -172,14 +162,8 @@ public class UserAccountService extends AbstractService<UserAccount> {
 
 		log.info("更新用户中奖订单为已派奖开始");
 		List<String> orderSnRewaredList = userIdAndRewardList.stream().map(s -> s.getOrderSn()).collect(Collectors.toList());
-		OrderSnListParam orderSnListParam = new OrderSnListParam();
-		orderSnListParam.setOrderSnlist(orderSnRewaredList);
-		BaseResult<Integer> orderRst = orderService.updateOrderStatusRewarded(orderSnListParam);
-		if (0 != orderRst.getCode()) {
-			log.error("更新用户订单为已派奖失败");
-		}
+		int num = orderMapper.updateOrderStatusRewarded(orderSnRewaredList);
 		log.info("更新用户中奖订单为已派奖成功");
-
 		//推送消息
 		saveRewardMessageAsync(userIdAndRewardList, accountTime);
 
@@ -189,7 +173,6 @@ public class UserAccountService extends AbstractService<UserAccount> {
 
 		return ResultGenerator.genSuccessResult("用户派发奖金完成");
 	}
-
 	/**
 	 * 异步保存中奖消息
 	 * 
@@ -250,9 +233,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
 		}
 		
 		List<String> orderSnRewaredList = beyondLimitList.stream().map(s->s.getOrderSn()).collect(Collectors.toList());
-		OrderSnListParam orderSnListParam = new OrderSnListParam();
-		orderSnListParam.setOrderSnlist(orderSnRewaredList);
-		BaseResult<Integer> orderRst = orderService.updateOrderStatusRewarded(orderSnListParam);
+		int num = orderMapper.updateOrderStatusRewarded(orderSnRewaredList);
 	}
 	
 	
@@ -324,19 +305,12 @@ public class UserAccountService extends AbstractService<UserAccount> {
 	public BaseResult<SurplusPaymentCallbackDTO> rollbackUserAccountChangeByPay(SurplusPayParam surplusPayParam) {
 		String inPrams = JSON.toJSONString(surplusPayParam);
 		log.info(DateUtil.getCurrentDateTime() + "使用到了部分或全部余额时候回滚支付传递的参数:" + inPrams);
-
-		OrderSnParam orderSnParam = new OrderSnParam();
-		orderSnParam.setOrderSn(surplusPayParam.getOrderSn());
-		BaseResult<OrderDTO> orderDTORst = orderService.getOrderInfoByOrderSn(orderSnParam);
-		if (orderDTORst.getCode() != 0) {
-			return ResultGenerator.genFailResult(orderDTORst.getMsg());
-		}
-		OrderDTO orderDTO = orderDTORst.getData();
-		if (null == orderDTO) {
+		Order order = orderMapper.getOrderInfoByOrderSn(surplusPayParam.getOrderSn());
+		if (null == order) {
 			return ResultGenerator.genFailResult("没有该笔订单" + surplusPayParam.getOrderSn() + "，无法回滚账户");
 		}
 
-		Integer userId = orderDTO.getUserId();
+		Integer userId = order.getUserId();
 		if (null == userId) {
 			return ResultGenerator.genFailResult("该笔订单" + surplusPayParam.getOrderSn() + "userId为空，无法回滚账户");
 		}
@@ -366,53 +340,42 @@ public class UserAccountService extends AbstractService<UserAccount> {
 		}
 
 		User updateUser = new User();
-		BigDecimal userSurplus = orderDTO.getUserSurplus();
-		BigDecimal userSurplusLimit = orderDTO.getUserSurplusLimit();
-		boolean isModify = false;
+		BigDecimal userSurplus = order.getUserSurplus();
+		BigDecimal userSurplusLimit = order.getUserSurplusLimit();
+		updateUser.setUserId(user.getUserId());
 		if (userSurplus != null && userSurplus.doubleValue() > 0) {
 			log.info("user money: " + user.getUserMoney());
 			BigDecimal user_money = user.getUserMoney().add(userSurplus);
 			updateUser.setUserMoney(user_money);
-			isModify = true;
+			userMapper.updateInDBUserMoneyLimit(updateUser);
 		}
 
 		if (userSurplusLimit != null && userSurplusLimit.doubleValue() > 0) {
 			BigDecimal user_money_limit = user.getUserMoneyLimit().add(userSurplusLimit);
 			updateUser.setUserMoneyLimit(user_money_limit);
-			isModify = true;
+			userMapper.updateInDBUserMoneyLimit(updateUser);
 		}
-
-		if (isModify) {
-			updateUser.setUserId(user.getUserId());
-			int moneyRst = userMapper.updateUserMoneyAndUserMoneyLimit(updateUser);
-		}
-
 		UserAccount userAccountParam = new UserAccount();
 		String accountSn = SNGenerator.nextSN(SNBusinessCodeEnum.ACCOUNT_SN.getCode());
 		userAccountParam.setAccountSn(accountSn);
 		userAccountParam.setUserId(userId);
-		userAccountParam.setAmount(orderDTO.getUserSurplus().add(orderDTO.getUserSurplusLimit()));
+		userAccountParam.setAmount(order.getUserSurplus().add(order.getUserSurplusLimit()));
 		User curUser = userService.findById(userId);
 		BigDecimal curBalance = curUser.getUserMoney().add(user.getUserMoneyLimit());
 		userAccountParam.setCurBalance(curBalance);
 		userAccountParam.setProcessType(ProjectConstant.ACCOUNT_ROLLBACK);
-		userAccountParam.setOrderSn(orderDTO.getOrderSn());
-		userAccountParam.setPaymentName(orderDTO.getPayName());
-		userAccountParam.setThirdPartName(StringUtils.isEmpty(orderDTO.getPayName()) ? "" : orderDTO.getPayName());
+		userAccountParam.setOrderSn(order.getOrderSn());
+		userAccountParam.setPaymentName(order.getPayName());
+		userAccountParam.setThirdPartName(StringUtils.isEmpty(order.getPayName()) ? "" : order.getPayName());
 		userAccountParam.setAddTime(DateUtil.getCurrentTimeLong());
 		userAccountParam.setLastTime(DateUtil.getCurrentTimeLong());
-		userAccountParam.setPayId(String.valueOf(orderDTO.getPayId()));
+		userAccountParam.setPayId(String.valueOf(order.getPayId()));
 		int insertRst = userAccountMapper.insertUserAccountBySelective(userAccountParam);
-
 		SurplusPaymentCallbackDTO surplusPaymentCallbackDTO = new SurplusPaymentCallbackDTO();
 		surplusPaymentCallbackDTO.setSurplus(BigDecimal.ZERO);
 		surplusPaymentCallbackDTO.setUserSurplus(BigDecimal.ZERO);
 		surplusPaymentCallbackDTO.setUserSurplusLimit(BigDecimal.ZERO);
 		surplusPaymentCallbackDTO.setCurBalance(curBalance);
-
 		return ResultGenerator.genSuccessResult("success", surplusPaymentCallbackDTO);
 	}
-	
-	
-
 }

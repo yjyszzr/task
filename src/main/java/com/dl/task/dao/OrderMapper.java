@@ -104,4 +104,6 @@ public interface OrderMapper extends Mapper<Order> {
 
 	public void saveChannelOperation(ChannelOperationLog channelOperationLog);
 	
+	public int updateOrderStatusRewarded(@Param("orderSnList") List<String> orderSnRewaredList);
+	
 }
