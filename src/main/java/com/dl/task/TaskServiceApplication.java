@@ -15,7 +15,7 @@ import com.dl.task.core.ProjectConstant;
 
 @SpringBootApplication
 @Import({RestTemplateConfig.class, Swagger2.class, WebMvcConfigurer.class, FeignConfiguration.class})
-@MapperScan(basePackages= {ProjectConstant.MAPPER_PACKAGE,"com.dl.task.dao2"})
+@MapperScan(basePackages= {ProjectConstant.MAPPER_PACKAGE,"com.dl.task.dao"})
 @EnableTransactionManagement
 @EnableEurekaClient
 public class TaskServiceApplication {
