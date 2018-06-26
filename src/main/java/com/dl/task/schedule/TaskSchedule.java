@@ -138,7 +138,6 @@ public class TaskSchedule {
 	@Scheduled(fixedRate = 1000 * 5)
 	public void timerOrderQueryScheduled() {
 		EmptyParam emptyParam = new EmptyParam();
-		// TODO 胡贺东 带移动
 		// ipaymentService.timerCheckCashReq(emptyParam);
 	}
 
@@ -148,7 +147,6 @@ public class TaskSchedule {
 	@Scheduled(fixedRate = 1000 * 20)
 	public void timerCheckCashReq() {
 		EmptyParam emptyParam = new EmptyParam();
-		// TODO 胡贺东 带移动
 		// ipaymentService.timerOrderQueryScheduled(emptyParam);
 	}
 }
