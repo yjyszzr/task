@@ -31,6 +31,7 @@ public class DlMessageService extends AbstractService<DlMessage> {
     private GeTuiUtil geTuiUtil;
     @Resource
     private UserMapper userMapper;
+    
     public BaseResult<String> add(@RequestBody AddMessageParam addParam) {
     	List<MessageAddParam> params = addParam.getParams();
     	List<Integer> lotteryFailUserIds = new ArrayList<Integer>(params.size());

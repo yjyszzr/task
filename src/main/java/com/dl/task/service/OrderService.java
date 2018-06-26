@@ -84,17 +84,15 @@ public class OrderService extends AbstractService<Order> {
 	private OrderDetailMapper orderDetailMapper;
 	
 	@Resource
-	private	UserAccountService userAccountService;
-
-	@Resource 
-	private DlMessageService dlMessageService;
-	@Resource
 	private UserBonusMapper userBonusMapper;
 
 	@Resource
 	private UserAccountMapper userAccountMapper;
+	
 	@Resource
 	private UserMapper userMapper;
+	
+	@Resource
 	private DlPrintLotteryMapper dlPrintLotteryMapper;
 	
 	@Resource
@@ -103,6 +101,11 @@ public class OrderService extends AbstractService<Order> {
 	@Resource
 	private DlLeagueMatchResultMapper dlLeagueMatchResultMapper;
 
+	@Resource
+	private	UserAccountService userAccountService;
+
+	@Resource 
+	private DlMessageService dlMessageService;
 	/**
 	 * 更新订单状态
 	 * 
