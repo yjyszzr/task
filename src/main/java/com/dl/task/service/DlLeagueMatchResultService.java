@@ -17,8 +17,8 @@ import com.dl.base.enums.MatchResultHadEnum;
 import com.dl.base.service.AbstractService;
 import com.dl.base.util.DateUtil;
 import com.dl.base.util.NetWorkUtil;
-import com.dl.task.dao.DlLeagueMatchResultMapper;
-import com.dl.task.dao.LotteryMatchMapper;
+import com.dl.task.dao2.DlLeagueMatchResultMapper;
+import com.dl.task.dao2.LotteryMatchMapper;
 import com.dl.task.model.DlLeagueMatchResult;
 import com.dl.task.model.LotteryMatch;
 

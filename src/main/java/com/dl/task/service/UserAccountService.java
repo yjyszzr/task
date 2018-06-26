@@ -11,15 +11,11 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import tk.mybatis.mapper.entity.Condition;
 
 import com.alibaba.fastjson.JSON;
 import com.dl.base.constant.CommonConstants;
@@ -48,8 +44,12 @@ import com.dl.task.util.GeTuiMessage;
 import com.dl.task.util.GeTuiUtil;
 import com.google.common.base.Joiner;
 
+import lombok.extern.slf4j.Slf4j;
+import tk.mybatis.mapper.entity.Condition;
+
 @Service
 @Slf4j
+@Transactional(value="transactionManager1")
 public class UserAccountService extends AbstractService<UserAccount> {
 	@Resource
 	private UserAccountMapper userAccountMapper;
@@ -58,9 +58,6 @@ public class UserAccountService extends AbstractService<UserAccount> {
 	private UserMapper userMapper;
 	@Resource
 	private OrderMapper orderMapper;
-
-	@Resource
-	private UserService userService;
 
 	@Resource
 	private SysConfigService sysConfigService;
@@ -99,7 +96,6 @@ public class UserAccountService extends AbstractService<UserAccount> {
 	 * 
 	 * @param userIdAndRewardList
 	 */
-	@Transactional
 	public BaseResult<String> batchUpdateUserAccount(List<UserIdAndRewardDTO> dtos, Integer dealType) {
 		List<UserIdAndRewardDTO> oldUserIdAndRewardDtos = new ArrayList<UserIdAndRewardDTO>(dtos);
 		List<UserIdAndRewardDTO> userIdAndRewardList = new ArrayList<UserIdAndRewardDTO>(dtos);
@@ -297,7 +293,6 @@ public class UserAccountService extends AbstractService<UserAccount> {
 	 * @param String
 	 *            orderSn,String surplus
 	 */
-	@Transactional
 	public BaseResult<SurplusPaymentCallbackDTO> rollbackUserAccountChangeByPay(SurplusPayParam surplusPayParam) {
 		String inPrams = JSON.toJSONString(surplusPayParam);
 		log.info(DateUtil.getCurrentDateTime() + "使用到了部分或全部余额时候回滚支付传递的参数:" + inPrams);

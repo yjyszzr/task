@@ -23,7 +23,7 @@ import tk.mybatis.mapper.entity.Condition;
 import tk.mybatis.mapper.entity.Example.Criteria;
 
 @Service
-@Transactional
+@Transactional(value="transactionManager1")
 @Slf4j
 public class UserBonusService extends AbstractService<UserBonus> {
 	@Resource
@@ -65,7 +65,6 @@ public class UserBonusService extends AbstractService<UserBonus> {
 	 * @param userBonusParam
 	 * @return
 	 */
-	@Transactional
 	public void updateUserBonusStatusUnused(Integer userBonusId) {
 		UserBonus userBonus = this.findById(userBonusId);
 		if (userBonus == null) {

@@ -23,7 +23,7 @@ import com.dl.task.util.GeTuiMessage;
 import com.dl.task.util.GeTuiUtil;
 
 @Service
-@Transactional
+@Transactional(value="transactionManager1")
 public class DlMessageService extends AbstractService<DlMessage> {
     @Resource
     private DlMessageMapper dlMessageMapper;

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.dl.task.dao.LotteryMatchMapper">
+<mapper namespace="com.dl.task.dao2.LotteryMatchMapper">
   <resultMap id="BaseResultMap" type="com.dl.task.model.LotteryMatch">
     <id column="match_id" jdbcType="INTEGER" property="matchId" />
     <result column="league_id" jdbcType="INTEGER" property="leagueId" />

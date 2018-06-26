@@ -29,7 +29,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 import com.dl.base.configurer.RestTemplateConfig;
@@ -38,10 +37,10 @@ import com.dl.base.util.DateUtil;
 import com.dl.base.util.JSONHelper;
 import com.dl.base.util.MD5Utils;
 import com.dl.task.core.ProjectConstant;
-import com.dl.task.dao.DlLeagueMatchResultMapper;
 import com.dl.task.dao.DlPrintLotteryMapper;
-import com.dl.task.dao.LotteryMatchMapper;
 import com.dl.task.dao.PeriodRewardDetailMapper;
+import com.dl.task.dao2.DlLeagueMatchResultMapper;
+import com.dl.task.dao2.LotteryMatchMapper;
 import com.dl.task.dto.DlQueryStakeDTO;
 import com.dl.task.dto.DlQueryStakeDTO.BackQueryStake;
 import com.dl.task.dto.DlToStakeDTO;
@@ -54,7 +53,6 @@ import com.dl.task.param.DlToStakeParam;
 import com.dl.task.param.DlToStakeParam.PrintTicketOrderParam;
 
 @Service
-@Transactional
 public class DlPrintLotteryService {
 	private final static Logger log = Logger.getLogger(DlPrintLotteryService.class);
 
@@ -503,7 +501,20 @@ public class DlPrintLotteryService {
 				}// 判断是否对比过over
 			}// over prints for
 		}// over playcode for
-		this.updatePrintLotteryCompareInfo(updates);
+		log.info("updateBatchLotteryPrint 准备更新彩票信息到数据库：size" + updates.size());
+		if(updates.size() > 0) {
+			int num = 0;
+			for (DlPrintLottery print : updates) {
+				if (null == print.getRealRewardMoney()) {
+					print.setRealRewardMoney(BigDecimal.ZERO);
+				}
+				int n = dlPrintLotteryMapper.updatePrintLotteryCompareInfo(print);
+				if (n > 0) {
+					num += n;
+				}
+			}
+			log.info("updateBatchLotteryPrint 更新彩票信息到数据库：size" + updates.size() + "  入库返回：size=" + num);
+		}
 	}
 
 	/**
@@ -524,25 +535,6 @@ public class DlPrintLotteryService {
 		return playCodes;
 	}
 
-	/**
-	 * 高速批量更新LotteryPrint 10万条数据 18s
-	 * 
-	 * @param list
-	 */
-	public void updatePrintLotteryCompareInfo(List<DlPrintLottery> list) {
-		log.info("updateBatchLotteryPrint 准备更新彩票信息到数据库：size" + list.size());
-		int num = 0;
-		for (DlPrintLottery print : list) {
-			if (null == print.getRealRewardMoney()) {
-				print.setRealRewardMoney(BigDecimal.ZERO);
-			}
-			int n = dlPrintLotteryMapper.updatePrintLotteryCompareInfo(print);
-			if (n > 0) {
-				num += n;
-			}
-		}
-		log.info("updateBatchLotteryPrint 更新彩票信息到数据库：size" + list.size() + "  入库返回：size=" + num);
-	}
 
 	/**
 	 * 组合中奖集合

@@ -4,12 +4,9 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.alibaba.fastjson.JSON;
 import com.dl.base.result.BaseResult;
@@ -25,6 +22,8 @@ import com.dl.task.model.PayMent;
 import com.dl.task.param.SurplusPayParam;
 import com.dl.task.param.UpdateOrderInfoParam;
 import com.dl.task.param.UserBonusParam;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
@@ -72,7 +71,6 @@ public class PayMentService extends AbstractService<PayMent> {
     /**
      * 处理支付超时订单
      */
-    @Transactional
     public void dealBeyondPayTimeOrder(Order or) {
     	if(or.getSurplus().compareTo(BigDecimal.ZERO) > 0) {
 	    	SurplusPayParam surplusPayParam = new SurplusPayParam();

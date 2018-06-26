@@ -10,7 +10,7 @@ import com.dl.task.dao.PayLogMapper;
 import com.dl.task.model.PayLog;
 
 @Service
-@Transactional
+@Transactional(value="transactionManager1")
 public class PayLogService extends AbstractService<PayLog> {
 	@Resource
 	private PayLogMapper payLogMapper;

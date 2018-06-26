@@ -19,14 +19,11 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.alibaba.fastjson.JSON;
 import com.dl.base.constant.CommonConstants;
@@ -44,14 +41,14 @@ import com.dl.base.util.DateUtil;
 import com.dl.base.util.DateUtilNew;
 import com.dl.base.util.SNGenerator;
 import com.dl.task.core.ProjectConstant;
-import com.dl.task.dao.DlLeagueMatchResultMapper;
 import com.dl.task.dao.DlPrintLotteryMapper;
-import com.dl.task.dao.LotteryMatchMapper;
 import com.dl.task.dao.OrderDetailMapper;
 import com.dl.task.dao.OrderMapper;
 import com.dl.task.dao.UserAccountMapper;
 import com.dl.task.dao.UserBonusMapper;
 import com.dl.task.dao.UserMapper;
+import com.dl.task.dao2.DlLeagueMatchResultMapper;
+import com.dl.task.dao2.LotteryMatchMapper;
 import com.dl.task.dto.CellInfo;
 import com.dl.task.dto.OrderDTO;
 import com.dl.task.dto.OrderWithUserDTO;
@@ -73,6 +70,8 @@ import com.dl.task.param.AddMessageParam;
 import com.dl.task.param.MessageAddParam;
 import com.dl.task.param.OrderSnParam;
 import com.dl.task.param.UpdateOrderInfoParam;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
@@ -110,7 +109,6 @@ public class OrderService extends AbstractService<Order> {
 	 * @param param
 	 * @return
 	 */
-	@Transactional
 	public BaseResult<String> updateOrderInfoStatus(UpdateOrderInfoParam param) {
 		log.info("-----------%%%--------更新订单状态:" + JSON.toJSONString(param));
 		Order order = new Order();
