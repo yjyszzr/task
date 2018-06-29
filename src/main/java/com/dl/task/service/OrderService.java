@@ -323,6 +323,10 @@ public class OrderService extends AbstractService<Order> {
 		Integer acceptTime = 0;
 		Integer ticketTime = 0;
 		for(DlPrintLottery printLottery: succPrintLotterys) {
+			if(!"T51".equals(printLottery.getGame())){
+//				其他玩法直接退出
+				return ;
+			}
 			String stakes = printLottery.getStakes();
 			String printSp = printLottery.getPrintSp();
 			this.getPrintOdds(map, stakes, printSp);
@@ -382,7 +386,6 @@ public class OrderService extends AbstractService<Order> {
 	}
 	//获取出票赔率
 	private void getPrintOdds(Map<String, Double> map, String stakes, String spStr) {
-		log.info("取出赔率stakes={}",stakes);
 		String[] stakesList = stakes.split(";");
 		Map<String, String> codeTypeMap = new HashMap<String, String>();
 		for(int i=0; i<stakesList.length; i++) {
