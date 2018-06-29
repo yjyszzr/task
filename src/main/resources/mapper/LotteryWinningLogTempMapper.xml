@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dl.task.dao.LotteryWinningLogTempMapper">
+  <resultMap id="BaseResultMap" type="com.dl.task.model.LotteryWinningLogTemp">
+    <id column="winning_log_id" jdbcType="INTEGER" property="winningLogId" />
+    <result column="phone" jdbcType="VARCHAR" property="phone" />
+    <result column="winning_money" jdbcType="DECIMAL" property="winningMoney" />
+    <result column="is_show" jdbcType="INTEGER" property="isShow" />
+  </resultMap>
+  <select id="selectIsShowList" resultMap="BaseResultMap">
+  select * from dl_winning_log_temp where is_show=1;
+  </select>
+  <insert id="insertlotteryWinningTemp" parameterType="com.dl.task.model.LotteryWinningLogTemp">
+  INSERT INTO `dl_winning_log_temp`(`phone`, `winning_money`, `is_show`) VALUES (#{phone}, #{winningMoney}, #{isShow});
+  </insert>
+  <delete id="deleteByLogIds">
+  	delete from dl_winning_log_temp 
+  	where winning_log_id in
+  	<foreach collection="ids" item="id" index="index" open="(" close=")" separator=",">
+ 		#{id}
+ 	</foreach>
+  </delete>
+</mapper>

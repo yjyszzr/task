@@ -10,4 +10,8 @@ import com.dl.task.model.LotteryWinningLogTemp;
 public interface LotteryWinningLogTempMapper extends Mapper<LotteryWinningLogTemp> {
 
 	void deleteByLogIds(@Param("ids") List<Integer> ids);
+
+	List<LotteryWinningLogTemp> selectIsShowList();
+
+	void insertlotteryWinningTemp(LotteryWinningLogTemp temp);
 }

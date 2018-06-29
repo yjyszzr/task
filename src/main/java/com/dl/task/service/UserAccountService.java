@@ -268,7 +268,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
     	}
     	Condition condition = new Condition(LotteryWinningLogTemp.class);
 		condition.createCriteria().andCondition("is_show=", 1);
-		List<LotteryWinningLogTemp> olds = lotteryWinningLogTempMapper.selectByCondition(condition);
+		List<LotteryWinningLogTemp> olds = lotteryWinningLogTempMapper.selectIsShowList();
     	for(UserIdAndRewardDTO dto: collect) {
     		BigDecimal reward = dto.getReward();
     		String mobile = map.get(dto.getUserId());
@@ -276,7 +276,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
     		temp.setWinningMoney(reward);
     		temp.setPhone(mobile==null?"":mobile);
     		temp.setIsShow(1);
-    		lotteryWinningLogTempMapper.insert(temp);
+    		lotteryWinningLogTempMapper.insertlotteryWinningTemp(temp);
     	}
     	int num = olds.size() + collect.size() - 10;
     	if(num > 0) {
