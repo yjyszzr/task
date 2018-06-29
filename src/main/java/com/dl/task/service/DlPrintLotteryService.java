@@ -136,9 +136,7 @@ public class DlPrintLotteryService {
 			List<DlPrintLottery> lotteryPrints = new ArrayList<>(queryStakes.size());
 			for(XianBackQueryStake stake: queryStakes) {
 				String ticketId = stake.getTicketId();
-				DlPrintLottery lotteryPrint = new DlPrintLottery();
-				lotteryPrint.setTicketId(ticketId);
-				lotteryPrint = dlPrintLotteryMapper.selectOne(lotteryPrint);
+				DlPrintLottery lotteryPrint = dlPrintLotteryMapper.selectDlPrintLotteryByTicketId(ticketId);
 				if(null != lotteryPrint) {
 					Integer printStatus = stake.getPrintStatus();
 					if(printStatus.equals(ProjectConstant.PRINT_STATUS_FAIL)) {
@@ -299,9 +297,7 @@ public class DlPrintLotteryService {
 			List<DlPrintLottery> lotteryPrints = new ArrayList<>(queryStakes.size());
 			for(BackQueryStake stake: queryStakes) {
 				String ticketId = stake.getTicketId();
-				DlPrintLottery lotteryPrint = new DlPrintLottery();
-				lotteryPrint.setTicketId(ticketId);
-				lotteryPrint = dlPrintLotteryMapper.selectOne(lotteryPrint);
+				DlPrintLottery lotteryPrint = dlPrintLotteryMapper.selectDlPrintLotteryByTicketId(ticketId);
 				if(null != lotteryPrint) {
 					Integer printStatus = stake.getPrintStatus();
 					if(printStatus.equals(ProjectConstant.PRINT_STATUS_FAIL)) {
