@@ -9,7 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 
 @Service
-@Transactional
+@Transactional("transactionManager1")
 public class SysConfigService extends AbstractService<SysConfig> {
     @Resource
     private SysConfigMapper sysConfigMapper;
