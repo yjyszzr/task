@@ -12,6 +12,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 
 import com.dl.base.param.EmptyParam;
+import com.dl.shop.payment.api.IpaymentService;
 import com.dl.task.service.DlPrintLotteryService;
 import com.dl.task.service.LotteryRewardService;
 import com.dl.task.service.OrderService;
@@ -38,8 +39,8 @@ public class TaskSchedule {
 	@Resource
 	private PayMentService paymentService;
 
-	// @Resource
-	// private IpaymentService ipaymentService;
+	@Resource
+	private IpaymentService ipaymentService;
 
 	/**
 	 * 第一步： 出票任务 （每5分钟执行一次） 调用第三方接口出票定时任务 定时的对出票中的进行查询结果
@@ -138,7 +139,7 @@ public class TaskSchedule {
 	@Scheduled(fixedRate = 1000 * 5)
 	public void timerOrderQueryScheduled() {
 		EmptyParam emptyParam = new EmptyParam();
-		// ipaymentService.timerCheckCashReq(emptyParam);
+		 ipaymentService.timerOrderQueryScheduled(emptyParam);
 	}
 
 	/**
@@ -147,6 +148,6 @@ public class TaskSchedule {
 	@Scheduled(fixedRate = 1000 * 20)
 	public void timerCheckCashReq() {
 		EmptyParam emptyParam = new EmptyParam();
-		// ipaymentService.timerOrderQueryScheduled(emptyParam);
+		 ipaymentService.timerCheckCashReq(emptyParam);
 	}
 }

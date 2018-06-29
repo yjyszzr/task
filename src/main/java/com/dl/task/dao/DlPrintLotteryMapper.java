@@ -32,4 +32,14 @@ public interface DlPrintLotteryMapper extends Mapper<DlPrintLottery> {
 	public void updatePrintLotteryFailStatus(DlPrintLottery lotteryPrint);
 	//获取订单下的所有标
 	public List<DlPrintLottery> printLotterysByOrderSn(@Param("orderSn")String orderSn);
+	
+	public int updatePrintStatusByTicketId(DlPrintLottery lotteryPrint);
+	
+	public List<DlPrintLottery> lotteryPrintsHenanByUnPrint();
+	
+	public List<DlPrintLottery> lotteryPrintsXianByUnPrint();
+
+	public List<DlPrintLottery> getPrintIngLotterysHenan();
+	
+	public List<DlPrintLottery> getPrintIngLotterysXian();
 }
