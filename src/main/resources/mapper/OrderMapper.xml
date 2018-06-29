@@ -205,6 +205,7 @@
         order_status = 6
         and pay_status = 1
         and is_delete = 0
+     order by order_sn limit 50
   </select>
   
   <select id="queryOrderSnListByStatus" parameterType = "com.dl.task.model.Order" resultType="java.lang.String">
