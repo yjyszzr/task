@@ -130,10 +130,9 @@ public class UserAccountService extends AbstractService<UserAccount> {
 		List<User> userList = userMapper.queryUserByUserIds(userIdList);*/
 		for (UserIdAndRewardDTO uDTO : userIdAndRewardList) {
 			User updateUserMoney = new User();
-//			BigDecimal userMoney = BigDecimal.ZERO;
 			updateUserMoney.setUserId(uDTO.getUserId());
 			updateUserMoney.setUserMoney(uDTO.getReward());
-			userMapper.updateInDBUserMoneyAndUserMoneyLimit(updateUserMoney);
+			userMapper.updateInDBUserMoney(updateUserMoney);
 			UserAccount userAccountParam = new UserAccount();
 			String accountSn = SNGenerator.nextSN(SNBusinessCodeEnum.ACCOUNT_SN.getCode());
 			userAccountParam.setAccountSn(accountSn);
