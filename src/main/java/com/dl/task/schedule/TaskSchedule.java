@@ -45,7 +45,7 @@ public class TaskSchedule {
 	/**
 	 * 第一步： 出票任务 （每5分钟执行一次） 调用第三方接口出票定时任务 定时的对出票中的进行查询结果
 	 */
-	@Scheduled(cron = "0 0/1 * * * ?")
+	@Scheduled(cron = "${task.schedule.lottery.print.lottery}")
 	public void printLottery() {
 		log.info("出票定时任务启动");
 		dlPrintLotteryService.goPrintLottery();
@@ -63,7 +63,7 @@ public class TaskSchedule {
 	/**
 	 * 第二步： 对出票数据进行兑奖，更新彩票信息
 	 */
-	@Scheduled(cron = "0 0/5 * * * ?")
+	@Scheduled(cron = "${task.schedule.lottery.print.comparestatus}")
 	public void updatePrintLotteryCompareStatus() {
 		log.info("更新彩票信息，彩票对奖开始");
 		dlPrintLotteryService.updatePrintLotteryCompareStatus();
@@ -75,7 +75,7 @@ public class TaskSchedule {
 	 * 第三步： 订单出票结果更新 将出票信息回写到订单
 	 * 
 	 */
-	@Scheduled(cron = "0 0/1 * * * ?")
+	@Scheduled(cron = "${task.schedule.order.print.lottery.status}")
 	public void refreshOrderPrintStatus() {
 		log.info("开始执行更新订单出票结果任务");
 		orderService.refreshOrderPrintStatus();
@@ -86,7 +86,7 @@ public class TaskSchedule {
 	 * 第四步： 更新待开奖的订单状态及中奖金额
 	 * 
 	 */
-	@Scheduled(cron = "0 0/5 * * * ?")
+	@Scheduled(cron = "${task.schedule.order.open.reward}")
 	public void updateOrderAfterOpenReward() {
 		log.info("更新待开奖的订单开始");
 		lotteryRewardService.updateOrderAfterOpenReward();
@@ -97,7 +97,7 @@ public class TaskSchedule {
 	/**
 	 * 订单详情赛果 （每5分钟执行一次）
 	 */
-	@Scheduled(cron = "0 0/2 * * * ?")
+	@Scheduled(cron = "${task.schedule.order.match.result}")
 	public void updateOrderMatchResult() {
 		log.info("开始执行更新订单详情赛果任务");
 		orderService.updateOrderMatchResult();
@@ -107,7 +107,7 @@ public class TaskSchedule {
 	/**
 	 * 更新中奖用户的账户
 	 */
-	@Scheduled(cron = "0 0/5 * * * ?")
+	@Scheduled(cron = "${task.schedule.member.reward.money}")
 	public void addRewardMoneyToUsers() {
 		log.info("更新中奖用户的账户，派奖开始");
 		orderService.addRewardMoneyToUsers();
@@ -118,7 +118,7 @@ public class TaskSchedule {
 	/**
 	 * 更新过期的红包
 	 */
-	@Scheduled(cron = "0 0/1 * * * ?")
+	@Scheduled(cron = "${task.schedule.member.bonus.expire}")
 	public void updateBonusExpire() {
 		log.info("更新过期的红包定时任务开始");
 		userBonusService.updateBonusExpire();
@@ -126,7 +126,7 @@ public class TaskSchedule {
 	}
 
 	/**************** 支付的定时任务,调用支付模块 **************/
-	@Scheduled(cron = "0 0/2 * * * ?")
+	@Scheduled(cron = "${task.schedule.payment.time.out}")
 	public void dealBeyondPayTimeOrderOut() {
 		log.info("开始执行混合支付超时订单任务");
 		paymentService.dealBeyondPayTimeOrderOut();
@@ -136,7 +136,7 @@ public class TaskSchedule {
 	/**
 	 * 第三方支付的query
 	 */
-	@Scheduled(fixedRate = 1000 * 5)
+	@Scheduled(cron = "${task.schedule.order.pay.timeout}")
 	public void timerOrderQueryScheduled() {
 		log.info("第三方支付定时任务开始");
 		EmptyParam emptyParam = new EmptyParam();
@@ -147,7 +147,7 @@ public class TaskSchedule {
 	/**
 	 * 提现状态轮询
 	 */
-	@Scheduled(fixedRate = 1000 * 20)
+	@Scheduled(cron = "${task.schedule.payment.check.cash}")
 	public void timerCheckCashReq() {
 		log.info("提现状态轮询定时任务开始");
 		EmptyParam emptyParam = new EmptyParam();
