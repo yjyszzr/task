@@ -3,19 +3,27 @@ import com.dl.base.service.AbstractService;
 import com.dl.task.dao.SysConfigMapper;
 import com.dl.task.dto.SysConfigDTO;
 import com.dl.task.model.SysConfig;
+
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import javax.annotation.Resource;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Transactional("transactionManager1")
+@Slf4j
 public class SysConfigService extends AbstractService<SysConfig> {
     @Resource
     private SysConfigMapper sysConfigMapper;
     
     public SysConfigDTO querySysConfig(Integer businessId) {
-    	SysConfig sysConfig = this.findBy("businessId", businessId);
+    	SysConfig config = new SysConfig();
+    	config.setBusinessId(businessId);
+    	SysConfig sysConfig = sysConfigMapper.selectOne(config);
+    	log.info("businessId={},value={}",businessId,sysConfig==null?"":sysConfig.getValue());
     	if(null == sysConfig) {
     		return new SysConfigDTO();
     	}
