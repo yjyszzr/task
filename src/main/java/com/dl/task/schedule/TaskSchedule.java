@@ -149,7 +149,7 @@ public class TaskSchedule {
 	 */
 	@Scheduled(fixedRate = 1000 * 20)
 	public void timerCheckCashReq() {
-		log.info("体现状态轮询定时任务开始");
+		log.info("提现状态轮询定时任务开始");
 		EmptyParam emptyParam = new EmptyParam();
 		ipaymentService.timerCheckCashReq(emptyParam);
 	}
