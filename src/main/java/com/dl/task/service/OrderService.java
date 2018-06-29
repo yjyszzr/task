@@ -382,6 +382,7 @@ public class OrderService extends AbstractService<Order> {
 	}
 	//获取出票赔率
 	private void getPrintOdds(Map<String, Double> map, String stakes, String spStr) {
+		log.info("取出赔率stakes={}",stakes);
 		String[] stakesList = stakes.split(";");
 		Map<String, String> codeTypeMap = new HashMap<String, String>();
 		for(int i=0; i<stakesList.length; i++) {
