@@ -20,9 +20,7 @@ public class SysConfigService extends AbstractService<SysConfig> {
     private SysConfigMapper sysConfigMapper;
     
     public SysConfigDTO querySysConfig(Integer businessId) {
-    	SysConfig config = new SysConfig();
-    	config.setBusinessId(businessId);
-    	SysConfig sysConfig = sysConfigMapper.selectOne(config);
+    	SysConfig sysConfig = sysConfigMapper.selectConfigByBusinessId(businessId);
     	log.info("businessId={},value={}",businessId,sysConfig==null?"":sysConfig.getValue());
     	if(null == sysConfig) {
     		return new SysConfigDTO();
