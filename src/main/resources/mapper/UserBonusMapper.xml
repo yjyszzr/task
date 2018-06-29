@@ -36,7 +36,7 @@
 	  where user_bonus_id= #{userBonusId}
   </select>
     
-   <update id ="updateBatchUserBonusExpire" parameterType="java.util.List" >
+   <update id ="updateBatchUserBonusExpire" parameterType="java.util.List">
       update  dl_user_bonus set bonus_status = 2 where user_bonus_id in 
           <foreach collection="list" index="index" item="item" open="(" separator="," close=")"> 
 			#{item}  

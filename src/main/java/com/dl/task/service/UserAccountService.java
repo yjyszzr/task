@@ -266,8 +266,6 @@ public class UserAccountService extends AbstractService<UserAccount> {
     	for(User user: users) {
     		map.put(user.getUserId(), user.getMobile());
     	}
-    	Condition condition = new Condition(LotteryWinningLogTemp.class);
-		condition.createCriteria().andCondition("is_show=", 1);
 		List<LotteryWinningLogTemp> olds = lotteryWinningLogTempMapper.selectIsShowList();
     	for(UserIdAndRewardDTO dto: collect) {
     		BigDecimal reward = dto.getReward();
@@ -336,7 +334,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
 			log.info("user money: " + user.getUserMoney());
 			BigDecimal user_money = user.getUserMoney().add(userSurplus);
 			updateUser.setUserMoney(user_money);
-			userMapper.updateInDBUserMoneyLimit(updateUser);
+			userMapper.updateInDBUserMoney(updateUser);
 		}
 
 		if (userSurplusLimit != null && userSurplusLimit.doubleValue() > 0) {

@@ -13,5 +13,5 @@ public interface LotteryWinningLogTempMapper extends Mapper<LotteryWinningLogTem
 
 	List<LotteryWinningLogTemp> selectIsShowList();
 
-	void insertlotteryWinningTemp(LotteryWinningLogTemp temp);
+	int insertlotteryWinningTemp(LotteryWinningLogTemp temp);
 }

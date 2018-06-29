@@ -10,7 +10,7 @@
   <select id="selectIsShowList" resultMap="BaseResultMap">
   select * from dl_winning_log_temp where is_show=1;
   </select>
-  <insert id="insertlotteryWinningTemp" parameterType="com.dl.task.model.LotteryWinningLogTemp">
+  <insert id="insertlotteryWinningTemp" parameterType="com.dl.task.model.LotteryWinningLogTemp"  useGeneratedKeys="true" keyProperty="winning_log_id">
   INSERT INTO `dl_winning_log_temp`(`phone`, `winning_money`, `is_show`) VALUES (#{phone}, #{winningMoney}, #{isShow});
   </insert>
   <delete id="deleteByLogIds">
