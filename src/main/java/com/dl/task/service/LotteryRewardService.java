@@ -64,7 +64,6 @@ public class LotteryRewardService {
 			if(CollectionUtils.isNotEmpty(dlOrderDataDTOs)) {
 				Map<String, Double> map = new HashMap<String, Double>();
 				Set<String> unOrderSns = new HashSet<String>();
-				List<DlPrintLottery> errorPrints = new ArrayList<DlPrintLottery>(0);
 				for(DlPrintLottery dto: dlOrderDataDTOs) {
 					int printStatus = dto.getPrintStatus();
 					String printSp = dto.getPrintSp();
@@ -83,13 +82,10 @@ public class LotteryRewardService {
 						double realReward = realRewardMoney == null?0:realRewardMoney.doubleValue();
 						double1 = double1==null?realReward:(double1+realReward);
 						map.put(orderSn, double1);
-					}else if(printStatus == ProjectConstant.PRINT_STATUS_FAIL){
-						errorPrints.add(dto);
 					}
 				}
 				
 				log.info("*********8可开奖订单及资金数："+map.size());
-//				LotteryPrintMoneyParam lotteryPrintMoneyDTO = new LotteryPrintMoneyParam();
 				List<OrderDataParam> dtos = new ArrayList<OrderDataParam>(map.size());
 				for(String orderSn: map.keySet()) {
 					OrderDataParam dlOrderDataDTO = new OrderDataParam();
@@ -122,11 +118,6 @@ public class LotteryRewardService {
 					}
 					log.info("更新订单中奖状态和中奖金额updateOrderInfoByExchangeReward param size="+ n);
 
-				}
-				if(errorPrints.size() > 0) {
-					for(DlPrintLottery lotteryPrint:errorPrints) {
-						dlPrintLotteryMapper.updatePrintLotteryFailStatus(lotteryPrint);
-					}
 				}
 			}
 			orderSnList.removeAll(subList);
