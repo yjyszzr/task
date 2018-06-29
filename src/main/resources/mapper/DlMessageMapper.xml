@@ -137,6 +137,9 @@
          <if test="contentUrl!=null">
             #{contentUrl},
         </if>  
+        <if test="msgDesc!=null">
+            #{msgDesc},
+        </if>   
         <if test="msgUrl!=null">
             #{msgUrl},
         </if>                           
