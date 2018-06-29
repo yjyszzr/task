@@ -4,28 +4,23 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.dl.base.result.BaseResult;
 import com.dl.base.result.ResultGenerator;
-import com.dl.base.service.AbstractService;
 import com.dl.base.util.DateUtil;
-import com.dl.base.util.SessionUtil;
-import com.dl.task.core.ProjectConstant;
 import com.dl.task.dao.UserBonusMapper;
 import com.dl.task.model.UserBonus;
 import com.dl.task.param.UserBonusParam;
 
-import lombok.extern.slf4j.Slf4j;
-import tk.mybatis.mapper.entity.Condition;
-import tk.mybatis.mapper.entity.Example.Criteria;
-
 @Service
 @Transactional(value="transactionManager1")
 @Slf4j
-public class UserBonusService extends AbstractService<UserBonus> {
+public class UserBonusService{
 	@Resource
 	private UserBonusMapper userBonusMapper;
 	
@@ -66,26 +61,14 @@ public class UserBonusService extends AbstractService<UserBonus> {
 	 * @return
 	 */
 	public void updateUserBonusStatusUnused(Integer userBonusId) {
-		UserBonus userBonus = this.findById(userBonusId);
-		if (userBonus == null) {
+		UserBonus userBonus = userBonusMapper.selectUserBonuByBonusId(userBonusId);
+		if(userBonus!=null){
+			UserBonus usedUserBonus = new UserBonus();
+			usedUserBonus.setUserBonusId(userBonusId);
+			usedUserBonus.setUsedTime(DateUtil.getCurrentTimeLong());
+			userBonusMapper.updateBonusUnuseByUserBonusId(usedUserBonus);
+		}else{			
 			log.error("用户红包编号为" + userBonusId + "不存在");
 		}
-		Condition cUsed = new Condition(UserBonus.class);
-		Criteria criteria = cUsed.createCriteria();
-		criteria.andCondition("user_bonus_id =", userBonusId);
-		criteria.andCondition("bonus_status =", ProjectConstant.BONUS_STATUS_UNUSED);
-		criteria.andCondition("is_delete =", ProjectConstant.NOT_DELETE);
-		List<UserBonus> userBonusList = this.findByCondition(cUsed);
-		if (userBonusList.size() > 0) {
-			log.error("用户红包编号为" + userBonusId + "不存在");
-		}
-
-		UserBonus usedUserBonus = new UserBonus();
-		usedUserBonus.setUserBonusId(userBonusId);
-		usedUserBonus.setUsedTime(DateUtil.getCurrentTimeLong());
-		usedUserBonus.setOrderSn("");
-		usedUserBonus.setUserId(SessionUtil.getUserId());
-		usedUserBonus.setBonusStatus(ProjectConstant.BONUS_STATUS_UNUSED);
-		this.update(usedUserBonus);
 	}
 }
