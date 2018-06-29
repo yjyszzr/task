@@ -138,8 +138,10 @@ public class TaskSchedule {
 	 */
 	@Scheduled(fixedRate = 1000 * 5)
 	public void timerOrderQueryScheduled() {
+		log.info("第三方支付定时任务开始");
 		EmptyParam emptyParam = new EmptyParam();
-		 ipaymentService.timerOrderQueryScheduled(emptyParam);
+		ipaymentService.timerOrderQueryScheduled(emptyParam);
+		
 	}
 
 	/**
@@ -147,7 +149,8 @@ public class TaskSchedule {
 	 */
 	@Scheduled(fixedRate = 1000 * 20)
 	public void timerCheckCashReq() {
+		log.info("体现状态轮询定时任务开始");
 		EmptyParam emptyParam = new EmptyParam();
-		 ipaymentService.timerCheckCashReq(emptyParam);
+		ipaymentService.timerCheckCashReq(emptyParam);
 	}
 }
