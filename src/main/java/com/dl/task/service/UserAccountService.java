@@ -27,6 +27,7 @@ import com.dl.base.util.DateUtil;
 import com.dl.base.util.JSONHelper;
 import com.dl.base.util.SNGenerator;
 import com.dl.task.core.ProjectConstant;
+import com.dl.task.dao.DlMessageMapper;
 import com.dl.task.dao.LotteryWinningLogTempMapper;
 import com.dl.task.dao.OrderMapper;
 import com.dl.task.dao.UserAccountMapper;
@@ -63,8 +64,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
 	private SysConfigService sysConfigService;
 
 	@Resource
-	private DlMessageService userMessageService;
-
+	private DlMessageMapper dlMessageMapper;
 	@Resource
 	private GeTuiUtil geTuiUtil;
 	
@@ -202,7 +202,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
 			messageAddParam.setMsgUrl("");// 通知暂时不需要
 			messageAddParam.setSendTime(accountTime);
 			messageAddParam.setMsgDesc(MessageFormat.format(CommonConstants.FORMAT_REWARD_MSG_DESC, u.getBetMoney(), u.getBetTime()));
-			userMessageService.save(messageAddParam);
+			dlMessageMapper.insertSelective(messageAddParam);
 			//push
 			if(StringUtils.isNotBlank(clientId)) {
 				String content = MessageFormat.format(CommonConstants.FORMAT_REWARD_PUSH_DESC, u.getReward());
