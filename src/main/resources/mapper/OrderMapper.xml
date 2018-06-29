@@ -192,7 +192,7 @@
 	 where order_sn=#{orderSn}
   </update>
   
- <select id="selectOpenedAllRewardOrderList" resultType="com.dl.order.dto.OrderWithUserDTO">
+ <select id="selectOpenedAllRewardOrderList" resultType="com.dl.task.dto.OrderWithUserDTO">
      select 
      	ticket_amount betMoney,
      	add_time betTime,
