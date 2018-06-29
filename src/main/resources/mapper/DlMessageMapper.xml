@@ -143,8 +143,8 @@
       </trim>
     </sql>
     
-  <insert id="insertUserAccountBySelective">
-  	INSERT INTO dl_user_account(<include refid="key"/>) values(<include refid="value"/>);
+  <insert id="insertInDbSelective">
+  	INSERT INTO dl_message(<include refid="key"/>) values(<include refid="value"/>);
   </insert>
   <select id="findUserMessageList" resultMap="BaseResultMap">
   	select 

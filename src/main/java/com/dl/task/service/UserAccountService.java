@@ -202,7 +202,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
 			messageAddParam.setMsgUrl("");// 通知暂时不需要
 			messageAddParam.setSendTime(accountTime);
 			messageAddParam.setMsgDesc(MessageFormat.format(CommonConstants.FORMAT_REWARD_MSG_DESC, u.getBetMoney(), u.getBetTime()));
-			dlMessageMapper.insertSelective(messageAddParam);
+			dlMessageMapper.insertInDbSelective(messageAddParam);
 			//push
 			if(StringUtils.isNotBlank(clientId)) {
 				String content = MessageFormat.format(CommonConstants.FORMAT_REWARD_PUSH_DESC, u.getReward());

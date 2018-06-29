@@ -10,7 +10,7 @@ import com.dl.task.param.UserMessageListParam;
 
 public interface DlMessageMapper extends Mapper<DlMessage> {
 	
-	int insertSelective(DlMessage dlMessage);
+	int insertInDbSelective(DlMessage dlMessage);
 
 	List<DlMessage> findUserMessageList(UserMessageListParam param);
 
