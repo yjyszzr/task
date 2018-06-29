@@ -11,6 +11,8 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.scheduling.annotation.Async;
@@ -44,9 +46,6 @@ import com.dl.task.param.SurplusPayParam;
 import com.dl.task.util.GeTuiMessage;
 import com.dl.task.util.GeTuiUtil;
 import com.google.common.base.Joiner;
-
-import lombok.extern.slf4j.Slf4j;
-import tk.mybatis.mapper.entity.Condition;
 
 @Service
 @Slf4j
@@ -150,10 +149,10 @@ public class UserAccountService extends AbstractService<UserAccount> {
 				log.error("用户" + uDTO.getUserId() + "中奖订单号为" + uDTO.getOrderSn() + "奖金派发完成");
 			}
 		}
-
 		log.info("更新用户中奖订单为已派奖开始");
-		List<String> orderSnRewaredList = userIdAndRewardList.stream().map(s -> s.getOrderSn()).collect(Collectors.toList());
-		int num = orderMapper.updateOrderStatusRewarded(orderSnRewaredList);
+		for(UserIdAndRewardDTO s: userIdAndRewardList){
+			orderMapper.updateOrderStatusRewardedOne(s.getOrderSn());
+		}
 		log.info("更新用户中奖订单为已派奖成功");
 		//推送消息
 		saveRewardMessageAsync(userIdAndRewardList, accountTime);
@@ -222,9 +221,9 @@ public class UserAccountService extends AbstractService<UserAccount> {
 		if(beyondLimitList.size() == 0) {
 			return;
 		}
-		
-		List<String> orderSnRewaredList = beyondLimitList.stream().map(s->s.getOrderSn()).collect(Collectors.toList());
-		int num = orderMapper.updateOrderStatusRewarded(orderSnRewaredList);
+		for(UserIdAndRewardDTO s: beyondLimitList){
+			orderMapper.updateOrderStatusRewardedOne(s.getOrderSn());
+		}
 	}
 	
 	
