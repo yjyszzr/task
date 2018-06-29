@@ -9,9 +9,9 @@
 	</appender>
 
 	<appender name="rollingFileINFO" class="ch.qos.logback.core.rolling.RollingFileAppender">
-		<file>${LOG_DIR}/shop-sms-info.log</file>
+		<file>${LOG_DIR}/task-info.log</file>
 		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-			<fileNamePattern>${LOG_DIR}/info/shop-sms-info.%d{yyyy-MM-dd}.log</fileNamePattern>
+			<fileNamePattern>${LOG_DIR}/info/task-info.%d{yyyy-MM-dd}.log</fileNamePattern>
 			<maxHistory>30</maxHistory>		
 		</rollingPolicy>
 		<encoder>
@@ -25,9 +25,9 @@
 	
 	
 	<appender name="rollingFileERROR" class="ch.qos.logback.core.rolling.RollingFileAppender">
-		<file>${LOG_DIR}/shop-sms-error.log</file>
+		<file>${LOG_DIR}/task-error.log</file>
 		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-			<fileNamePattern>${LOG_DIR}/error/shop-sms-error.%d{yyyy-MM-dd}.log</fileNamePattern>
+			<fileNamePattern>${LOG_DIR}/error/task-error.%d{yyyy-MM-dd}.log</fileNamePattern>
 			<maxHistory>30</maxHistory>		
 		</rollingPolicy>
 		<encoder>
