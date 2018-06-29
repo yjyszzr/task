@@ -176,5 +176,11 @@
   	#{note},#{payId},#{thirdPartName},#{userSurplus},
   	#{userSurplusLimit},#{thirdPartPaid},#{status});
   </insert> 
-  
+  <select id="queryUserAccountRewardByOrdersn" parameterType="java.util.List"  resultType="java.lang.String">
+  		select order_sn  from dl_user_account 
+  		where process_type = 1 and  order_sn in
+  		<foreach collection="list" index="index" item="item" open="(" separator="," close=")">  
+	         #{item}  
+	    </foreach>
+  </select>
 </mapper>
