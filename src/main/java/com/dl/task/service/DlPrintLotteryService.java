@@ -633,6 +633,44 @@ public class DlPrintLotteryService {
         dlPrintLotteryMapper.saveLotteryThirdApiLog(thirdApiLog);
 		return response;
 	}
+//	FIXME 用于调试河南期次兑奖文件main方法
+//	public static void main(String[] args) {
+//		String heNanUrl="http://1.192.90.178:9085";
+//		String heNanMerchant="180326";
+//		String heNanPwd="0FC67A15";
+//		Map<String,Object> param = new HashMap<String, Object>();
+//		param.put("game", "T51");
+//		param.put("issue", "201806306110");
+//		param.put("merchant", heNanMerchant);
+//		param.put("version", "1.0");
+//		param.put("timestamp", DateUtil.getCurrentTimeString(DateUtil.getCurrentTimeLong().longValue(), DateUtil.datetimeFormat));
+//		JSONObject jo = JSONObject.fromObject(param);
+//		String authStr = heNanMerchant + heNanPwd + jo.toString();
+//		HttpHeaders headers = new HttpHeaders();
+//		MediaType type = MediaType.parseMediaType("application/json;charset=UTF-8");
+//		headers.setContentType(type);
+//		String authorization = MD5Utils.MD5(authStr);
+//		headers.add("Authorization", authorization);
+//		HttpEntity<JSONObject> requestEntity = new HttpEntity<JSONObject>(jo, headers);
+//		String requestUrl = heNanUrl + "/prize_file";
+//		SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
+//        //ms
+//        factory.setReadTimeout(5000);
+//        //ms
+//        factory.setConnectTimeout(15000);
+//        RestTemplate restTemplate = new RestTemplate(factory);
+//        List<HttpMessageConverter<?>> messageConverters = Lists.newArrayList();
+//        for (HttpMessageConverter httpMessageConverter : restTemplate.getMessageConverters()) {
+//            if (httpMessageConverter instanceof StringHttpMessageConverter) {
+//                messageConverters.add(new StringHttpMessageConverter(Charset.forName("UTF-8")));
+//                continue;
+//            }
+//            messageConverters.add(httpMessageConverter);
+//        }
+//        restTemplate.setMessageConverters(messageConverters);
+//		String response = restTemplate.postForObject(requestUrl, requestEntity, String.class);
+//		log.info(response);
+//	}
 	/**
 	 * 河南出票处理
 	 */
