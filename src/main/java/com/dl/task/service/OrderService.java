@@ -201,7 +201,7 @@ public class OrderService extends AbstractService<Order> {
 					BigDecimal bonusAmount = order.getBonus();
 					Integer userBonusId = order.getUserBonusId();
 					if(userBonusId > 0 && 
-							refundMoney.setScale(2,RoundingMode.HALF_EVEN).compareTo(bonusAmount.setScale(2,RoundingMode.HALF_EVEN)) > 0) {
+							refundMoney.setScale(2,RoundingMode.HALF_EVEN).compareTo(bonusAmount.setScale(2,RoundingMode.HALF_EVEN)) >= 0) {
 						refundMoney = refundMoney.subtract(bonusAmount);
 						UserBonus updateUserBonus = new UserBonus();
 						updateUserBonus.setUserId(userId);
