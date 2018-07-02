@@ -49,7 +49,7 @@ public class DlMessageService extends AbstractService<DlMessage> {
     		dlMessage.setTitle(param.getTitle());
     		dlMessage.setMsgUrl(param.getMsgUrl());
     		dlMessage.setContentUrl(param.getContentUrl());
-    		this.save(dlMessage);
+    		dlMessageMapper.insertInDbSelective(dlMessage);
     		if(3 == param.getObjectType()) {
     			lotteryFailUserIds.add(param.getReceiver());
     		}
