@@ -53,7 +53,7 @@ public class TaskSchedule {
 		// 每天9点前不作查询处理，只作出票处理
 		LocalTime localTime = LocalTime.now(ZoneId.systemDefault());
 		int hour = localTime.getHour();
-		if (hour >= 9) {
+		if (hour < 1 && hour >= 9) {
 			log.info("彩票出票状态查询定时任务启动");
 			dlPrintLotteryService.goQueryStake();
 			log.info("彩票出票状态查询定时任务结束");
