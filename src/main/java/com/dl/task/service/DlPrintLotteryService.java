@@ -195,6 +195,7 @@ public class DlPrintLotteryService {
 		param.setTimestamp(DateUtil.getCurrentTimeString(DateUtil.getCurrentTimeLong().longValue(), DateUtil.datetimeFormat));
 		JSONObject jo = JSONObject.fromObject(param);
 		String backStr = getBackDateByJsonDataXian(jo, "/order/query");
+		log.info("西安出票查询参数={},响应信息={}",jo,backStr);
 		JSONObject backJo = JSONObject.fromObject(backStr);
 		@SuppressWarnings("rawtypes")
 		Map<String,Class> mapClass = new HashMap<String,Class>();
