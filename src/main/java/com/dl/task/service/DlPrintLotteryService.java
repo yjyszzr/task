@@ -416,7 +416,7 @@ public class DlPrintLotteryService {
 	 */
 	private String getComparePrintSpXian(String callBackSp, String ticketId) {
 		DlQueryStakeParam param = new DlQueryStakeParam();
-		param.setMerchant(merchant);
+		param.setMerchant(xianMerchant);
 		String[] orders = new String[1];
 		orders[0] = ticketId;
 		param.setOrders(orders);
