@@ -328,4 +328,8 @@
   <update id="updateOrderStatus6To5"> 
    update dl_order set order_status = 5 WHERE order_sn =#{orderSn} and order_status = 6
   </update>
+  <update id="updateOrderStatus0To8" >
+	 update dl_order set pay_time=#{payTime},pay_status=2,order_status=8
+	 where order_sn=#{orderSn} and order_status=0
+  </update>
 </mapper>

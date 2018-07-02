@@ -77,12 +77,8 @@ public class PayMentService extends AbstractService<PayMent> {
 	    	surplusPayParam.setOrderSn(or.getOrderSn());
 	    	BaseResult<SurplusPaymentCallbackDTO> rollRst = userAccountService.rollbackUserAccountChangeByPay(surplusPayParam);
 	    	if(rollRst.getCode() != 0) {
-	    		log.error(rollRst.getMsg());
-	    		return;
-	    	}
-	    	
-	    	if(rollRst.getCode() != 0) {
 	    		log.error("支付超时订单回滚用户余额异常,code="+rollRst.getCode()+"  msg:"+rollRst.getMsg()+" 订单号："+or.getOrderSn());
+	    		return;
 	    	}else {
 	    		log.info(JSON.toJSONString("用户"+or.getUserId()+"超时支付订单"+or.getOrderSn()+"已回滚账户余额"));
 	    	} 
@@ -96,14 +92,9 @@ public class PayMentService extends AbstractService<PayMent> {
     		userBonusService.rollbackChangeUserAccountByCreateOrder(userbonusParam);
     	}
    	
-    	UpdateOrderInfoParam updateOrderInfoParam = new UpdateOrderInfoParam();
-    	updateOrderInfoParam.setOrderSn(or.getOrderSn());
-    	updateOrderInfoParam.setOrderStatus(8);//订单失败
-    	updateOrderInfoParam.setPayStatus(2);//支付失败
-    	updateOrderInfoParam.setPayTime(DateUtil.getCurrentTimeLong());
-    	BaseResult<String> updateRst = orderService.updateOrderInfoStatus(updateOrderInfoParam);
-    	if(updateRst.getCode() != 0) {
-    		log.error("支付超时订单更新订单为出票失败 异常，返回，code="+updateRst.getCode()+"  msg:"+updateRst.getMsg()+" 订单号："+or.getOrderSn());
+    	int rst = orderMapper.updateOrderStatus0To8(or.getOrderSn(), DateUtil.getCurrentTimeLong());
+    	if(rst <= 0) {
+    		log.error("支付超时订单更新订单为出票失败 异常，订单号："+or.getOrderSn());
     		return;
     	}
     	

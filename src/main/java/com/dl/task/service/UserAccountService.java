@@ -102,8 +102,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
 		if (1 == dealType) {
 			limitValue = this.queryBusinessLimit(CommonConstants.BUSINESS_ID_REWARD);
 			if (limitValue.compareTo(BigDecimal.ZERO) <= 0) {
-				log.error("请前往后台管理系统设置派奖金额阈值,不予派奖");
-				return ResultGenerator.genFailResult("请前往后台管理系统设置派奖金额阈值");
+				limitValue = BigDecimal.ZERO;
 			}
 
 			Double limitValueDouble = limitValue.doubleValue();
@@ -111,6 +110,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
 			userIdAndRewardList.removeIf(s -> s.getReward().doubleValue() >= limitValueDouble);
 		}
 		if (userIdAndRewardList.size() == 0) {
+			log.info("没有要自动开奖的订单");
 			return ResultGenerator.genSuccessResult("没有要自动开奖的订单");
 		}
 
