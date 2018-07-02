@@ -148,21 +148,20 @@ public class DlPrintLotteryService {
 					} else {
 						continue;
 					}
-					String stakes = lotteryPrint.getStakes();
+//					String stakes = lotteryPrint.getStakes();
 					String sp = stake.getSp();
-					String comparePrintSp = getComparePrintSpXian(sp, stake.getTicketId());
-					comparePrintSp = StringUtils.isBlank(comparePrintSp)?sp:comparePrintSp;
-
-					String game = lotteryPrint.getGame();
-					String printSp = null;
-					if("T51".equals(game) && StringUtils.isNotBlank(comparePrintSp)) {
-						printSp = this.getPrintSp(stakes, comparePrintSp);
-					} else if("T56".equals(game)) {
-						printSp = comparePrintSp;
-					}
+//					String comparePrintSp = getComparePrintSpXian(sp, stake.getTicketId());
+//					comparePrintSp = StringUtils.isBlank(comparePrintSp)?sp:comparePrintSp;
+//					String game = lotteryPrint.getGame();
+//					String printSp = null;
+//					if("T51".equals(game) && StringUtils.isNotBlank(comparePrintSp)) {
+//						printSp = this.getPrintSp(stakes, comparePrintSp);
+//					} else if("T56".equals(game)) {
+//						printSp = comparePrintSp;
+//					}
 					lotteryPrint.setPlatformId(stake.getPlatformId());
 					lotteryPrint.setPrintNo(stake.getPrintNo());
-					lotteryPrint.setPrintSp(printSp);
+					lotteryPrint.setPrintSp(sp);
 					lotteryPrint.setPrintStatus(printStatus);
 					Date printTime = null;
 					String printTimeStr = stake.getPrintTime();
@@ -308,21 +307,21 @@ public class DlPrintLotteryService {
 					} else {
 						continue;
 					}
-					String stakes = lotteryPrint.getStakes();
+//					String stakes = lotteryPrint.getStakes();
 					String sp = stake.getSp();
-					String comparePrintSp = getComparePrintSpHenan(sp, stake.getTicketId());
-					comparePrintSp = StringUtils.isBlank(comparePrintSp)?sp:comparePrintSp;
+//					String comparePrintSp = getComparePrintSpHenan(sp, stake.getTicketId());
+//					comparePrintSp = StringUtils.isBlank(comparePrintSp)?sp:comparePrintSp;
 
-					String game = lotteryPrint.getGame();
-					String printSp = null;
-					if("T51".equals(game) && StringUtils.isNotBlank(comparePrintSp)) {
-						printSp = this.getPrintSp(stakes, comparePrintSp);
-					} else if("T56".equals(game)) {
-						printSp = comparePrintSp;
-					}
+//					String game = lotteryPrint.getGame();
+//					String printSp = null;
+//					if("T51".equals(game) && StringUtils.isNotBlank(comparePrintSp)) {
+//						printSp = this.getPrintSp(stakes, comparePrintSp);
+//					} else if("T56".equals(game)) {
+//						printSp = comparePrintSp;
+//					}
 					lotteryPrint.setPlatformId(stake.getPlatformId());
 					lotteryPrint.setPrintNo(stake.getPrintNo());
-					lotteryPrint.setPrintSp(printSp);
+					lotteryPrint.setPrintSp(sp);
 					lotteryPrint.setPrintStatus(printStatus);
 					Date printTime = null;
 					String printTimeStr = stake.getPrintTime();

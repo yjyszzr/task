@@ -157,6 +157,9 @@ public class OrderService extends AbstractService<Order> {
 			List<Order> succOrders = new ArrayList<Order>(orders.size());
 			List<Order> rollOrders = new ArrayList<Order>(orders.size());
 			for (Order order : orders) {
+				if(order.getOrderSn().equals("2018070213377371330005")){
+					log.info("debug ............");
+				}
 				Integer userId = order.getUserId();
 				if(userId == null) {//?????有没有必要
 					continue;
@@ -209,9 +212,6 @@ public class OrderService extends AbstractService<Order> {
 						updateUserBonus.setUsedTime(DateUtil.getCurrentTimeLong());
 						int i = userBonusMapper.updateBonusUnuseByUserBonusId(updateUserBonus);
 						log.info("出票失败退回优惠券，userid={},user_bonus_id={}",userId,userBonusId);
-					}
-					if(refundMoney.setScale(2,RoundingMode.HALF_EVEN).compareTo(bonusAmount.setScale(2,RoundingMode.HALF_EVEN)) <= 0) {
-						continue;
 					}
 					//账户流水查看
 					UserAccount userAccountRoll = new UserAccount();
