@@ -151,7 +151,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
 		}
 		log.info("更新用户中奖订单为已派奖开始");
 		for(UserIdAndRewardDTO s: userIdAndRewardList){
-			orderMapper.updateOrderStatusRewardedOne(s.getOrderSn());
+			orderMapper.updateOrderStatus6To5(s.getOrderSn());
 		}
 		log.info("更新用户中奖订单为已派奖成功");
 		//推送消息
@@ -222,7 +222,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
 			return;
 		}
 		for(UserIdAndRewardDTO s: beyondLimitList){
-			orderMapper.updateOrderStatusRewardedOne(s.getOrderSn());
+			orderMapper.updateOrderStatus6To7(s.getOrderSn());
 		}
 	}
 	

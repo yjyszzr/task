@@ -103,8 +103,9 @@ public interface OrderMapper extends Mapper<Order> {
 	public List<DlChannelDistributor> channelDistributorList(@Param("channelDistributorIds") List<Integer> channelDistributorIds);
 
 	public void saveChannelOperation(ChannelOperationLog channelOperationLog);
-//	TODO 胡贺东暂时先注释 
-//	public int updateOrderStatusRewarded(@Param("orderSnList") List<String> orderSnRewaredList);
-	public int updateOrderStatusRewardedOne(String orderSn);
+	
+	public int updateOrderStatus6To5(String orderSn);
+	
+	public int updateOrderStatus6To7(String orderSn);
 	
 }

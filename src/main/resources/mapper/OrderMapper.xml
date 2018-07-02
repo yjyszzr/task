@@ -322,13 +322,10 @@
   	from dl_channel_option_log where order_sn = #{orderSn}
   </select>
  
-  <update id="updateOrderStatusRewarded"> 
-   update dl_order set order_status = 5 WHERE order_sn in
-		<foreach collection="orderSnList" item="orderSn" index="index" open="(" separator="," close=")">
-           	#{orderSn}
-        </foreach>
+  <update id="updateOrderStatus6To7"> 
+   update dl_order set order_status = 7 WHERE order_sn =#{orderSn} and order_status = 6
   </update>
-  <update id="updateOrderStatusRewardedOne"> 
-   update dl_order set order_status = 5 WHERE order_sn =#{orderSn}
+  <update id="updateOrderStatus6To5"> 
+   update dl_order set order_status = 5 WHERE order_sn =#{orderSn} and order_status = 6
   </update>
 </mapper>
