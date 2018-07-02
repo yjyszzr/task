@@ -157,9 +157,6 @@ public class OrderService extends AbstractService<Order> {
 			List<Order> succOrders = new ArrayList<Order>(orders.size());
 			List<Order> rollOrders = new ArrayList<Order>(orders.size());
 			for (Order order : orders) {
-				if(order.getOrderSn().equals("2018070213377371330005")){
-					log.info("debug ............");
-				}
 				Integer userId = order.getUserId();
 				if(userId == null) {//?????有没有必要
 					continue;
