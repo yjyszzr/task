@@ -216,11 +216,6 @@ public class DlPrintLotteryService {
 		log.info("转化后的赔率格式是={}",ourSp);
 		xianStake.setSp(ourSp);
 	}
-//	public static void main(String[] args) {
-//		String sp = "05|201806273043|1:3@26.00;05|201806273042|0:3@28.00";
-//		String praseResult = parseStakeIssues(sp,Boolean.FALSE);
-//		System.out.println(praseResult);
-//	}
 	/**
 	 * 处理投注信息转化
 	 * @param stakeIssues
@@ -466,27 +461,6 @@ public class DlPrintLotteryService {
 		DlQueryStakeDTO dlQueryStakeDTO = (DlQueryStakeDTO) JSONObject.toBean(backJo, DlQueryStakeDTO.class, mapClass); 
 		return dlQueryStakeDTO;
 	}
-//   TODO 胡贺东 DEL late
-//	// ※※※※※※※※※※※※※※※※※
-//	// ※※※※※※※※※※※※※※※※※
-//	// 出票
-//	public void goPrintLottery() {
-//		String tokenId = "goPrintLottery" + DateUtil.getCurrentTimeLong();
-//		List<DlPrintLottery> lotteryPrintList = dlPrintLotteryMapper.lotteryPrintsByUnPrint();
-//		log.info("request token: " + tokenId + " goPrintLottery 未出票数：" + lotteryPrintList.size());
-//		if (CollectionUtils.isNotEmpty(lotteryPrintList)) {
-//			while (lotteryPrintList.size() > 0) {
-//				int toIndex = lotteryPrintList.size() > 50 ? 50 : lotteryPrintList.size();
-//				List<DlPrintLottery> lotteryPrints = lotteryPrintList.subList(0, toIndex);
-//				log.info("request token: " + tokenId + "  go tostake size=" + lotteryPrints.size());
-//				// 调用第三方出票
-//				Set<String> errOrderSns = this.gotoStak(lotteryPrints, tokenId);
-//				log.info("request token: " + tokenId + "出票失败订单数：" + errOrderSns.size());
-//				lotteryPrintList.removeAll(lotteryPrints);
-//			}
-//		}
-//	}
-	
 	/**
 	 * 出票定时任务
 	 */
