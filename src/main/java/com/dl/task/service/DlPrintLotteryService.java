@@ -150,7 +150,7 @@ public class DlPrintLotteryService {
 					}
 					String stakes = lotteryPrint.getStakes();
 					String sp = stake.getSp();
-					String comparePrintSp = getComparePrintSpHenan(sp, stake.getTicketId());
+					String comparePrintSp = getComparePrintSpXian(sp, stake.getTicketId());
 					comparePrintSp = StringUtils.isBlank(comparePrintSp)?sp:comparePrintSp;
 
 					String game = lotteryPrint.getGame();
@@ -397,6 +397,45 @@ public class DlPrintLotteryService {
 			return callBackSp;
 		}
 		BackQueryStake backQueryStake = backQueryStakes.get(0);
+		if(null == backQueryStake || backQueryStake.getPrintStatus() != 16) {
+			return callBackSp;
+		}
+		if(StringUtils.isNotEmpty(callBackSp) && StringUtils.isNotEmpty(backQueryStake.getSp())) {
+			if(callBackSp.equals(backQueryStake.getSp())) {
+				return callBackSp;
+			} else {
+				return backQueryStake.getSp();
+			}
+		} else if(StringUtils.isNotEmpty(callBackSp)) {
+			return callBackSp;
+		}
+		
+		return backQueryStake.getSp();
+	}
+	/**
+	 * 比较回调和主动查询的赔率是否一致，如果不一致，以主动查询成功的结果为准
+	 * @param callBackSp
+	 * @param issue
+	 * @return
+	 */
+	private String getComparePrintSpXian(String callBackSp, String ticketId) {
+		DlQueryStakeParam param = new DlQueryStakeParam();
+		param.setMerchant(merchant);
+		String[] orders = new String[1];
+		orders[0] = ticketId;
+		param.setOrders(orders);
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		param.setTimestamp(sdf.format(new Date()));
+		param.setVersion("1.0");
+		XianDlQueryStakeDTO dlQueryStakeDTO = queryStakeXian(param);
+		if(!dlQueryStakeDTO.getRetCode().equals("0")) {
+			return callBackSp;
+		}
+		List<XianBackQueryStake> backQueryStakes = dlQueryStakeDTO.getOrders();
+		if(CollectionUtils.isEmpty(backQueryStakes)) {
+			return callBackSp;
+		}
+		XianBackQueryStake backQueryStake = backQueryStakes.get(0);
 		if(null == backQueryStake || backQueryStake.getPrintStatus() != 16) {
 			return callBackSp;
 		}
