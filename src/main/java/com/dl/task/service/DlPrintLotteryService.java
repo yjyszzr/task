@@ -201,6 +201,9 @@ public class DlPrintLotteryService {
 		Map<String,Class> mapClass = new HashMap<String,Class>();
 		mapClass.put("orders", XianBackQueryStake.class);
 		XianDlQueryStakeDTO dlQueryStakeDTO = (XianDlQueryStakeDTO) JSONObject.toBean(backJo, XianDlQueryStakeDTO.class, mapClass); 
+		if(dlQueryStakeDTO.getOrders()==null){
+			log.error("西安出票查询失败，retCode={},retDesc={}",dlQueryStakeDTO.getRetCode(),dlQueryStakeDTO.getRetDesc());
+		}
 //		转化 一些特定参数例如利率，票号
 		for(XianBackQueryStake stake : dlQueryStakeDTO.getOrders()){
 			praseXianPrintSpToOurSp(stake);
