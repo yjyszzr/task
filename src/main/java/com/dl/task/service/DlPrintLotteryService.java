@@ -532,7 +532,7 @@ public class DlPrintLotteryService {
 				lotteryPrint.setErrorCode(Integer.parseInt(retCode));
 				lotteryPrint.setStatus(2);
 				lotteryPrint.setPrintTime(new Date());
-				int rst = this.updatePrintStatusByTicketId(lotteryPrint);
+				int rst = dlPrintLotteryMapper.updatePrintStatus0To2(lotteryPrint);
 			}
 			return allOrderSns;
 		}

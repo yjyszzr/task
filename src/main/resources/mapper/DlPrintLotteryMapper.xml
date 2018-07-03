@@ -152,4 +152,12 @@
 	</if>
   	where ticket_id=#{ticketId}
   </update>
+  
+   <update id="updatePrintStatus0To2">
+  	update dl_print_lottery set 
+  	error_code=#{errorCode}, 
+  	status=2 ,
+	print_time = #{printTime}
+  	where ticket_id=#{ticketId} and status=0
+  </update>
 </mapper>

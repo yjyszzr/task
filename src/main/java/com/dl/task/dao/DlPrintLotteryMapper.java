@@ -42,4 +42,6 @@ public interface DlPrintLotteryMapper extends Mapper<DlPrintLottery> {
 	public List<DlPrintLottery> getPrintIngLotterysHenan();
 	
 	public List<DlPrintLottery> getPrintIngLotterysXian();
+	
+	public int updatePrintStatus0To2(DlPrintLottery lotteryPrint);
 }
