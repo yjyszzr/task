@@ -522,6 +522,20 @@ public class DlPrintLotteryService {
 		});
 		dlToStakeParam.setOrders(printTicketOrderParams);
 		XianDlToStakeDTO dlToStakeDTO = this.toStakeXian(dlToStakeParam);
+		String retCode = dlToStakeDTO.getRetCode();
+		log.info("西安出票 retCode={},retDesc={}",retCode,dlToStakeDTO.getRetDesc());
+		if(!"0".equals(retCode)){
+			for(PrintTicketOrderParam param:printTicketOrderParams){
+				log.info("ticketId={},设置出票失败");
+				DlPrintLottery lotteryPrint = new DlPrintLottery();
+				lotteryPrint.setTicketId(param.getTicketId());
+				lotteryPrint.setErrorCode(Integer.parseInt(retCode));
+				lotteryPrint.setStatus(2);
+				lotteryPrint.setPrintTime(new Date());
+				int rst = this.updatePrintStatusByTicketId(lotteryPrint);
+			}
+			return allOrderSns;
+		}
 		if(null != dlToStakeDTO && CollectionUtils.isNotEmpty(dlToStakeDTO.getOrders())) {
 			log.info("inf tostake orders");
 			List<DlPrintLottery> lotteryPrintErrors = new LinkedList<DlPrintLottery>();
