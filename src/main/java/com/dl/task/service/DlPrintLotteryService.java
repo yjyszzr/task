@@ -526,7 +526,7 @@ public class DlPrintLotteryService {
 		log.info("西安出票 retCode={},retDesc={}",retCode,dlToStakeDTO.getRetDesc());
 		if(!"0".equals(retCode)){
 			for(PrintTicketOrderParam param:printTicketOrderParams){
-				log.info("ticketId={},设置出票失败");
+				log.info("ticketId={},设置出票失败",param.getTicketId());
 				DlPrintLottery lotteryPrint = new DlPrintLottery();
 				lotteryPrint.setTicketId(param.getTicketId());
 				lotteryPrint.setErrorCode(Integer.parseInt(retCode));
