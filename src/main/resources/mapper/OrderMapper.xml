@@ -313,7 +313,7 @@
 			#{userName},
 			#{mobile},
 			#{source},
-			#{optionAmount,
+			#{optionAmount},
 			#{orderSn}
 			)
 	</insert>
