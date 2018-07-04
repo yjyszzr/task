@@ -300,7 +300,8 @@
 		user_name,
 		mobile,
 		 source,
-		option_amount)
+		option_amount,
+		order_sn)
 			values(
 			#{optionId},
 			#{userId},
@@ -312,7 +313,8 @@
 			#{userName},
 			#{mobile},
 			#{source},
-			#{optionAmount}
+			#{optionAmount,
+			#{orderSn}
 			)
 	</insert>
   
