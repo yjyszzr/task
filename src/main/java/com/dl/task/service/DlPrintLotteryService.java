@@ -3,6 +3,7 @@ package com.dl.task.service;
 import io.jsonwebtoken.lang.Collections;
 
 import java.math.BigDecimal;
+import java.nio.charset.Charset;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -29,6 +30,9 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.ClientHttpRequestFactory;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -56,6 +60,7 @@ import com.dl.task.model.LotteryThirdApiLog;
 import com.dl.task.param.DlQueryStakeParam;
 import com.dl.task.param.DlToStakeParam;
 import com.dl.task.param.DlToStakeParam.PrintTicketOrderParam;
+import com.google.common.collect.Lists;
 
 @Service
 @Slf4j
@@ -532,6 +537,8 @@ public class DlPrintLotteryService {
 				Integer errorCode = backOrderDetail.getErrorCode();
 				if(errorCode != 0) {
 					if(3002 == errorCode) {
+						lotteryPrint.setStatus(3);
+						lotteryPrintSuccess.add(lotteryPrint);
 						successOrderSn.add(ticketIdOrderSnMap.get(backOrderDetail.getTicketId()));
 					}else {
 						lotteryPrint.setErrorCode(errorCode);
@@ -611,43 +618,102 @@ public class DlPrintLotteryService {
 		return response;
 	}
 //	FIXME 用于调试河南期次兑奖文件main方法
-//	public static void main(String[] args) {
+	public static void main(String[] args) {
+		String heNanUrl="http://capi.bjzhongteng.com";
+		String heNanMerchant="caixiaomi_pro";
+		String heNanPwd="zoo3ReabDeGo6Ao4";
+		queryOrder(heNanUrl,heNanMerchant,heNanPwd);
+//		queryPrizeFile(heNanUrl,heNanMerchant,heNanPwd);
+	}
+	private static void queryOrder(String heNanUrl, String heNanMerchant,
+			String heNanPwd) {
+//		String[] orders=new String[]{"2018070220336551340874","2018070220343831340875","2018070220344721290876","2018070220342271280877"};
+//		2018070220336551340874
+//		2018070220343831340875
+//		2018070220344721290876
+//		2018070220342271280877		
+//		String[] orders=new String[]{"2018070220344071350880","2018070220343531290879","2018070220347661330878"};
+//		2018070220344071350880
+//		2018070220343531290879
+//		2018070220347661330878
+		String[] orders=new String[]{"2018070220348623260972","2018070220341183790973","2018070220343653130975"};
+//		2018070220348623260972
+//		2018070220341183790973
+//		2018070220343653130975
+//		2018070220345593790970
+//		2018070220347713260976
+//		2018070220346653250971
+//		2018070220347413880974
+		Map<String,Object> param = new HashMap<String, Object>();
+		param.put("orders", orders);
+		param.put("merchant", heNanMerchant);
+		param.put("version", "1.0");
+		param.put("timestamp", DateUtil.getCurrentTimeString(DateUtil.getCurrentTimeLong().longValue(), DateUtil.datetimeFormat));
+		JSONObject jo = JSONObject.fromObject(param);
+		String authStr = heNanMerchant + heNanPwd + jo.toString();
+		HttpHeaders headers = new HttpHeaders();
+		MediaType type = MediaType.parseMediaType("application/json;charset=UTF-8");
+		headers.setContentType(type);
+		String authorization = MD5Utils.MD5(authStr);
+		headers.add("Authorization", authorization);
+		HttpEntity<JSONObject> requestEntity = new HttpEntity<JSONObject>(jo, headers);
+		String requestUrl = heNanUrl + "/order/query";
+		SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
+        //ms
+        factory.setReadTimeout(5000);
+        //ms
+        factory.setConnectTimeout(15000);
+        RestTemplate restTemplate = new RestTemplate(factory);
+        List<HttpMessageConverter<?>> messageConverters = Lists.newArrayList();
+        for (HttpMessageConverter httpMessageConverter : restTemplate.getMessageConverters()) {
+            if (httpMessageConverter instanceof StringHttpMessageConverter) {
+                messageConverters.add(new StringHttpMessageConverter(Charset.forName("UTF-8")));
+                continue;
+            }
+            messageConverters.add(httpMessageConverter);
+        }
+        restTemplate.setMessageConverters(messageConverters);
+		String response = restTemplate.postForObject(requestUrl, requestEntity, String.class);
+		log.info(response);
+	}
+
+	private static void queryPrizeFile(String heNanUrl,String heNanMerchant,String heNanPwd){
 //		String heNanUrl="http://1.192.90.178:9085";
 //		String heNanMerchant="180326";
 //		String heNanPwd="0FC67A15";
-//		Map<String,Object> param = new HashMap<String, Object>();
-//		param.put("game", "T51");
-//		param.put("issue", "201806306110");
-//		param.put("merchant", heNanMerchant);
-//		param.put("version", "1.0");
-//		param.put("timestamp", DateUtil.getCurrentTimeString(DateUtil.getCurrentTimeLong().longValue(), DateUtil.datetimeFormat));
-//		JSONObject jo = JSONObject.fromObject(param);
-//		String authStr = heNanMerchant + heNanPwd + jo.toString();
-//		HttpHeaders headers = new HttpHeaders();
-//		MediaType type = MediaType.parseMediaType("application/json;charset=UTF-8");
-//		headers.setContentType(type);
-//		String authorization = MD5Utils.MD5(authStr);
-//		headers.add("Authorization", authorization);
-//		HttpEntity<JSONObject> requestEntity = new HttpEntity<JSONObject>(jo, headers);
-//		String requestUrl = heNanUrl + "/prize_file";
-//		SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
-//        //ms
-//        factory.setReadTimeout(5000);
-//        //ms
-//        factory.setConnectTimeout(15000);
-//        RestTemplate restTemplate = new RestTemplate(factory);
-//        List<HttpMessageConverter<?>> messageConverters = Lists.newArrayList();
-//        for (HttpMessageConverter httpMessageConverter : restTemplate.getMessageConverters()) {
-//            if (httpMessageConverter instanceof StringHttpMessageConverter) {
-//                messageConverters.add(new StringHttpMessageConverter(Charset.forName("UTF-8")));
-//                continue;
-//            }
-//            messageConverters.add(httpMessageConverter);
-//        }
-//        restTemplate.setMessageConverters(messageConverters);
-//		String response = restTemplate.postForObject(requestUrl, requestEntity, String.class);
-//		log.info(response);
-//	}
+		Map<String,Object> param = new HashMap<String, Object>();
+		param.put("game", "T51");
+		param.put("issue", "201806306110");
+		param.put("merchant", heNanMerchant);
+		param.put("version", "1.0");
+		param.put("timestamp", DateUtil.getCurrentTimeString(DateUtil.getCurrentTimeLong().longValue(), DateUtil.datetimeFormat));
+		JSONObject jo = JSONObject.fromObject(param);
+		String authStr = heNanMerchant + heNanPwd + jo.toString();
+		HttpHeaders headers = new HttpHeaders();
+		MediaType type = MediaType.parseMediaType("application/json;charset=UTF-8");
+		headers.setContentType(type);
+		String authorization = MD5Utils.MD5(authStr);
+		headers.add("Authorization", authorization);
+		HttpEntity<JSONObject> requestEntity = new HttpEntity<JSONObject>(jo, headers);
+		String requestUrl = heNanUrl + "/prize_file";
+		SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
+        //ms
+        factory.setReadTimeout(5000);
+        //ms
+        factory.setConnectTimeout(15000);
+        RestTemplate restTemplate = new RestTemplate(factory);
+        List<HttpMessageConverter<?>> messageConverters = Lists.newArrayList();
+        for (HttpMessageConverter httpMessageConverter : restTemplate.getMessageConverters()) {
+            if (httpMessageConverter instanceof StringHttpMessageConverter) {
+                messageConverters.add(new StringHttpMessageConverter(Charset.forName("UTF-8")));
+                continue;
+            }
+            messageConverters.add(httpMessageConverter);
+        }
+        restTemplate.setMessageConverters(messageConverters);
+		String response = restTemplate.postForObject(requestUrl, requestEntity, String.class);
+		log.info(response);
+	}
 	/**
 	 * 河南出票处理
 	 */

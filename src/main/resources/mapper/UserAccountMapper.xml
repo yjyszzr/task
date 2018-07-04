@@ -45,6 +45,10 @@
 		    <if test="orderSn != null">
 		        AND order_sn = #{orderSn}
 		    </if>
+		    <if test="payId != null">
+		        AND pay_id = #{payId}
+		    </if>
+		    
 	    </where>
   		ORDER BY add_time DESC
   </select>

@@ -2,6 +2,7 @@ package com.dl.task.schedule;
 
 import java.time.LocalTime;
 import java.time.ZoneId;
+import java.util.List;
 
 import javax.annotation.Resource;
 
@@ -13,11 +14,13 @@ import org.springframework.scheduling.annotation.Scheduled;
 
 import com.dl.base.param.EmptyParam;
 import com.dl.shop.payment.api.IpaymentService;
+import com.dl.task.model.UserWithdraw;
 import com.dl.task.service.DlPrintLotteryService;
 import com.dl.task.service.LotteryRewardService;
 import com.dl.task.service.OrderService;
 import com.dl.task.service.PayMentService;
 import com.dl.task.service.UserBonusService;
+import com.dl.task.service.WithdrawService;
 
 @Slf4j
 @Configuration
@@ -38,6 +41,9 @@ public class TaskSchedule {
 
 	@Resource
 	private PayMentService paymentService;
+	
+	@Resource
+	private WithdrawService withdrawService;
 
 	@Resource
 	private IpaymentService ipaymentService;
@@ -152,5 +158,20 @@ public class TaskSchedule {
 		log.info("提现状态轮询定时任务开始");
 		EmptyParam emptyParam = new EmptyParam();
 		ipaymentService.timerCheckCashReq(emptyParam);
+	}
+	/**
+	 * 提现失败定时任务处理回退用户信息
+	 */
+	@Scheduled(cron = "${task.schedule.withdraw.fail}")
+	public void withdrawFail() {
+		log.info("提现失败定时处理订单");
+		List<UserWithdraw> userWithdrawFailRefundigList = withdrawService.queryUserWithdrawRefundings();
+		for(UserWithdraw userWithdraw:userWithdrawFailRefundigList){
+			try{
+				withdrawService.userWithdrawFailRefund(userWithdraw);
+			}catch(Exception e){
+				log.error("withdrawsn={},提现失败回滚用户账户金额异常");
+			}
+		}
 	}
 }
