@@ -51,7 +51,7 @@ public class WithdrawService {
 	}
 	
 	
-	@Transactional
+	@Transactional(value="transactionManager1")
 	public void userWithdrawFailRefund(UserWithdraw userWithdraw) {
 		String withdrawSn = userWithdraw.getWithdrawalSn();
 		Integer userId = userWithdraw.getUserId();
