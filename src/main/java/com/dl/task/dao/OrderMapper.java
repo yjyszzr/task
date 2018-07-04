@@ -110,4 +110,7 @@ public interface OrderMapper extends Mapper<Order> {
 	
 	public int updateOrderStatus0To8(@Param("orderSn")String orderSn, @Param("payTime")Integer payTime);
 	
+	public List<Order> selectPaySuccessOrdersList();
+	public int updateOrderStatus0To1(@Param("orderSn")String orderSn);
+	
 }

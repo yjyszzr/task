@@ -2,6 +2,7 @@ package com.dl.task.model;
 
 import java.math.BigDecimal;
 import java.util.Date;
+
 import javax.persistence.*;
 
 @Table(name = "dl_print_lottery")
@@ -144,6 +145,11 @@ public class DlPrintLottery {
     @Column(name = "compared_stakes")
     private String comparedStakes;
 
+    /**
+     * print_lottery_com
+     */
+    @Column(name = "print_lottery_com")
+    private Integer printLotteryCom;
     /**
      * 获取出票流水id
      *
@@ -583,4 +589,12 @@ public class DlPrintLottery {
     public void setComparedStakes(String comparedStakes) {
         this.comparedStakes = comparedStakes;
     }
+
+	public Integer getPrintLotteryCom() {
+		return printLotteryCom;
+	}
+
+	public void setPrintLotteryCom(Integer printLotteryCom) {
+		this.printLotteryCom = printLotteryCom;
+	}
 }

@@ -137,6 +137,9 @@
   <select id="getPrintIngLotterysXian" resultMap="BaseResultMap">
   	select * from dl_print_lottery where status=3 and print_lottery_com=2 order by order_sn
   </select>
+   <select id="printLotteryRoutAmount" resultType="java.lang.Double">
+  	 select value from dl_sys_config where business_id=10;
+  </select>
   <update id="updatePrintLotteryFailStatus">
     update dl_print_lottery set 
   	error_code='55555', 

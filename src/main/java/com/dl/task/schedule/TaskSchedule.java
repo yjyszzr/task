@@ -14,6 +14,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 
 import com.dl.base.param.EmptyParam;
 import com.dl.shop.payment.api.IpaymentService;
+import com.dl.task.model.Order;
 import com.dl.task.model.UserWithdraw;
 import com.dl.task.service.DlPrintLotteryService;
 import com.dl.task.service.LotteryRewardService;
@@ -148,6 +149,21 @@ public class TaskSchedule {
 		EmptyParam emptyParam = new EmptyParam();
 		ipaymentService.timerOrderQueryScheduled(emptyParam);
 		
+	}
+	/**
+	 * 订单支付成功逻辑处理
+	 */
+	@Scheduled(cron = "${task.schedule.order.pay.timeout}")
+	public void orderPaySuccessScheduled() {
+		log.info("订单支付完成后的逻辑处理");
+		List<Order> orderList = orderService.getPaySuccessOrdersList();
+		for(Order order : orderList){
+			try{
+			orderService.doPaySuccessOrder(order);
+			}catch(Exception e){
+				log.error("处理订单支付order_sn={}",order.getOrderSn());
+			}
+		}
 	}
 
 	/**

@@ -19,11 +19,14 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.alibaba.fastjson.JSON;
 import com.dl.base.constant.CommonConstants;
@@ -44,13 +47,18 @@ import com.dl.task.core.ProjectConstant;
 import com.dl.task.dao.DlPrintLotteryMapper;
 import com.dl.task.dao.OrderDetailMapper;
 import com.dl.task.dao.OrderMapper;
+import com.dl.task.dao.PayLogMapper;
 import com.dl.task.dao.UserAccountMapper;
 import com.dl.task.dao.UserBonusMapper;
 import com.dl.task.dao.UserMapper;
 import com.dl.task.dao2.DlLeagueMatchResultMapper;
 import com.dl.task.dao2.LotteryMatchMapper;
 import com.dl.task.dto.CellInfo;
+import com.dl.task.dto.LotteryPrintDTO;
 import com.dl.task.dto.OrderDTO;
+import com.dl.task.dto.OrderDetailDataDTO;
+import com.dl.task.dto.OrderInfoAndDetailDTO;
+import com.dl.task.dto.OrderInfoDTO;
 import com.dl.task.dto.OrderWithUserDTO;
 import com.dl.task.dto.TMatchBetMaxAndMinOddsList;
 import com.dl.task.dto.TicketInfo;
@@ -63,6 +71,7 @@ import com.dl.task.model.DlLeagueMatchResult;
 import com.dl.task.model.DlPrintLottery;
 import com.dl.task.model.Order;
 import com.dl.task.model.OrderDetail;
+import com.dl.task.model.PayLog;
 import com.dl.task.model.User;
 import com.dl.task.model.UserAccount;
 import com.dl.task.model.UserBonus;
@@ -70,8 +79,6 @@ import com.dl.task.param.AddMessageParam;
 import com.dl.task.param.MessageAddParam;
 import com.dl.task.param.OrderSnParam;
 import com.dl.task.param.UpdateOrderInfoParam;
-
-import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
@@ -99,6 +106,9 @@ public class OrderService extends AbstractService<Order> {
 	private LotteryMatchMapper lotteryMatchMapper;
 	
 	@Resource
+	private DlPrintLotteryService dlPrintLotteryService;
+	
+	@Resource
 	private DlLeagueMatchResultMapper dlLeagueMatchResultMapper;
 
 	@Resource
@@ -106,6 +116,9 @@ public class OrderService extends AbstractService<Order> {
 
 	@Resource 
 	private DlMessageService dlMessageService;
+	
+	@Resource
+	private PayLogMapper payLogMapper;
 	/**
 	 * 更新订单状态
 	 * 
@@ -158,6 +171,9 @@ public class OrderService extends AbstractService<Order> {
 			List<Order> rollOrders = new ArrayList<Order>(orders.size());
 			for (Order order : orders) {
 				Integer userId = order.getUserId();
+				if(userId.equals(400399)){
+					log.info("debug.........");
+				}
 				if(userId == null) {//?????有没有必要
 					continue;
 				}
@@ -286,8 +302,10 @@ public class OrderService extends AbstractService<Order> {
 			distributors.forEach(item->distributorMap.put(item.getChannelDistributorId(), item));
 			for(Order orderFor: orderList) {
 				if(dUserIds.contains(orderFor.getUserId())) {
+					
 					ChannelOperationLog channelOperationByOrderSn = orderMapper.getChannelOperationByOrderSn(orderFor.getOrderSn());
 					if(channelOperationByOrderSn == null) {
+						log.info("debug......");
 						User user = userMap.get(orderFor.getUserId());
 						ChannelOperationLog channelOperationLog = new ChannelOperationLog();
 						channelOperationLog.setOptionId(0);
@@ -1206,5 +1224,121 @@ public class OrderService extends AbstractService<Order> {
 			allBetSumOdds.addAll(allOdds);
 		}
 		return allBetSumOdds;
+	}
+
+	/**
+	 * 查询支付成功订单未进行出票数据
+	 * @return
+	 */
+	public List<Order> getPaySuccessOrdersList() {
+		return orderMapper.selectPaySuccessOrdersList();
+	}
+
+	@Transactional(value="transactionManager1")
+	public void doPaySuccessOrder(Order order) {
+		String orderSn = order.getOrderSn();
+		Integer userId = order.getUserId();
+//		更新order_status=1
+		int updateRow = orderMapper.updateOrderStatus0To1(orderSn);
+		if(updateRow==1){			
+//		生成支付流水
+			UserAccount queryUserAccount = new UserAccount();
+			queryUserAccount.setUserId(userId);
+			queryUserAccount.setPayId(orderSn);
+			queryUserAccount.setProcessType(3);
+			List<UserAccount> userThisWithdrawRollList = userAccountMapper.queryUserAccountBySelective(queryUserAccount);
+			if(CollectionUtils.isEmpty(userThisWithdrawRollList)){
+				User user = userMapper.queryUserByUserId(userId);
+				PayLog payLog = payLogMapper.findPayLogByOrderSign(orderSn);
+//				生成账户流水
+				UserAccount userAccount = new UserAccount();
+				userAccount.setUserId(userId);
+				String accountSn = SNGenerator.nextSN(SNBusinessCodeEnum.ACCOUNT_SN.getCode());
+				userAccount.setAmount(payLog.getOrderAmount());
+				userAccount.setAccountSn(accountSn);
+				userAccount.setBonusPrice(BigDecimal.ZERO);
+				userAccount.setProcessType(3);
+				userAccount.setThirdPartName("");
+				userAccount.setPayId(""+payLog.getLogId());
+				userAccount.setAddTime(DateUtil.getCurrentTimeLong());
+				userAccount.setLastTime(DateUtil.getCurrentTimeLong());
+				userAccount.setCurBalance(user.getUserMoney().add(user.getUserMoneyLimit()));
+				userAccount.setStatus(1);
+				userAccount.setNote("支付成功");
+				String payCode = payLog.getPayCode();
+				String payName;
+				if(payCode.equals("app_weixin") || payCode.equals("app_weixin_h5")) {
+					payName = "微信";
+				}else {
+					payName = "银行卡";
+				}
+				userAccount.setPaymentName(payName);
+				userAccount.setThirdPartName(payName);
+				userAccount.setThirdPartPaid(payLog.getOrderAmount());
+				userAccount.setUserId(payLog.getUserId());
+				int rst = userAccountMapper.insertUserAccountBySelective(userAccount);
+				log.info("生成回滚账户流水返回值" + rst);				
+//		进行预出票
+				List<DlPrintLottery> dlPrints = dlPrintLotteryMapper.printLotterysByOrderSn(orderSn);
+				if(!CollectionUtils.isEmpty(dlPrints)){
+					Integer lotteryClassifyId = order.getLotteryClassifyId();
+					Integer lotteryPlayClassifyId = order.getLotteryPlayClassifyId();
+					OrderInfoAndDetailDTO orderDetail = getOrderWithDetailByOrder(order);
+					if(1== lotteryClassifyId && 8 == lotteryPlayClassifyId) {
+						dlPrintLotteryService.saveLotteryPrintInfo(orderDetail, order.getOrderSn());
+						return;
+					}
+					List<LotteryPrintDTO> lotteryPrints = dlPrintLotteryService.getPrintLotteryListByOrderInfo(orderDetail,orderSn);
+					if(CollectionUtils.isNotEmpty(lotteryPrints)) {
+						Double printLotteryRoutAmount = dlPrintLotteryMapper.printLotteryRoutAmount();
+				        int printLotteryCom = 1 ;//河南出票公司
+				        log.info("save printLotteryCom orderSn={},ticketAmount={},canBetMoney={}",order.getOrderSn(),order.getTicketAmount(),printLotteryRoutAmount);
+				        if(order.getTicketAmount().subtract(new BigDecimal(printLotteryRoutAmount)).compareTo(BigDecimal.ZERO)<0){
+				            log.info("orderSn={},设置出票公司为西安出票公司",order.getOrderSn());
+				            printLotteryCom = 2;//西安出票公司
+				        }
+				        dlPrintLotteryService.saveLotteryPrintInfo(lotteryPrints, order.getOrderSn(),printLotteryCom);
+				        return;
+					}
+				}
+			}
+		}else{
+			log.info("order_sn={},支付成功,更新状态1失败 where 0 ",orderSn);
+		}
+	}
+	/**
+	 * 根据订单编号查询订单及订单详情
+	 * 
+	 * @param param
+	 * @return
+	 */
+	public OrderInfoAndDetailDTO getOrderWithDetailByOrder(Order order) {
+		List<OrderDetail> orderDetails = orderDetailMapper.queryListByOrderSn(order.getOrderSn());
+		OrderInfoAndDetailDTO orderInfoAndDetailDTO = new OrderInfoAndDetailDTO();
+		OrderInfoDTO orderInfoDTO = new OrderInfoDTO();
+		orderInfoDTO.setCathectic(order.getCathectic());
+		orderInfoDTO.setLotteryClassifyId(order.getLotteryClassifyId());
+		orderInfoDTO.setLotteryPlayClassifyId(order.getLotteryPlayClassifyId());
+		orderInfoDTO.setPassType(order.getPassType());
+		orderInfoDTO.setPlayType(order.getPlayType());
+		orderInfoAndDetailDTO.setOrderInfoDTO(orderInfoDTO);
+		List<OrderDetailDataDTO> orderDetailDataDTOs = new LinkedList<OrderDetailDataDTO>();
+		if (CollectionUtils.isNotEmpty(orderDetails)) {
+			for (OrderDetail orderDetail : orderDetails) {
+				OrderDetailDataDTO orderDetailDataDTO = new OrderDetailDataDTO();
+				orderDetailDataDTO.setChangci(orderDetail.getChangci());
+				orderDetailDataDTO.setIsDan(orderDetail.getIsDan());
+				orderDetailDataDTO.setLotteryClassifyId(orderDetail.getLotteryClassifyId());
+				orderDetailDataDTO.setLotteryPlayClassifyId(orderDetail.getLotteryPlayClassifyId());
+				orderDetailDataDTO.setMatchId(orderDetail.getMatchId());
+				orderDetailDataDTO.setMatchTeam(orderDetail.getMatchTeam());
+				orderDetailDataDTO.setMatchTime(orderDetail.getMatchTime());
+				orderDetailDataDTO.setTicketData(orderDetail.getTicketData());
+				orderDetailDataDTO.setIssue(orderDetail.getIssue());
+				orderDetailDataDTOs.add(orderDetailDataDTO);
+			}
+		}
+		orderInfoAndDetailDTO.setOrderDetailDataDTOs(orderDetailDataDTOs);
+		return orderInfoAndDetailDTO;
 	}
 }
