@@ -884,6 +884,7 @@ public class DlPrintLotteryService {
 					comparedStakes += playCode;
 					DlPrintLottery updatePrint = new DlPrintLottery();
 					updatePrint.setPrintLotteryId(print.getPrintLotteryId());
+					updatePrint.setCompareStatus("0");
 					updatePrint.setComparedStakes(comparedStakes);
 					String[] stakesarr = stakes.split(";");
 					StringBuffer sbuf = new StringBuffer();
