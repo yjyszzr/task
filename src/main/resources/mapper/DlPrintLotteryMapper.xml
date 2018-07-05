@@ -118,7 +118,7 @@
         #{dlPrintLottery.betType},#{dlPrintLottery.money},#{dlPrintLottery.issue},#{dlPrintLottery.playType},
         #{dlPrintLottery.times},#{dlPrintLottery.stakes},#{dlPrintLottery.orderSn},#{dlPrintLottery.realRewardMoney},
         #{dlPrintLottery.thirdPartRewardMoney},#{dlPrintLottery.compareStatus},#{dlPrintLottery.comparedStakes},#{dlPrintLottery.rewardStakes}
-        ,#{dlPrintLottery.status,#{dlPrintLottery.printLotteryCom}}
+        ,#{dlPrintLottery.status,#{dlPrintLottery.printLotteryCom}
         )
         </foreach>
   </insert>
