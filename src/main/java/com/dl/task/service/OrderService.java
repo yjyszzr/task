@@ -171,9 +171,6 @@ public class OrderService extends AbstractService<Order> {
 			List<Order> rollOrders = new ArrayList<Order>(orders.size());
 			for (Order order : orders) {
 				Integer userId = order.getUserId();
-				if(userId.equals(400399)){
-					log.info("debug.........");
-				}
 				if(userId == null) {
 					continue;
 				}
