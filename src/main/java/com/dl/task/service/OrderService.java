@@ -1277,7 +1277,7 @@ public class OrderService extends AbstractService<Order> {
 				log.info("生成回滚账户流水返回值" + rst);				
 //		进行预出票
 				List<DlPrintLottery> dlPrints = dlPrintLotteryMapper.printLotterysByOrderSn(orderSn);
-				if(!CollectionUtils.isEmpty(dlPrints)){
+				if(CollectionUtils.isEmpty(dlPrints)){
 					Integer lotteryClassifyId = order.getLotteryClassifyId();
 					Integer lotteryPlayClassifyId = order.getLotteryPlayClassifyId();
 					OrderInfoAndDetailDTO orderDetail = getOrderWithDetailByOrder(order);
