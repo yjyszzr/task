@@ -303,6 +303,7 @@ public class OrderService extends AbstractService<Order> {
 			for(Order orderFor: orderList) {
 				if(dUserIds.contains(orderFor.getUserId())) {
 					ChannelOperationLog channelOperationByOrderSn = orderMapper.getChannelOperationByOrderSn(orderFor.getOrderSn());
+					log.info("select order_sn={},channel option log .......",orderFor.getOrderSn());
 					if(channelOperationByOrderSn == null) {
 						User user = userMap.get(orderFor.getUserId());
 						ChannelOperationLog channelOperationLog = new ChannelOperationLog();
@@ -322,6 +323,7 @@ public class OrderService extends AbstractService<Order> {
 						channelOperationLog.setChannelId(distributor.getChannelId());
 						channelOperationLog.setOrderSn(orderFor.getOrderSn());
 						orderMapper.saveChannelOperation(channelOperationLog);
+						log.info("save order_sn={},channel option log .......",orderFor.getOrderSn());
 					}
 				}
 			}
