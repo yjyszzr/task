@@ -14,6 +14,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 
 import com.dl.base.param.EmptyParam;
 import com.dl.shop.payment.api.IpaymentService;
+import com.dl.task.model.DlPrintLottery;
 import com.dl.task.model.Order;
 import com.dl.task.model.UserWithdraw;
 import com.dl.task.service.DlPrintLotteryService;
@@ -67,6 +68,15 @@ public class TaskSchedule {
 		}
 	}
 
+//	/**
+//	 * 更新出票的中奖信息
+//	 */
+//	@Scheduled(cron = "${task.schedule.lottery.print.third.reward}")
+//	public void updatePrintLotteryThirdRewardInfo(){
+//	    dlPrintLotteryService.updatePrintLotterysThirdRewardXian();
+//		dlPrintLotteryService.updatePrintLotteryThirdRewardHeNan();
+//	}
+	
 	/**
 	 * 第二步： 对出票数据进行兑奖，更新彩票信息
 	 */
@@ -161,7 +171,7 @@ public class TaskSchedule {
 			try{
 			orderService.doPaySuccessOrder(order);
 			}catch(Exception e){
-				log.error("处理订单支付order_sn={}",order.getOrderSn());
+				log.error("处理订单支付order_sn={}",order.getOrderSn(),e);
 			}
 		}
 	}
@@ -186,7 +196,7 @@ public class TaskSchedule {
 			try{
 				withdrawService.userWithdrawFailRefund(userWithdraw);
 			}catch(Exception e){
-				log.error("withdrawsn={},提现失败回滚用户账户金额异常");
+				log.error("withdrawsn={},提现失败回滚用户账户金额异常",userWithdraw.getWithdrawalSn(),e);
 			}
 		}
 	}
