@@ -1163,8 +1163,7 @@ public class DlPrintLotteryService {
 			lotteryPrint.setPrintLotteryCom(printLotteryCom);
 			return lotteryPrint;
 		}).collect(Collectors.toList());
-//		super.save(models);
-//		save
+		dlPrintLotteryMapper.batchInsertDlPrintLottery(models);
 		return ResultGenerator.genSuccessResult();
 	}
 	@Transactional(value="transactionManager1")
@@ -1199,8 +1198,7 @@ public class DlPrintLotteryService {
 		lotteryPrint.setComparedStakes("");
 		lotteryPrint.setRewardStakes("");
 		lotteryPrint.setStatus(0);
-//		TODO INSERT SAVE 
-//		super.save(lotteryPrint);
+		dlPrintLotteryMapper.insertDlPrintLottery(lotteryPrint);
 		return ResultGenerator.genSuccessResult();
 	}
 

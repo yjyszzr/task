@@ -86,7 +86,42 @@
   	insert into dl_third_api_log(api_name,api_type,api_param,api_result,api_desc)
   	values(#{apiName},#{apiType},#{apiParam},#{apiResult},#{apiDesc})
   </insert>
-  
+  <insert id="insertDlPrintLottery" parameterType="com.dl.task.model.DlPrintLottery">
+  insert into dl_print_lottery
+  (
+  game,merchant,ticket_id,accept_time,
+  betType,money,issue,play_type,
+  times,stakes,order_sn,real_reward_money,
+  third_part_reward_money,compare_status,compared_stakes,reward_stakes,
+  status
+  )
+   values(
+        #{game},#{merchant},#{ticketId},#{acceptTime},
+        #{betType},#{money},#{issue},#{playType},
+        #{times},#{stakes},#{orderSn},#{realRewardMoney},
+        #{thirdPartRewardMoney},#{compareStatus},#{comparedStakes},#{rewardStakes}
+        ,#{status}
+        )
+  </insert>
+  <insert id="batchInsertDlPrintLottery">
+  insert into dl_print_lottery
+  (
+  game,merchant,ticket_id,accept_time,
+  betType,money,issue,play_type,
+  times,stakes,order_sn,real_reward_money,
+  third_part_reward_money,compare_status,compared_stakes,reward_stakes,
+  status,print_lottery_com)
+   values
+        <foreach collection="dlPrintLotterys" item="dlPrintLottery" separator=";">
+        (
+        #{dlPrintLottery.game},#{dlPrintLottery.merchant},#{dlPrintLottery.ticketId},#{dlPrintLottery.acceptTime},
+        #{dlPrintLottery.betType},#{dlPrintLottery.money},#{dlPrintLottery.issue},#{dlPrintLottery.playType},
+        #{dlPrintLottery.times},#{dlPrintLottery.stakes},#{dlPrintLottery.orderSn},#{dlPrintLottery.realRewardMoney},
+        #{dlPrintLottery.thirdPartRewardMoney},#{dlPrintLottery.compareStatus},#{dlPrintLottery.comparedStakes},#{dlPrintLottery.rewardStakes}
+        ,#{dlPrintLottery.status,#{dlPrintLottery.printLotteryCom}}
+        )
+        </foreach>
+  </insert>
    <select id="lotteryPrintsByUnCompare" resultMap="BaseResultMap">
   	select 
   	<include refid="allFields"></include>
