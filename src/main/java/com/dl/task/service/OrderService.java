@@ -174,11 +174,11 @@ public class OrderService extends AbstractService<Order> {
 				if(userId.equals(400399)){
 					log.info("debug.........");
 				}
-				if(userId == null) {//?????有没有必要
+				if(userId == null) {
 					continue;
 				}
 				List<DlPrintLottery> printLotterys = dlPrintLotteryMapper.printLotterysByOrderSn(order.getOrderSn());
-				if(CollectionUtils.isEmpty(printLotterys)) {//?????
+				if(CollectionUtils.isEmpty(printLotterys)) {
 					continue;
 				}
 				Set<Integer> lotteryStatus = printLotterys.stream().map(item->item.getStatus()).collect(Collectors.toSet());
@@ -302,10 +302,8 @@ public class OrderService extends AbstractService<Order> {
 			distributors.forEach(item->distributorMap.put(item.getChannelDistributorId(), item));
 			for(Order orderFor: orderList) {
 				if(dUserIds.contains(orderFor.getUserId())) {
-					
 					ChannelOperationLog channelOperationByOrderSn = orderMapper.getChannelOperationByOrderSn(orderFor.getOrderSn());
 					if(channelOperationByOrderSn == null) {
-						log.info("debug......");
 						User user = userMap.get(orderFor.getUserId());
 						ChannelOperationLog channelOperationLog = new ChannelOperationLog();
 						channelOperationLog.setOptionId(0);
@@ -318,7 +316,7 @@ public class OrderService extends AbstractService<Order> {
 						channelOperationLog.setOperationNode(2);
 						channelOperationLog.setStatus(1);
 						channelOperationLog.setSource(orderFor.getOrderFrom());
-						BigDecimal moneyPaid = orderFor.getMoneyPaid();///???????
+						BigDecimal moneyPaid = orderFor.getMoneyPaid();
 						channelOperationLog.setOptionAmount(moneyPaid);
 						channelOperationLog.setOptionTime(DateUtilNew.getCurrentTimeLong());
 						channelOperationLog.setChannelId(distributor.getChannelId());
