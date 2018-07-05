@@ -148,9 +148,9 @@ public class DlPrintLotteryThirdReward {
     }
 
     /**
-     * 设置出票状态 8-小奖 9-大奖 10-未中奖
+     * 设置出票状态1-小奖 2-大奖 3-未中奖
      *
-     * @param rewardStatus 出票状态 8-小奖 9-大奖 10-未中奖
+     * @param rewardStatus 出票状态 1-小奖 2-大奖 3-未中奖
      */
     public void setRewardStatus(Integer rewardStatus) {
         this.rewardStatus = rewardStatus;

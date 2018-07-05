@@ -45,4 +45,8 @@ public interface DlPrintLotteryMapper extends Mapper<DlPrintLottery> {
 	public void insertDlPrintLottery(@Param("dlPrintLottery") DlPrintLottery dlPrintLottery);
 	public void batchInsertDlPrintLottery(@Param("dlPrintLotterys") List<DlPrintLottery> dlPrintLotterys);
 	public Double printLotteryRoutAmount();
+	public List<DlPrintLottery> selectFinishPrintLotteryButNotRewardXian();
+	public void updatePrintThirdReward(DlPrintLottery updateDlPrint);
+	public List<String> selectIssuesNotUpdateReward();
+	public List<DlPrintLottery> selectFinishPrintLotteryButNotRewardHeNan();
 }

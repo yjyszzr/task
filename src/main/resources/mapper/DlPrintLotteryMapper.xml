@@ -49,6 +49,18 @@
   	where ticket_id=#{ticketId}
   </select>
   
+  <select id="selectFinishPrintLotteryButNotRewardXian" resultMap="BaseResultMap" >
+  select printLottery.* from dl_print_lottery printLottery
+  left join dl_print_lottery_third_reward reward on printLottery.ticket_id=reward.ticket_id
+  where printLottery.status=1 and printLottery.print_lottery_com=2
+  and reward.ticket_id is null
+  </select>
+  <select id="selectFinishPrintLotteryButNotRewardHeNan" resultMap="BaseResultMap" >
+  select printLottery.* from dl_print_lottery printLottery
+  left join dl_print_lottery_third_reward reward on printLottery.ticket_id=reward.ticket_id
+  where printLottery.status=1 and printLottery.print_lottery_com=1
+  and reward.ticket_id is null
+  </select>
    <select id="getPrintIngLotterys" resultMap="BaseResultMap">
   	select 
 		<include refid="allFields"></include>
@@ -62,6 +74,13 @@
   	status=3 
   	where status=0 and ticket_id=#{ticketId}
   </update>
+  
+  <update id="updatePrintThirdReward" parameterType="com.dl.task.model.DlPrintLottery">
+  	update dl_print_lottery set 
+  	third_part_reward_money=#{thirdPartRewardMoney} 
+  	where status=1 and ticket_id=#{ticketId}
+  </update>
+  
   
   <update id="updatePrintErrorStatusByTicketId">
   	update dl_print_lottery set 

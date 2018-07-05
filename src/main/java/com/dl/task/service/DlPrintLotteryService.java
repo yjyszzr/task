@@ -2,7 +2,11 @@ package com.dl.task.service;
 
 import io.jsonwebtoken.lang.Collections;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.math.BigDecimal;
+import java.net.URL;
 import java.nio.charset.Charset;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -52,10 +56,12 @@ import com.dl.base.util.MD5Utils;
 import com.dl.base.util.SNGenerator;
 import com.dl.task.core.ProjectConstant;
 import com.dl.task.dao.DlPrintLotteryMapper;
+import com.dl.task.dao.DlPrintLotteryThirdRewardMapper;
 import com.dl.task.dao.PeriodRewardDetailMapper;
 import com.dl.task.dao2.DlLeagueMatchResultMapper;
 import com.dl.task.dao2.LotteryMatchMapper;
 import com.dl.task.dto.DlJcZqMatchCellDTO;
+import com.dl.task.dto.DlQueryPrizeFileDTO;
 import com.dl.task.dto.DlQueryStakeDTO;
 import com.dl.task.dto.DlQueryStakeDTO.BackQueryStake;
 import com.dl.task.dto.DlToStakeDTO;
@@ -74,8 +80,10 @@ import com.dl.task.dto.XianDlToStakeDTO.XianBackOrderDetail;
 import com.dl.task.model.BetResultInfo;
 import com.dl.task.model.DlLeagueMatchResult;
 import com.dl.task.model.DlPrintLottery;
+import com.dl.task.model.DlPrintLotteryThirdReward;
 import com.dl.task.model.LotteryThirdApiLog;
 import com.dl.task.param.DlJcZqMatchBetParam;
+import com.dl.task.param.DlQueryPrizeFileParam;
 import com.dl.task.param.DlQueryStakeParam;
 import com.dl.task.param.DlToStakeParam;
 import com.dl.task.param.DlToStakeParam.PrintTicketOrderParam;
@@ -99,7 +107,8 @@ public class DlPrintLotteryService {
 
 	@Resource
 	private LotteryMatchMapper lotteryMatchMapper;
-
+    @Resource
+    private DlPrintLotteryThirdRewardMapper dlPrintLotteryThirdRewardMapper;
 	@Resource
 	private RestTemplateConfig restTemplateConfig;
 
@@ -638,9 +647,12 @@ public class DlPrintLotteryService {
 	}
 //	FIXME 用于调试河南期次兑奖文件main方法
 	public static void main(String[] args) {
-		String heNanUrl="http://capi.bjzhongteng.com";
-		String heNanMerchant="caixiaomi_pro";
-		String heNanPwd="zoo3ReabDeGo6Ao4";
+//		String heNanUrl="http://capi.bjzhongteng.com";
+//		String heNanMerchant="caixiaomi_pro";
+//		String heNanPwd="zoo3ReabDeGo6Ao4";
+		String heNanUrl="devcapi.bjzhongteng.com";
+		String heNanMerchant="caixiaomi_dev";
+		String heNanPwd="Udohdup9shoh0Pee";
 		queryOrder(heNanUrl,heNanMerchant,heNanPwd);
 //		queryPrizeFile(heNanUrl,heNanMerchant,heNanPwd);
 	}
@@ -1529,5 +1541,160 @@ public class DlPrintLotteryService {
 				betNum1(item,num-1,link, betList);
 			}
 		}
+	}
+
+	/**
+	 * 获取河南已出票未获取第三方出奖信息的进行出奖
+	 */
+	public void updatePrintLotteryThirdRewardHeNan() {
+//		每一期次进行处理
+		List<DlPrintLottery> dlPrintLotterys = dlPrintLotteryMapper.selectFinishPrintLotteryButNotRewardHeNan();
+		List<String> issueAndGameList = new ArrayList<String>();
+		Map<String,String> printOrderSnMap = new HashMap<String, String>();
+		dlPrintLotterys.forEach(print->{
+			String issueAndGame = print.getGame()+";"+print.getIssue();
+			if(!issueAndGameList.contains(issueAndGame)){
+				issueAndGameList.add(issueAndGame);
+			}
+			printOrderSnMap.put(print.getTicketId(), print.getOrderSn());
+		});
+//		获取每一期次的逻辑处理
+		for(String issueAndGame : issueAndGameList){
+			String[] issueAndGameArr = issueAndGame.split(";");
+			DlQueryPrizeFileParam param = new DlQueryPrizeFileParam();
+			param.setMerchant(xianMerchant);
+			param.setVersion("1.0");
+			param.setGame(issueAndGameArr[0]);
+			param.setIssue(issueAndGameArr[1]);
+			DlQueryPrizeFileDTO dto = queryPrizeFile(param);
+			if(dto!=null&&StringUtils.isNotEmpty(dto.getUrl())){
+//				读取文件内容
+				List<DlPrintLotteryThirdReward> rewards;
+				try {
+					rewards = readFileFromUrl(dto.getUrl(),printOrderSnMap);
+					for(DlPrintLotteryThirdReward thirdReward:rewards){
+						saveDlPrintLotteryThirdReward(thirdReward);
+					}
+				} catch (IOException e) {
+					log.info("解析河南出票奖金文件失败",e);
+				}
+				
+			}
+		}
+	}
+	
+	
+
+	/**
+	 * 读取文件封装为对应参数
+	 * @param printMap 
+	 * @param url
+	 * @return
+	 * @throws IOException 
+	 */
+	private List<DlPrintLotteryThirdReward> readFileFromUrl(String urlStr, Map<String, String> printOrderSnMap) throws IOException {
+		List<DlPrintLotteryThirdReward> rewardList = new ArrayList<DlPrintLotteryThirdReward>();
+		log.info("解析河南出票兑奖信息 文件地址={}",urlStr);
+		 URL url = new URL(urlStr);
+        BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
+        String s;
+        int row=0;
+        while ((s = reader.readLine()) != null) {
+        	log.info("查询河南出奖信息内容为={}",s);
+        	row++;
+        	if(row==1){
+        		continue;
+        	}
+        	String[] printPrizeInfoArr = s.split(" ");
+        	String ticketId = printPrizeInfoArr[0];
+        	String platformId = printPrizeInfoArr[1];
+        	String thirdPrizeStatus = printPrizeInfoArr[2];
+        	String thirdReward = printPrizeInfoArr[3];
+        	DlPrintLotteryThirdReward printThirdReward = new DlPrintLotteryThirdReward();
+        	printThirdReward.setTicketId(ticketId);
+        	printThirdReward.setPlatformId(platformId);
+        	Integer prizeStatus = Integer.valueOf(3);
+			if("8".equals(thirdPrizeStatus)){
+				prizeStatus = Integer.valueOf(1);
+			}else if("9".equals(thirdPrizeStatus)){
+				prizeStatus = Integer.valueOf(2);
+			}
+			printThirdReward.setRewardStatus(prizeStatus);
+			printThirdReward.setThirdPartRewardMoney(BigDecimal.valueOf(Integer.parseInt(thirdReward)));
+			printThirdReward.setOrderSn(printOrderSnMap.get(ticketId));
+        	rewardList.add(printThirdReward);
+        }
+        reader.close();
+		return rewardList;
+	}
+
+	public void updatePrintLotterysThirdRewardXian() {
+		List<DlPrintLottery> dlPrintLotterys = dlPrintLotteryMapper.selectFinishPrintLotteryButNotRewardXian();
+		Map<String,DlPrintLottery> dlPrintLotterysMaps = new HashMap<String, DlPrintLottery>();
+		dlPrintLotterys.forEach(print->{
+			dlPrintLotterysMaps.put(print.getTicketId(), print);
+		});
+//		获取第三方奖金信息
+		List<String> tickets = dlPrintLotterys.stream().map(print->print.getTicketId()).collect(Collectors.toList());
+		String[] ticketsArr = tickets.toArray(new String[tickets.size()]);
+		DlQueryStakeParam queryStakeParam = new DlQueryStakeParam();
+		queryStakeParam.setMerchant(xianMerchant);
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		queryStakeParam.setTimestamp(sdf.format(new Date()));
+		queryStakeParam.setVersion("1.0");
+		queryStakeParam.setOrders(ticketsArr);
+		XianDlQueryStakeDTO dlQueryStakeDTO = this.queryStakeXian(queryStakeParam);
+		String retCode = dlQueryStakeDTO.getRetCode();
+		if("0".equals(retCode)) {
+			List<XianBackQueryStake> queryStakes = dlQueryStakeDTO.getOrders();
+			for(XianBackQueryStake stake: queryStakes) {
+				Integer prizeStatus = stake.getPrizeStatus();
+				if(Integer.valueOf(1).equals(prizeStatus) || Integer.valueOf(2).equals(prizeStatus)){
+					String ticketId = stake.getTicketId();
+					Integer money = stake.getPrizemoney();
+					if(money==null){
+						money=Integer.valueOf(0);
+					}
+					BigDecimal thirdRewardMoney = BigDecimal.valueOf(money);
+					DlPrintLottery printTemp = dlPrintLotterysMaps.get(ticketId);
+					Integer rewardStatus = Integer.valueOf(1).equals(prizeStatus)? 1:3;
+					DlPrintLotteryThirdReward thirdReward = new DlPrintLotteryThirdReward();
+					thirdReward.setOrderSn(printTemp.getOrderSn());
+					thirdReward.setPlatformId(printTemp.getPlatformId());
+					thirdReward.setRewardStatus(rewardStatus);
+					thirdReward.setThirdPartRewardMoney(thirdRewardMoney);
+					thirdReward.setTicketId(ticketId);
+					saveDlPrintLotteryThirdReward(thirdReward);
+				}
+			}
+		}
+	}
+	/**
+	 * 期次中奖文件查询
+	 * @return
+	 */
+	private DlQueryPrizeFileDTO queryPrizeFile(DlQueryPrizeFileParam param) {
+		param.setTimestamp(DateUtil.getCurrentTimeString(DateUtil.getCurrentTimeLong().longValue(), DateUtil.datetimeFormat));
+		JSONObject jo = JSONObject.fromObject(param);
+		String backStr = getBackDateByJsonDataHenan(jo, "/prize_file");
+		JSONObject backJo = JSONObject.fromObject(backStr);
+		DlQueryPrizeFileDTO dlQueryPrizeFileDTO = (DlQueryPrizeFileDTO) JSONObject.toBean(backJo, DlQueryPrizeFileDTO.class); 
+		return dlQueryPrizeFileDTO;
+	}
+	/**
+	 * 保存第三方出票中奖信息
+	 * @param orderSn
+	 * @param ticketId
+	 * @param platformId
+	 * @param rewardStatus
+	 * @param thirdPartRewardMoney
+	 */
+	private void saveDlPrintLotteryThirdReward(DlPrintLotteryThirdReward thirdReward){
+		thirdReward.setBalanceStatus(1);
+		dlPrintLotteryThirdRewardMapper.insertIntoPrintLotteryThirdReward(thirdReward);
+		DlPrintLottery updateDlPrint = new DlPrintLottery();
+		updateDlPrint.setThirdPartRewardMoney(thirdReward.getThirdPartRewardMoney());
+		updateDlPrint.setTicketId(thirdReward.getTicketId());
+		dlPrintLotteryMapper.updatePrintThirdReward(updateDlPrint);
 	}
 }

@@ -68,14 +68,22 @@ public class TaskSchedule {
 		}
 	}
 
-//	/**
-//	 * 更新出票的中奖信息
-//	 */
-//	@Scheduled(cron = "${task.schedule.lottery.print.third.reward}")
-//	public void updatePrintLotteryThirdRewardInfo(){
-//	    dlPrintLotteryService.updatePrintLotterysThirdRewardXian();
-//		dlPrintLotteryService.updatePrintLotteryThirdRewardHeNan();
-//	}
+	/**
+	 * 更新出票的中奖信息
+	 */
+	@Scheduled(cron = "${task.schedule.lottery.print.third.reward}")
+	public void updatePrintLotteryThirdRewardInfo(){
+		try{
+	    dlPrintLotteryService.updatePrintLotterysThirdRewardXian();
+		}catch(Exception e){
+			log.error("定时更新西安获奖信息失败",e);
+		}
+		try{
+		dlPrintLotteryService.updatePrintLotteryThirdRewardHeNan();
+		}catch(Exception e){
+			log.error("定时更新河南获奖信息失败",e);
+		}
+	}
 	
 	/**
 	 * 第二步： 对出票数据进行兑奖，更新彩票信息
