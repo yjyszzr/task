@@ -1246,7 +1246,7 @@ public class OrderService extends AbstractService<Order> {
 			List<UserAccount> userThisWithdrawRollList = userAccountMapper.queryUserAccountBySelective(queryUserAccount);
 			if(CollectionUtils.isEmpty(userThisWithdrawRollList)){
 				User user = userMapper.queryUserByUserId(userId);
-				PayLog payLog = payLogMapper.findPayLogByOrderSign(orderSn);
+				PayLog payLog = payLogMapper.findPayLogByOrderSn(orderSn);
 //				生成账户流水
 				UserAccount userAccount = new UserAccount();
 				userAccount.setUserId(userId);
