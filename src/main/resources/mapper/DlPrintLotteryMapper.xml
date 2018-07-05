@@ -88,24 +88,20 @@
   </insert>
   <insert id="insertDlPrintLottery" parameterType="com.dl.task.model.DlPrintLottery">
   insert into dl_print_lottery
-  (
-  game,merchant,ticket_id,accept_time,
-  betType,money,issue,play_type,
+  (game,merchant,ticket_id,accept_time,
+  bet_type,money,issue,play_type,
   times,stakes,order_sn,real_reward_money,
   third_part_reward_money,compare_status,compared_stakes,reward_stakes,
-  status
-  )values(
-        #{game},#{merchant},#{ticketId},#{acceptTime},
+  status) values(#{game},#{merchant},#{ticketId},#{acceptTime},
         #{betType},#{money},#{issue},#{playType},
         #{times},#{stakes},#{orderSn},#{realRewardMoney},
         #{thirdPartRewardMoney},#{compareStatus},#{comparedStakes},#{rewardStakes}
-        ,#{status}
-        )
+        ,#{status})
   </insert>
   <insert id="batchInsertDlPrintLottery">
   insert into dl_print_lottery
   (game,merchant,ticket_id,accept_time,
-  betType,money,issue,play_type,
+  bet_type,money,issue,play_type,
   times,stakes,order_sn,real_reward_money,
   third_part_reward_money,compare_status,compared_stakes,reward_stakes,
   status,print_lottery_com) values
