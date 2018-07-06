@@ -223,10 +223,12 @@ public class OrderService extends AbstractService<Order> {
 						int i = userBonusMapper.updateBonusUnuseByUserBonusId(updateUserBonus);
 						log.info("出票失败退回优惠券，userid={},user_bonus_id={}",userId,userBonusId);
 					}
+					if(refundMoney.compareTo(BigDecimal.ZERO)<=0){//刚好等于优惠券 的情况不需要流水变动
+						continue;
+					}
 					//账户流水查看
 					UserAccount userAccountRoll = new UserAccount();
 					userAccountRoll.setUserId(userId);
-//					userAccountRoll.setThirdPartPaid(refundMoney);
 					userAccountRoll.setOrderSn(order.getOrderSn());
 					userAccountRoll.setProcessType(ProjectConstant.ACCOUNT_ROLLBACK);
 					List<UserAccount> userAccountListRoll = userAccountMapper.queryUserAccountBySelective(userAccountRoll);
