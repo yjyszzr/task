@@ -67,23 +67,23 @@ public class TaskSchedule {
 			log.info("彩票出票状态查询定时任务结束");
 		}
 	}
-
-	/**
-	 * 更新出票的中奖信息
-	 */
-	@Scheduled(cron = "${task.schedule.lottery.print.third.reward}")
-	public void updatePrintLotteryThirdRewardInfo(){
-		try{
-	    dlPrintLotteryService.updatePrintLotterysThirdRewardXian();
-		}catch(Exception e){
-			log.error("定时更新西安获奖信息失败",e);
-		}
-		try{
-		dlPrintLotteryService.updatePrintLotteryThirdRewardHeNan();
-		}catch(Exception e){
-			log.error("定时更新河南获奖信息失败",e);
-		}
-	}
+//	胡贺东 暂时注释 目前出奖逻辑还差调试以及测试另外需1、在订单出奖更新是校验第三方奖金是否已经到了2、河南更新出票信息定时规则需要再次思考
+//	/**
+//	 * 更新出票的中奖信息
+//	 */
+//	@Scheduled(cron = "${task.schedule.lottery.print.third.reward}")
+//	public void updatePrintLotteryThirdRewardInfo(){
+//		try{
+//	    dlPrintLotteryService.updatePrintLotterysThirdRewardXian();
+//		}catch(Exception e){
+//			log.error("定时更新西安获奖信息失败",e);
+//		}
+//		try{
+//		dlPrintLotteryService.updatePrintLotteryThirdRewardHeNan();
+//		}catch(Exception e){
+//			log.error("定时更新河南获奖信息失败",e);
+//		}
+//	}
 	
 	/**
 	 * 第二步： 对出票数据进行兑奖，更新彩票信息
