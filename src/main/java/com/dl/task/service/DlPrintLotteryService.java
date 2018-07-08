@@ -956,6 +956,7 @@ public class DlPrintLotteryService {
 				continue;
 			}
 			for (DlPrintLottery print : lotteryPrints) {
+				Boolean playTypehaveResult = Boolean.FALSE;
 				String stakes = print.getStakes();
 				String comparedStakes = print.getComparedStakes() == null ? "" : print.getComparedStakes();
 				// 判断是否对比过
@@ -978,6 +979,7 @@ public class DlPrintLotteryService {
 							String playTypeStr = split[0];
 							List<String> cellCodes = Arrays.asList(split[2].split(","));
 							if (isCancel) {
+								playTypehaveResult = Boolean.TRUE;
 								sbuf.append(";").append(playTypeStr).append("|").append(playCode).append("|");
 								for (int i = 0; i < cellCodes.size(); i++) {
 									if (i > 0) {
@@ -990,6 +992,7 @@ public class DlPrintLotteryService {
 								// 比赛结果获取中奖信息
 								for (DlLeagueMatchResult rst : matchResultList) {
 									if (rst.getPlayType().equals(Integer.valueOf(playTypeStr))) {
+										playTypehaveResult = Boolean.TRUE;
 										String cellCode = rst.getCellCode();
 										if (cellCodes.contains(cellCode)) {
 											Map<String, String> aa = this.aa(print.getPrintSp());
@@ -1004,6 +1007,9 @@ public class DlPrintLotteryService {
 								}
 							}
 						}
+					}
+					if(!playTypehaveResult){//没有赛果时，跳出该处理等待下次循环
+						continue;
 					}
 					// 中奖记录
 					String reward = print.getRewardStakes();
