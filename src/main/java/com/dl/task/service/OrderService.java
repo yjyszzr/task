@@ -247,7 +247,7 @@ public class OrderService extends AbstractService<Order> {
 					Integer accountType = ProjectConstant.ACCOUNT_ROLLBACK;
 					log.info("===========更新用户流水表=======:" + accountType);
 					userAccountParamByType.setProcessType(accountType);
-					userAccountParamByType.setAmount(BigDecimal.ZERO.subtract(refundMoney));
+					userAccountParamByType.setAmount(refundMoney);
 					userAccountParamByType.setBonusPrice(BigDecimal.ZERO);//暂无红包金额
 					userAccountParamByType.setOrderSn(order.getOrderSn());
 					userAccountParamByType.setThirdPartPaid(refundMoney);
