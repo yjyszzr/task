@@ -51,6 +51,7 @@ import com.dl.task.dao.PayLogMapper;
 import com.dl.task.dao.UserAccountMapper;
 import com.dl.task.dao.UserBonusMapper;
 import com.dl.task.dao.UserMapper;
+import com.dl.task.dao.UserMatchCollectMapper;
 import com.dl.task.dao2.DlLeagueMatchResultMapper;
 import com.dl.task.dao2.LotteryMatchMapper;
 import com.dl.task.dto.CellInfo;
@@ -75,6 +76,7 @@ import com.dl.task.model.PayLog;
 import com.dl.task.model.User;
 import com.dl.task.model.UserAccount;
 import com.dl.task.model.UserBonus;
+import com.dl.task.model.UserMatchCollect;
 import com.dl.task.param.AddMessageParam;
 import com.dl.task.param.MessageAddParam;
 import com.dl.task.param.OrderSnParam;
@@ -119,6 +121,11 @@ public class OrderService extends AbstractService<Order> {
 	
 	@Resource
 	private PayLogMapper payLogMapper;
+	
+    @Resource
+    private UserMatchCollectMapper userMatchCollectMapper;
+    
+    
 	/**
 	 * 更新订单状态
 	 * 
@@ -569,6 +576,22 @@ public class OrderService extends AbstractService<Order> {
 		log.info("updateOrderMatchResult 准备去执行数据库更新操作：size=" + orderDetailList.size());
 		for(OrderDetail detail: orderDetailList) {
 			orderDetailMapper.updateMatchResult(detail);
+			
+			//需求：购买并成功出票，就收藏赛事
+			Integer userId = detail.getUserId();
+			Integer matchId = detail.getMatchId();
+	    	int rst = userMatchCollectMapper.queryUserMatchCollect(userId, matchId);
+	    	if(rst <= 0) {
+	        	UserMatchCollect umc = new UserMatchCollect();
+	        	umc.setUserId(detail.getUserId());
+	        	umc.setMatchId(detail.getMatchId());
+	        	umc.setAddTime(DateUtil.getCurrentTimeLong());
+	        	umc.setIsDelete(0);
+	        	userMatchCollectMapper.insertUserCollectMatch(umc);
+	    	}
+			
+			
+			
 		}
 		log.info("updateOrderMatchResult 准备去执行数据库更新取消赛事结果操作：size=" + cancelList.size());
 		for(OrderDetail detail: cancelList) {

@@ -166,7 +166,6 @@ public class TaskSchedule {
 		log.info("第三方支付定时任务开始");
 		EmptyParam emptyParam = new EmptyParam();
 		ipaymentService.timerOrderQueryScheduled(emptyParam);
-		
 	}
 	/**
 	 * 订单支付成功逻辑处理

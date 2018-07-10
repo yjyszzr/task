@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dl.member.dao.UserMatchCollectMapper">
+  <resultMap id="BaseResultMap" type="com.dl.member.model.UserMatchCollect">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="match_id" jdbcType="INTEGER" property="matchId" />
+    <result column="add_time" jdbcType="INTEGER" property="addTime" />
+    <result column="collect_from" jdbcType="VARCHAR" property="collectFrom" />
+    <result column="user_id" jdbcType="INTEGER" property="userId" />
+    <result column="is_delete" jdbcType="INTEGER" property="isDelete" />
+  </resultMap>
+  
+  <select id="queryUserMatchCollectListBySelective" parameterType="com.dl.member.model.UserMatchCollect"  resultType="java.lang.Integer">
+	  	SELECT match_id FROM dl_user_match_collect
+		<where>
+			<if test="id != null">
+		        AND id = #{id}
+		    </if>
+		  	<if test="userId != null">
+		        AND user_id = #{userId}
+		    </if>
+		    <if test="collectFrom != null">
+		        AND collect_from = #{collectFrom}
+		    </if>
+		    <if test="isDelete != null">
+		        AND is_delete = #{isDelete}
+		    </if>
+	    </where>
+	    order by add_time desc
+  </select>
+  
+  <select id="queryUserMatchCollect"  resultType="java.lang.Integer">
+	  	SELECT count(1) FROM dl_user_match_collect WHERE user_id = #{userId} AND match_id = #{matchId}
+  </select>  
+  
+  <insert id="insertUserCollectMatch"  parameterType="com.dl.member.model.UserMatchCollect">
+	INSERT INTO dl_user_match_collect(match_id,add_time,user_id,is_delete) VALUES(#{matchId},#{addTime},#{userId},#{isDelete}) 
+  </insert>  
+  
+   <delete id="deleteUserMatchCollect" parameterType="java.lang.Integer">
+  		DELETE FROM dl_user_match_collect WHERE user_id = #{userId} AND match_id = #{matchId}
+  </delete>
+</mapper>
