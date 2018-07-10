@@ -253,6 +253,9 @@ public class OrderService extends AbstractService<Order> {
 					UserAccount userAccountParamByType = new UserAccount();
 					Integer accountType = ProjectConstant.ACCOUNT_ROLLBACK;
 					log.info("===========更新用户流水表=======:" + accountType);
+					User curUser = userMapper.queryUserByUserId(userId);
+					BigDecimal curBalance = curUser.getUserMoney().add(curUser.getUserMoneyLimit());
+					userAccountParamByType.setCurBalance(curBalance);
 					userAccountParamByType.setProcessType(accountType);
 					userAccountParamByType.setAmount(refundMoney);
 					userAccountParamByType.setBonusPrice(BigDecimal.ZERO);//暂无红包金额

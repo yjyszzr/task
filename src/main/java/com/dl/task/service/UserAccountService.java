@@ -346,7 +346,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
 		userAccountParam.setUserId(userId);
 		userAccountParam.setAmount(order.getUserSurplus().add(order.getUserSurplusLimit()));
 		User curUser = userMapper.queryUserByUserId(userId);
-		BigDecimal curBalance = curUser.getUserMoney().add(user.getUserMoneyLimit());
+		BigDecimal curBalance = curUser.getUserMoney().add(curUser.getUserMoneyLimit());
 		userAccountParam.setCurBalance(curBalance);
 		userAccountParam.setProcessType(ProjectConstant.ACCOUNT_ROLLBACK);
 		userAccountParam.setOrderSn(order.getOrderSn());
