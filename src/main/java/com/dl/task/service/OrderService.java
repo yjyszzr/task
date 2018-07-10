@@ -1276,7 +1276,8 @@ public class OrderService extends AbstractService<Order> {
 				UserAccount userAccount = new UserAccount();
 				userAccount.setUserId(userId);
 				String accountSn = SNGenerator.nextSN(SNBusinessCodeEnum.ACCOUNT_SN.getCode());
-				userAccount.setAmount(payLog.getOrderAmount());
+				userAccount.setAmount(BigDecimal.ZERO.subtract(payLog.getOrderAmount()));
+				userAccount.setOrderSn(orderSn);
 				userAccount.setAccountSn(accountSn);
 				userAccount.setBonusPrice(BigDecimal.ZERO);
 				userAccount.setProcessType(3);
@@ -1297,7 +1298,6 @@ public class OrderService extends AbstractService<Order> {
 				userAccount.setPaymentName(payName);
 				userAccount.setThirdPartName(payName);
 				userAccount.setThirdPartPaid(payLog.getOrderAmount());
-				userAccount.setUserId(payLog.getUserId());
 				int rst = userAccountMapper.insertUserAccountBySelective(userAccount);
 				log.info("生成回滚账户流水返回值" + rst);				
 //		进行预出票
