@@ -332,14 +332,12 @@ public class UserAccountService extends AbstractService<UserAccount> {
 		updateUser.setUserId(user.getUserId());
 		if (userSurplus != null && userSurplus.doubleValue() > 0) {
 			log.info("user money: " + user.getUserMoney());
-			BigDecimal user_money = user.getUserMoney().add(userSurplus);
-			updateUser.setUserMoney(user_money);
+			updateUser.setUserMoney(userSurplus);
 			userMapper.updateInDBUserMoney(updateUser);
 		}
 
 		if (userSurplusLimit != null && userSurplusLimit.doubleValue() > 0) {
-			BigDecimal user_money_limit = user.getUserMoneyLimit().add(userSurplusLimit);
-			updateUser.setUserMoneyLimit(user_money_limit);
+			updateUser.setUserMoneyLimit(userSurplusLimit);
 			userMapper.updateInDBUserMoneyLimit(updateUser);
 		}
 		UserAccount userAccountParam = new UserAccount();
