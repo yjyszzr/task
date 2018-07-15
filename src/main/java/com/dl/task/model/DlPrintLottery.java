@@ -99,7 +99,12 @@ public class DlPrintLottery {
      */
     @Column(name = "print_status")
     private Integer printStatus;
-
+    /**
+     * 第三方出奖状态 1:第三方未进行出奖 2:第三方出奖中 3:第三方已出奖 4:第三方已结算
+     */
+    @Column(name = "third_reward_status")
+    private Integer thirdRewardStatus;
+    
     /**
      * 出票返回的赔率
      */
@@ -452,7 +457,15 @@ public class DlPrintLottery {
         this.printStatus = printStatus;
     }
 
-    /**
+    public Integer getThirdRewardStatus() {
+		return thirdRewardStatus;
+	}
+
+	public void setThirdRewardStatus(Integer thirdRewardStatus) {
+		this.thirdRewardStatus = thirdRewardStatus;
+	}
+
+	/**
      * 获取出票返回的赔率
      *
      * @return print_sp - 出票返回的赔率

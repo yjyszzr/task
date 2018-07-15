@@ -56,7 +56,6 @@ import com.dl.base.util.MD5Utils;
 import com.dl.base.util.SNGenerator;
 import com.dl.task.core.ProjectConstant;
 import com.dl.task.dao.DlPrintLotteryMapper;
-import com.dl.task.dao.DlPrintLotteryThirdRewardMapper;
 import com.dl.task.dao.PeriodRewardDetailMapper;
 import com.dl.task.dao2.DlLeagueMatchResultMapper;
 import com.dl.task.dao2.LotteryMatchMapper;
@@ -80,7 +79,6 @@ import com.dl.task.dto.XianDlToStakeDTO.XianBackOrderDetail;
 import com.dl.task.model.BetResultInfo;
 import com.dl.task.model.DlLeagueMatchResult;
 import com.dl.task.model.DlPrintLottery;
-import com.dl.task.model.DlPrintLotteryThirdReward;
 import com.dl.task.model.LotteryThirdApiLog;
 import com.dl.task.param.DlJcZqMatchBetParam;
 import com.dl.task.param.DlQueryPrizeFileParam;
@@ -107,8 +105,6 @@ public class DlPrintLotteryService {
 
 	@Resource
 	private LotteryMatchMapper lotteryMatchMapper;
-    @Resource
-    private DlPrintLotteryThirdRewardMapper dlPrintLotteryThirdRewardMapper;
 	@Resource
 	private RestTemplateConfig restTemplateConfig;
 
@@ -181,17 +177,7 @@ public class DlPrintLotteryService {
 					} else {
 						continue;
 					}
-//					String stakes = lotteryPrint.getStakes();
 					String sp = stake.getSp();
-//					String comparePrintSp = getComparePrintSpXian(sp, stake.getTicketId());
-//					comparePrintSp = StringUtils.isBlank(comparePrintSp)?sp:comparePrintSp;
-//					String game = lotteryPrint.getGame();
-//					String printSp = null;
-//					if("T51".equals(game) && StringUtils.isNotBlank(comparePrintSp)) {
-//						printSp = this.getPrintSp(stakes, comparePrintSp);
-//					} else if("T56".equals(game)) {
-//						printSp = comparePrintSp;
-//					}
 					lotteryPrint.setPlatformId(stake.getPlatformId());
 					lotteryPrint.setPrintNo(stake.getPrintNo());
 					lotteryPrint.setPrintSp(sp);
@@ -1556,13 +1542,11 @@ public class DlPrintLotteryService {
 //		每一期次进行处理
 		List<DlPrintLottery> dlPrintLotterys = dlPrintLotteryMapper.selectFinishPrintLotteryButNotRewardHeNan();
 		List<String> issueAndGameList = new ArrayList<String>();
-		Map<String,String> printOrderSnMap = new HashMap<String, String>();
 		dlPrintLotterys.forEach(print->{
 			String issueAndGame = print.getGame()+";"+print.getIssue();
 			if(!issueAndGameList.contains(issueAndGame)){
 				issueAndGameList.add(issueAndGame);
 			}
-			printOrderSnMap.put(print.getTicketId(), print.getOrderSn());
 		});
 //		获取每一期次的逻辑处理
 		for(String issueAndGame : issueAndGameList){
@@ -1575,11 +1559,11 @@ public class DlPrintLotteryService {
 			DlQueryPrizeFileDTO dto = queryPrizeFile(param);
 			if(dto!=null&&StringUtils.isNotEmpty(dto.getUrl())){
 //				读取文件内容
-				List<DlPrintLotteryThirdReward> rewards;
 				try {
-					rewards = readFileFromUrl(dto.getUrl(),printOrderSnMap);
-					for(DlPrintLotteryThirdReward thirdReward:rewards){
-						saveDlPrintLotteryThirdReward(thirdReward);
+					List<DlPrintLottery> dlPrintList = readFileFromUrl(dto.getUrl());
+					for(DlPrintLottery updateDlPrint : dlPrintList){//FIXME 后面有时间改为批量更新
+						log.info("河南更新第三方奖金 ticketId={},thirdRewardMoney={}",updateDlPrint.getTicketId(),updateDlPrint.getThirdPartRewardMoney());
+						dlPrintLotteryMapper.updatePrintThirdRewardRewardStatus1To3(updateDlPrint);
 					}
 				} catch (IOException e) {
 					log.info("解析河南出票奖金文件失败",e);
@@ -1598,8 +1582,8 @@ public class DlPrintLotteryService {
 	 * @return
 	 * @throws IOException 
 	 */
-	private List<DlPrintLotteryThirdReward> readFileFromUrl(String urlStr, Map<String, String> printOrderSnMap) throws IOException {
-		List<DlPrintLotteryThirdReward> rewardList = new ArrayList<DlPrintLotteryThirdReward>();
+	private List<DlPrintLottery> readFileFromUrl(String urlStr) throws IOException {
+		List<DlPrintLottery> issueList = new ArrayList<DlPrintLottery>();
 		log.info("解析河南出票兑奖信息 文件地址={}",urlStr);
 		 URL url = new URL(urlStr);
         BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
@@ -1614,32 +1598,18 @@ public class DlPrintLotteryService {
         	String[] printPrizeInfoArr = s.split(" ");
         	String ticketId = printPrizeInfoArr[0];
         	String platformId = printPrizeInfoArr[1];
-        	String thirdPrizeStatus = printPrizeInfoArr[2];
         	String thirdReward = printPrizeInfoArr[3];
-        	DlPrintLotteryThirdReward printThirdReward = new DlPrintLotteryThirdReward();
-        	printThirdReward.setTicketId(ticketId);
-        	printThirdReward.setPlatformId(platformId);
-        	Integer prizeStatus = Integer.valueOf(3);
-			if("8".equals(thirdPrizeStatus)){
-				prizeStatus = Integer.valueOf(1);
-			}else if("9".equals(thirdPrizeStatus)){
-				prizeStatus = Integer.valueOf(2);
-			}
-			printThirdReward.setRewardStatus(prizeStatus);
-			printThirdReward.setThirdPartRewardMoney(BigDecimal.valueOf(Integer.parseInt(thirdReward)));
-			printThirdReward.setOrderSn(printOrderSnMap.get(ticketId));
-        	rewardList.add(printThirdReward);
+			DlPrintLottery updateDlPrint = new DlPrintLottery();
+			updateDlPrint.setThirdPartRewardMoney(BigDecimal.valueOf(Integer.parseInt(thirdReward)));
+			updateDlPrint.setTicketId(ticketId);
+			issueList.add(updateDlPrint);
         }
         reader.close();
-		return rewardList;
+		return issueList;
 	}
 
 	public void updatePrintLotterysThirdRewardXian() {
 		List<DlPrintLottery> dlPrintLotterys = dlPrintLotteryMapper.selectFinishPrintLotteryButNotRewardXian();
-		Map<String,DlPrintLottery> dlPrintLotterysMaps = new HashMap<String, DlPrintLottery>();
-		dlPrintLotterys.forEach(print->{
-			dlPrintLotterysMaps.put(print.getTicketId(), print);
-		});
 //		获取第三方奖金信息
 		List<String> tickets = dlPrintLotterys.stream().map(print->print.getTicketId()).collect(Collectors.toList());
 		String[] ticketsArr = tickets.toArray(new String[tickets.size()]);
@@ -1662,15 +1632,11 @@ public class DlPrintLotteryService {
 						money=Integer.valueOf(0);
 					}
 					BigDecimal thirdRewardMoney = BigDecimal.valueOf(money);
-					DlPrintLottery printTemp = dlPrintLotterysMaps.get(ticketId);
-					Integer rewardStatus = Integer.valueOf(1).equals(prizeStatus)? 1:3;
-					DlPrintLotteryThirdReward thirdReward = new DlPrintLotteryThirdReward();
-					thirdReward.setOrderSn(printTemp.getOrderSn());
-					thirdReward.setPlatformId(printTemp.getPlatformId());
-					thirdReward.setRewardStatus(rewardStatus);
-					thirdReward.setThirdPartRewardMoney(thirdRewardMoney);
-					thirdReward.setTicketId(ticketId);
-					saveDlPrintLotteryThirdReward(thirdReward);
+					DlPrintLottery updateDlPrint = new DlPrintLottery();
+					updateDlPrint.setThirdPartRewardMoney(thirdRewardMoney);
+					updateDlPrint.setTicketId(ticketId);
+					log.info("西安 更新第三方奖金信息 ticketId={},thirdRewardMoney={}",updateDlPrint.getTicketId(),updateDlPrint.getThirdPartRewardMoney());
+					dlPrintLotteryMapper.updatePrintThirdRewardRewardStatus1To3(updateDlPrint);
 				}
 			}
 		}
@@ -1686,21 +1652,5 @@ public class DlPrintLotteryService {
 		JSONObject backJo = JSONObject.fromObject(backStr);
 		DlQueryPrizeFileDTO dlQueryPrizeFileDTO = (DlQueryPrizeFileDTO) JSONObject.toBean(backJo, DlQueryPrizeFileDTO.class); 
 		return dlQueryPrizeFileDTO;
-	}
-	/**
-	 * 保存第三方出票中奖信息
-	 * @param orderSn
-	 * @param ticketId
-	 * @param platformId
-	 * @param rewardStatus
-	 * @param thirdPartRewardMoney
-	 */
-	private void saveDlPrintLotteryThirdReward(DlPrintLotteryThirdReward thirdReward){
-		thirdReward.setBalanceStatus(1);
-		dlPrintLotteryThirdRewardMapper.insertIntoPrintLotteryThirdReward(thirdReward);
-		DlPrintLottery updateDlPrint = new DlPrintLottery();
-		updateDlPrint.setThirdPartRewardMoney(thirdReward.getThirdPartRewardMoney());
-		updateDlPrint.setTicketId(thirdReward.getTicketId());
-		dlPrintLotteryMapper.updatePrintThirdReward(updateDlPrint);
 	}
 }

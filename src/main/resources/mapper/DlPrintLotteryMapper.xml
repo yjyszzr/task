@@ -25,6 +25,7 @@
     <result column="real_reward_money" jdbcType="DECIMAL" property="realRewardMoney" />
     <result column="third_part_reward_money" jdbcType="DECIMAL" property="thirdPartRewardMoney" />
     <result column="compare_status" jdbcType="VARCHAR" property="compareStatus" />
+    <result column="third_reward_status" jdbcType="INTEGER" property="thirdRewardStatus" />
     <result column="compared_stakes" jdbcType="VARCHAR" property="comparedStakes" />
   </resultMap>
   
@@ -51,15 +52,13 @@
   
   <select id="selectFinishPrintLotteryButNotRewardXian" resultMap="BaseResultMap" >
   select printLottery.* from dl_print_lottery printLottery
-  left join dl_print_lottery_third_reward reward on printLottery.ticket_id=reward.ticket_id
   where printLottery.status=1 and printLottery.print_lottery_com=2
-  and reward.ticket_id is null
+  and printLottery.third_reward_status=1
   </select>
   <select id="selectFinishPrintLotteryButNotRewardHeNan" resultMap="BaseResultMap" >
   select printLottery.* from dl_print_lottery printLottery
-  left join dl_print_lottery_third_reward reward on printLottery.ticket_id=reward.ticket_id
   where printLottery.status=1 and printLottery.print_lottery_com=1
-  and reward.ticket_id is null
+  and printLottery.third_reward_status=1
   </select>
    <select id="getPrintIngLotterys" resultMap="BaseResultMap">
   	select 
@@ -75,10 +74,17 @@
   	where status=0 and ticket_id=#{ticketId}
   </update>
   
-  <update id="updatePrintThirdReward" parameterType="com.dl.task.model.DlPrintLottery">
+  <update id="updatePrintThirdRewardRewardStatus1To3" parameterType="com.dl.task.model.DlPrintLottery">
   	update dl_print_lottery set 
-  	third_part_reward_money=#{thirdPartRewardMoney} 
-  	where status=1 and ticket_id=#{ticketId}
+  	third_part_reward_money=#{thirdPartRewardMoney},
+  	third_reward_status = 3 
+  	where status=1 and ticket_id=#{ticketId} and third_reward_status = 1
+  </update>
+  <update id="updatePrintThirdRewardRewardStatus2To3" parameterType="com.dl.task.model.DlPrintLottery">
+  	update dl_print_lottery set 
+  	third_part_reward_money=#{thirdPartRewardMoney},
+  	third_reward_status = 3 
+  	where status=1 and ticket_id=#{ticketId} and third_reward_status = 2
   </update>
   
   
