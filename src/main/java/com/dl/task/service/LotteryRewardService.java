@@ -1,6 +1,7 @@
 package com.dl.task.service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -65,24 +66,29 @@ public class LotteryRewardService {
 				Map<String, Double> map = new HashMap<String, Double>();
 				Set<String> unOrderSns = new HashSet<String>();
 				for(DlPrintLottery dto: dlOrderDataDTOs) {
-					int printStatus = dto.getPrintStatus();
-					String printSp = dto.getPrintSp();
-					if(printStatus == ProjectConstant.PRINT_STATUS_SUCCESS || StringUtils.isNotBlank(printSp)) {//出票成功
-						String orderSn = dto.getOrderSn();
-						String compareStatus = dto.getCompareStatus();
-						if(StringUtils.isBlank(compareStatus) || !"1".equals(compareStatus)) {
-							unOrderSns.add(orderSn);
-						}
-						if(unOrderSns.contains(orderSn)) {
-							map.remove(orderSn);
-							continue;
-						}
-						Double double1 = map.get(orderSn);
-						BigDecimal realRewardMoney = dto.getRealRewardMoney();
-						double realReward = realRewardMoney == null?0:realRewardMoney.doubleValue();
-						double1 = double1==null?realReward:(double1+realReward);
-						map.put(orderSn, double1);
+					String orderSn = dto.getOrderSn();
+					String compareStatus = dto.getCompareStatus();
+					Integer thirdRewardStatus = dto.getThirdRewardStatus();
+					if(StringUtils.isBlank(compareStatus) || !"1".equals(compareStatus)
+							||!Integer.valueOf(3).equals(thirdRewardStatus)) {
+						unOrderSns.add(orderSn);
 					}
+					if(unOrderSns.contains(orderSn)) {
+						map.remove(orderSn);
+						continue;
+					}
+					Double double1 = map.get(orderSn);
+					BigDecimal realRewardMoney = dto.getRealRewardMoney();
+					double realReward = 0;
+//						FIXME 胡贺东 暂时取我们和第三放开奖奖金最低那个金额 后期根据产品定
+					BigDecimal thirdRewardMoney = dto.getThirdPartRewardMoney().divide(new BigDecimal("100"), 0, RoundingMode.HALF_EVEN);
+					if(realRewardMoney != null&&realRewardMoney.subtract(thirdRewardMoney).compareTo(BigDecimal.ZERO)>0){
+						realReward = thirdRewardMoney.doubleValue();
+					}else if(realRewardMoney!=null){
+						realReward = realRewardMoney.doubleValue();
+					}
+					double1 = double1==null?realReward:(double1+realReward);
+					map.put(orderSn, double1);
 				}
 				
 				log.info("*********8可开奖订单及资金数："+map.size());
