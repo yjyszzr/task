@@ -33,7 +33,7 @@
   print_lottery_id,order_sn,ticket_id,accept_time,merchant,game,issue,play_type,
   bet_type,times,money,stakes,reward_stakes,error_code,status,platform_id,print_status,
   print_sp,print_no,print_time,real_reward_money,third_part_reward_money,compare_status,
-  compared_stakes
+  compared_stakes,third_reward_status
   </sql>
   
    <select id="lotteryPrintsByUnPrint" resultMap="BaseResultMap">
