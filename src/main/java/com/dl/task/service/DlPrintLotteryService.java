@@ -1557,7 +1557,7 @@ public class DlPrintLotteryService {
 		for(String issueAndGame : issueAndGameList){
 			String[] issueAndGameArr = issueAndGame.split(";");
 			DlQueryPrizeFileParam param = new DlQueryPrizeFileParam();
-			param.setMerchant(xianMerchant);
+			param.setMerchant(merchant);
 			param.setVersion("1.0");
 			param.setGame(issueAndGameArr[0]);
 			param.setIssue(issueAndGameArr[1]);
@@ -1602,7 +1602,6 @@ public class DlPrintLotteryService {
         	}
         	String[] printPrizeInfoArr = s.split(" ");
         	String ticketId = printPrizeInfoArr[0];
-        	String platformId = printPrizeInfoArr[1];
         	String thirdReward = printPrizeInfoArr[3];
 			DlPrintLottery updateDlPrint = new DlPrintLottery();
 			updateDlPrint.setThirdPartRewardMoney(BigDecimal.valueOf(Integer.parseInt(thirdReward)));
