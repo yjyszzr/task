@@ -867,6 +867,7 @@ public class DlPrintLotteryService {
 		HttpEntity<JSONObject> requestEntity = new HttpEntity<JSONObject>(jo, headers);
 		String requestUrl = printTicketUrl + inter;
 		String response = rest.postForObject(requestUrl, requestEntity, String.class);
+		log.info("河南出票调用requestUrl={},响应={}",requestUrl,response);
 		String requestParam = JSONHelper.bean2json(requestEntity);
 		LotteryThirdApiLog thirdApiLog = new LotteryThirdApiLog(requestUrl, ThirdApiEnum.HE_NAN_LOTTERY.getCode(), requestParam, response);
 		dlPrintLotteryMapper.saveLotteryThirdApiLog(thirdApiLog);
@@ -1541,6 +1542,9 @@ public class DlPrintLotteryService {
 	public void updatePrintLotteryThirdRewardHeNan() {
 //		每一期次进行处理
 		List<DlPrintLottery> dlPrintLotterys = dlPrintLotteryMapper.selectFinishPrintLotteryButNotRewardHeNan();
+		if(CollectionUtils.isEmpty(dlPrintLotterys)){
+			return ;
+		}
 		List<String> issueAndGameList = new ArrayList<String>();
 		dlPrintLotterys.forEach(print->{
 			String issueAndGame = print.getGame()+";"+print.getIssue();
@@ -1548,6 +1552,7 @@ public class DlPrintLotteryService {
 				issueAndGameList.add(issueAndGame);
 			}
 		});
+		log.info("河南期次查询集合={}",issueAndGameList);
 //		获取每一期次的逻辑处理
 		for(String issueAndGame : issueAndGameList){
 			String[] issueAndGameArr = issueAndGame.split(";");
@@ -1610,6 +1615,9 @@ public class DlPrintLotteryService {
 
 	public void updatePrintLotterysThirdRewardXian() {
 		List<DlPrintLottery> dlPrintLotterys = dlPrintLotteryMapper.selectFinishPrintLotteryButNotRewardXian();
+		if(CollectionUtils.isEmpty(dlPrintLotterys)){
+			return ;
+		}
 //		获取第三方奖金信息
 		List<String> tickets = dlPrintLotterys.stream().map(print->print.getTicketId()).collect(Collectors.toList());
 		String[] ticketsArr = tickets.toArray(new String[tickets.size()]);

@@ -14,7 +14,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 
 import com.dl.base.param.EmptyParam;
 import com.dl.shop.payment.api.IpaymentService;
-import com.dl.task.model.DlPrintLottery;
 import com.dl.task.model.Order;
 import com.dl.task.model.UserWithdraw;
 import com.dl.task.service.DlPrintLotteryService;
@@ -49,6 +48,7 @@ public class TaskSchedule {
 
 	@Resource
 	private IpaymentService ipaymentService;
+	
 
 	/**
 	 * 第一步： 出票任务 （每5分钟执行一次） 调用第三方接口出票定时任务 定时的对出票中的进行查询结果
@@ -158,7 +158,7 @@ public class TaskSchedule {
 	}
 
 	/**
-	 * 第三方支付的query
+	 * 第三方支付的query 订单
 	 */
 	@Scheduled(cron = "${task.schedule.order.pay.timeout}")
 	public void timerOrderQueryScheduled() {
@@ -166,10 +166,11 @@ public class TaskSchedule {
 		EmptyParam emptyParam = new EmptyParam();
 		ipaymentService.timerOrderQueryScheduled(emptyParam);
 	}
+	
 	/**
 	 * 订单支付成功逻辑处理
 	 */
-	@Scheduled(cron = "${task.schedule.order.pay.timeout}")
+	@Scheduled(cron = "${task.schedule.order.pay.success}")
 	public void orderPaySuccessScheduled() {
 		log.info("订单支付完成后的逻辑处理");
 		List<Order> orderList = orderService.getPaySuccessOrdersList();
@@ -181,7 +182,15 @@ public class TaskSchedule {
 			}
 		}
 	}
-
+	/**
+	 * 第三方支付的query 充值
+	 */
+	@Scheduled(cron = "${task.schedule.recharge.pay.timeout}")
+	public void timerRechargeQueryScheduled() {
+		log.info("第三方支付定时任务开始");
+		EmptyParam emptyParam = new EmptyParam();
+		ipaymentService.timerRechargeQueryScheduled(emptyParam);
+	}
 	/**
 	 * 提现状态轮询
 	 */

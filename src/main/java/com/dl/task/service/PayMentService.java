@@ -4,6 +4,8 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -20,10 +22,7 @@ import com.dl.task.model.Order;
 import com.dl.task.model.PayLog;
 import com.dl.task.model.PayMent;
 import com.dl.task.param.SurplusPayParam;
-import com.dl.task.param.UpdateOrderInfoParam;
 import com.dl.task.param.UserBonusParam;
-
-import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
@@ -103,6 +102,4 @@ public class PayMentService extends AbstractService<PayMent> {
     	updatepayLog.setOrderSn(or.getOrderSn());
     	payLogService.updatePayLogByOrderSn(updatepayLog);
     }
-    	
-
 }
