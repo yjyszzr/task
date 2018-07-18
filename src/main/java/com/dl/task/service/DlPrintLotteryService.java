@@ -1601,6 +1601,7 @@ public class DlPrintLotteryService {
         		continue;
         	}
         	String[] printPrizeInfoArr = s.split(" ");
+        	log.info("出奖信息={}",printPrizeInfoArr);
         	String ticketId = printPrizeInfoArr[0];
         	String thirdReward = printPrizeInfoArr[3];
 			DlPrintLottery updateDlPrint = new DlPrintLottery();
