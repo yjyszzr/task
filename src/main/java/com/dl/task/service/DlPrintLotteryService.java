@@ -1600,7 +1600,7 @@ public class DlPrintLotteryService {
         	if(row==1){
         		continue;
         	}
-        	String[] printPrizeInfoArr = s.split(" ");
+        	String[] printPrizeInfoArr = s.split("\t");
         	log.info("出奖信息={}",printPrizeInfoArr);
         	String ticketId = printPrizeInfoArr[0];
         	String thirdReward = printPrizeInfoArr[3];
