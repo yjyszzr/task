@@ -52,12 +52,12 @@
   
   <select id="selectFinishPrintLotteryButNotRewardXian" resultMap="BaseResultMap" >
   select printLottery.* from dl_print_lottery printLottery
-  where printLottery.status=1 and printLottery.print_lottery_com=2
+  where printLottery.status=1 and printLottery.print_lottery_com=2 and printLottery.compare_status=1
   and printLottery.third_reward_status=1
   </select>
   <select id="selectFinishPrintLotteryButNotRewardHeNan" resultMap="BaseResultMap" >
   select printLottery.* from dl_print_lottery printLottery
-  where printLottery.status=1 and printLottery.print_lottery_com=1
+  where printLottery.status=1 and printLottery.print_lottery_com=1 and printLottery.compare_status=1
   and printLottery.third_reward_status=1
   </select>
    <select id="getPrintIngLotterys" resultMap="BaseResultMap">
