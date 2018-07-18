@@ -1602,7 +1602,7 @@ public class DlPrintLotteryService {
         	}
         	String[] printPrizeInfoArr = s.split("\t");
         	log.info("出奖信息={}",printPrizeInfoArr);
-        	String ticketId = printPrizeInfoArr[0];
+        	String ticketId = printPrizeInfoArr[1];
         	String thirdReward = printPrizeInfoArr[3];
 			DlPrintLottery updateDlPrint = new DlPrintLottery();
 			updateDlPrint.setThirdPartRewardMoney(BigDecimal.valueOf(Integer.parseInt(thirdReward)));
