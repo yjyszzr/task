@@ -94,7 +94,7 @@
   <select id="selectPaySuccessOrdersList" resultMap="BaseResultMap">
   select * from dl_order where order_status = 0 and pay_status = 1
   </select>
-  <select id="selectPaySuccessOrdersList" resultMap="BaseResultMap">
+  <select id="selectPayFailOrdersList" resultMap="BaseResultMap">
   select * from dl_order where order_status = 0 and pay_status = 2
   </select>
   <update id="updateOrderStatus0To1">
