@@ -1366,4 +1366,8 @@ public class OrderService extends AbstractService<Order> {
 		orderInfoAndDetailDTO.setOrderDetailDataDTOs(orderDetailDataDTOs);
 		return orderInfoAndDetailDTO;
 	}
+
+	public List<Order> getPayFailOrdersList() {
+		return orderMapper.selectPayFailOrdersList();
+	}
 }

@@ -156,7 +156,7 @@ public class TaskSchedule {
 		paymentService.dealBeyondPayTimeOrderOut();
 		log.info("结束执行支混合付超时订单任务");
 	}
-
+	
 	/**
 	 * 第三方支付的query 订单
 	 */
@@ -177,6 +177,21 @@ public class TaskSchedule {
 		for(Order order : orderList){
 			try{
 			orderService.doPaySuccessOrder(order);
+			}catch(Exception e){
+				log.error("处理订单支付order_sn={}",order.getOrderSn(),e);
+			}
+		}
+	}
+	/**
+	 * 订单支付失败逻辑处理
+	 */
+	@Scheduled(cron = "${task.schedule.order.pay.fail}")
+	public void orderPayFailScheduled() {
+		log.info("订单支付失败后的逻辑处理");
+		List<Order> orderList = orderService.getPayFailOrdersList();
+		for(Order order : orderList){
+			try{
+			paymentService.dealBeyondPayTimeOrder(order);
 			}catch(Exception e){
 				log.error("处理订单支付order_sn={}",order.getOrderSn(),e);
 			}
