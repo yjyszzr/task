@@ -1635,7 +1635,7 @@ public class DlPrintLotteryService {
 				Integer prizeStatus = stake.getPrizeStatus();
 				if(Integer.valueOf(1).equals(prizeStatus) || Integer.valueOf(2).equals(prizeStatus)){
 					String ticketId = stake.getTicketId();
-					Integer money = stake.getPrizemoney();
+					Integer money = stake.getPrizeMoney();
 					if(money==null){
 						money=Integer.valueOf(0);
 					}
