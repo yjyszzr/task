@@ -63,7 +63,7 @@ public class XianDlQueryStakeDTO implements Serializable{
 		@ApiModelProperty(value = "中奖的注数", required = true)
 	    private Integer prizeCount;
 		@ApiModelProperty(value = "中奖金额 分为单位", required = true)
-	    private Integer prizemoney;
+	    private Integer prizeMoney;
 		@ApiModelProperty(value = "结算状态", required = true)
 	    private Integer settleStatus;
 	}
