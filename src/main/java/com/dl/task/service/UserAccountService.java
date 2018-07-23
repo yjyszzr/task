@@ -143,11 +143,15 @@ public class UserAccountService extends AbstractService<UserAccount> {
 			userAccountParam.setLastTime(DateUtil.getCurrentTimeLong());
 			userAccountParam.setAddTime(accountTime);
 			userAccountParam.setStatus(Integer.valueOf(ProjectConstant.FINISH));
+			User curUser = userMapper.queryUserByUserId(uDTO.getUserId());
+			log.info("派奖 userId={},orderSn={},userMoney={},userMoneyLimit={}",uDTO.getUserId(),uDTO.getOrderSn(),curUser.getUserMoney(),curUser.getUserMoneyLimit());
+			BigDecimal curBalance = curUser.getUserMoney().add(curUser.getUserMoneyLimit());
+			userAccountParam.setCurBalance(curBalance);
 			int insertRst = userAccountMapper.insertUserAccountBySelective(userAccountParam);
 			if (1 != insertRst) {
 				log.error("中奖订单号为" + uDTO.getOrderSn() + "生成中奖流水失败");
 			} else {
-				log.error("用户" + uDTO.getUserId() + "中奖订单号为" + uDTO.getOrderSn() + "奖金派发完成");
+				log.info("用户" + uDTO.getUserId() + "中奖订单号为" + uDTO.getOrderSn() + "奖金派发完成");
 			}
 		}
 		log.info("更新用户中奖订单为已派奖开始");
