@@ -68,9 +68,12 @@ public class LotteryRewardService {
 				for(DlPrintLottery dto: dlOrderDataDTOs) {
 					String orderSn = dto.getOrderSn();
 					String compareStatus = dto.getCompareStatus();
-					Integer thirdRewardStatus = dto.getThirdRewardStatus();
+//					Integer thirdRewardStatus = dto.getThirdRewardStatus();
+//					if(StringUtils.isBlank(compareStatus) || !"1".equals(compareStatus)
+//							||!Integer.valueOf(3).equals(thirdRewardStatus)) {
 					if(StringUtils.isBlank(compareStatus) || !"1".equals(compareStatus)
-							||!Integer.valueOf(3).equals(thirdRewardStatus)) {
+//							||!Integer.valueOf(3).equals(thirdRewardStatus)
+							) {
 						unOrderSns.add(orderSn);
 					}
 					if(unOrderSns.contains(orderSn)) {
@@ -80,11 +83,12 @@ public class LotteryRewardService {
 					Double double1 = map.get(orderSn);
 					BigDecimal realRewardMoney = dto.getRealRewardMoney();
 					double realReward = 0;
-//						FIXME 胡贺东 暂时取我们和第三放开奖奖金最低那个金额 后期根据产品定
-					BigDecimal thirdRewardMoney = dto.getThirdPartRewardMoney().divide(new BigDecimal("100"), 0, RoundingMode.HALF_EVEN);
-					if(realRewardMoney != null&&realRewardMoney.subtract(thirdRewardMoney).compareTo(BigDecimal.ZERO)>0){
-						realReward = thirdRewardMoney.doubleValue();
-					}else if(realRewardMoney!=null){
+////						FIXME 胡贺东 暂时取我们和第三放开奖奖金最低那个金额 后期根据产品定
+//					BigDecimal thirdRewardMoney = dto.getThirdPartRewardMoney().divide(new BigDecimal("100"), 0, RoundingMode.HALF_EVEN);
+//					if(realRewardMoney != null&&realRewardMoney.subtract(thirdRewardMoney).compareTo(BigDecimal.ZERO)>0){
+//						realReward = thirdRewardMoney.doubleValue();
+//					}else 
+					if(realRewardMoney!=null){
 						realReward = realRewardMoney.doubleValue();
 					}
 					double1 = double1==null?realReward:(double1+realReward);
