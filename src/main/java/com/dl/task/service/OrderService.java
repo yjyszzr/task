@@ -9,6 +9,7 @@ import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -588,7 +589,8 @@ public class OrderService extends AbstractService<Order> {
 	        	UserMatchCollect umc = new UserMatchCollect();
 	        	umc.setUserId(detail.getUserId());
 	        	umc.setMatchId(detail.getMatchId());
-	        	umc.setAddTime(DateUtil.getCurrentTimeLong());
+	        	Date matchDate = detail.getMatchTime();
+	        	umc.setAddTime(DateUtil.getTimeSomeDate(matchDate));
 	        	umc.setIsDelete(0);
 	        	userMatchCollectMapper.insertUserCollectMatch(umc);
 	    	}
