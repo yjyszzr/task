@@ -585,7 +585,9 @@ public class OrderService extends AbstractService<Order> {
 			Integer userId = detail.getUserId();
 			Integer matchId = detail.getMatchId();
 	    	int rst = userMatchCollectMapper.queryUserMatchCollect(userId, matchId);
+	    	log.info("查询到已购赛事:"+rst);
 	    	if(rst <= 0) {
+	    		log.info("已购赛事收藏开始");
 	        	UserMatchCollect umc = new UserMatchCollect();
 	        	umc.setUserId(detail.getUserId());
 	        	umc.setMatchId(detail.getMatchId());
@@ -593,9 +595,8 @@ public class OrderService extends AbstractService<Order> {
 	        	umc.setAddTime(DateUtil.getTimeSomeDate(matchDate));
 	        	umc.setIsDelete(0);
 	        	userMatchCollectMapper.insertUserCollectMatch(umc);
+	        	log.info("已购赛事收藏开始");
 	    	}
-			
-			
 			
 		}
 		log.info("updateOrderMatchResult 准备去执行数据库更新取消赛事结果操作：size=" + cancelList.size());
