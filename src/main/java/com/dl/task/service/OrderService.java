@@ -408,6 +408,11 @@ public class OrderService extends AbstractService<Order> {
 		// 计算预测奖金
 		String forecastMoney = this.betMaxAndMinMoney(ticketInfos, order);
 		order.setForecastMoney(forecastMoney);
+		
+		//购买并成功出票后就收藏赛事
+		for (OrderDetail orderDetail : orderDetailList) {
+			addUserMatchCollect(orderDetail);
+		}
 	}
 	//获取出票赔率
 	private void getPrintOdds(Map<String, Double> map, String stakes, String spStr) {
@@ -580,24 +585,6 @@ public class OrderService extends AbstractService<Order> {
 		log.info("updateOrderMatchResult 准备去执行数据库更新操作：size=" + orderDetailList.size());
 		for(OrderDetail detail: orderDetailList) {
 			orderDetailMapper.updateMatchResult(detail);
-			
-			//需求：购买并成功出票，就收藏赛事
-			Integer userId = detail.getUserId();
-			Integer matchId = detail.getMatchId();
-	    	int rst = userMatchCollectMapper.queryUserMatchCollect(userId, matchId);
-	    	log.info("查询到已购赛事:"+rst);
-	    	if(rst <= 0) {
-	    		log.info("已购赛事收藏开始");
-	        	UserMatchCollect umc = new UserMatchCollect();
-	        	umc.setUserId(detail.getUserId());
-	        	umc.setMatchId(detail.getMatchId());
-	        	Date matchDate = detail.getMatchTime();
-	        	umc.setAddTime(DateUtil.getTimeSomeDate(matchDate));
-	        	umc.setIsDelete(0);
-	        	userMatchCollectMapper.insertUserCollectMatch(umc);
-	        	log.info("已购赛事收藏开始");
-	    	}
-			
 		}
 		log.info("updateOrderMatchResult 准备去执行数据库更新取消赛事结果操作：size=" + cancelList.size());
 		for(OrderDetail detail: cancelList) {
@@ -605,6 +592,29 @@ public class OrderService extends AbstractService<Order> {
 		}
 	}
 
+	/*
+	 * 需求：购买并成功出票，就收藏赛事
+	 */
+	public void addUserMatchCollect(OrderDetail detail) {
+		Integer userId = detail.getUserId();
+		Integer matchId = detail.getMatchId();
+    	int rst = userMatchCollectMapper.queryUserMatchCollect(userId, matchId);
+    	log.info("查询到已购赛事:"+rst);
+    	if(rst <= 0) {
+    		log.info("已购赛事收藏开始");
+        	UserMatchCollect umc = new UserMatchCollect();
+        	umc.setUserId(detail.getUserId());
+        	umc.setMatchId(detail.getMatchId());
+        	Date matchDate = detail.getMatchTime();
+        	log.info("日期格式："+matchDate.toString());
+        	umc.setAddTime(DateUtil.getTimeSomeDate(matchDate));
+        	umc.setIsDelete(0);
+        	userMatchCollectMapper.insertUserCollectMatch(umc);
+        	log.info("已购赛事收藏結束");
+    	}
+	}
+	
+	
 	public void addRewardMoneyToUsers() {
 		List<OrderWithUserDTO> orderWithUserDTOs = orderMapper.selectOpenedAllRewardOrderList();
 		log.info("派奖已中奖的用户数据：code=" + orderWithUserDTOs.size());
