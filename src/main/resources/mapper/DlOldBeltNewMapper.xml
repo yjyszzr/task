@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dl.task.dao.DlOldBeltNewMapper">
+	  <resultMap id="BaseResultMap" type="com.dl.task.model.DlOldBeltNew">
+		    <id column="id" jdbcType="INTEGER" property="id" />
+		    <result column="inviter_user_id" jdbcType="INTEGER" property="inviterUserId" />
+		    <result column="inviter_encryption_user_id" jdbcType="VARCHAR" property="inviterEncryptionUserId" />
+		    <result column="register_user_id" jdbcType="INTEGER" property="registerUserId" />
+		    <result column="consumption_status" jdbcType="INTEGER" property="consumptionStatus" />
+	  </resultMap>
+	  
+	  <resultMap id="allInvitationsNumMap" type="com.dl.task.model.InvitationsNum">
+		    <result column="user_id" jdbcType="INTEGER" property="userId" />
+		    <result column="user_num" jdbcType="INTEGER" property="userNum" />
+	  </resultMap>
+	  
+	  <resultMap id="extraBonusMap" type="com.dl.task.model.ExtraBonus">
+		    <id column="id" jdbcType="INTEGER" property="id" />
+		    <result column="user_id" jdbcType="INTEGER" property="userId" />
+		    <result column="extra_bonus" jdbcType="INTEGER" property="ExtraBonus" />
+	  </resultMap>
+  
+	  <select id="findInvitationsByUserId"   parameterType="Integer"   resultMap="BaseResultMap">
+			SELECT
+				* 
+			FROM
+				dl_old_belt_new 
+			WHERE
+				consumption_status = #{status}
+	  </select>
+  
+	  <select id="findAllInvitationsNum"   resultMap="allInvitationsNumMap">
+		SELECT
+			count( * ) AS user_num,
+			inviter_user_id AS user_id 
+		FROM
+			dl_old_belt_new 
+		WHERE
+			consumption_status != 0 
+		GROUP BY
+			inviter_user_id
+	  </select>
+	  
+<!-- 	  返回待确认的userIdList -->
+	  <select id="findToBeConfirmedUserIds" resultType="Integer">
+			SELECT
+				a.user_id 
+			FROM
+				(
+			SELECT
+				SUM( surplus ) AS surplus,
+				user_id 
+			FROM
+				dl_order 
+			WHERE
+				user_id IN ( SELECT register_user_id FROM dl_old_belt_new WHERE consumption_status = 0 ) 
+			GROUP BY
+				user_id 
+				) a 
+			WHERE
+				a.surplus &gt;= 20 
+	  </select>
+	  
+<!-- 	  更新用户状态 -->
+	  <update id="updateConformingUser">
+			UPDATE dl_old_belt_new 
+			SET consumption_status = 2 
+ 			WHERE
+				register_user_id IN 
+			<foreach collection="userIdsArr" item="userId" index="index" open="(" close=")" separator=",">
+            	#{userId,jdbcType = INTEGER}
+        	</foreach>
+	  </update>
+	  
+<!-- 	  更新用户额外奖励 -->
+	  <update id="updateExtraBonus">
+			UPDATE 
+	  			dl_old_belt_new_extra_bonus
+ 			SET 		
+ 				extra_bonus = extra_bonus + #{extra_bonus} 
+ 			WHERE 
+ 				user_id = #{userId}
+	  </update>
+	  
+<!-- 	  插入用户额外奖励 -->
+	  <insert id="insertExtraBonus"   parameterType="com.dl.task.model.ExtraBonus">
+		 INSERT INTO 
+		 dl_old_belt_new_extra_bonus  
+			 (id,
+			 user_id, 
+			 extra_bonus) 
+		 VALUES 
+			 (#{id},
+			 #{userId},
+			 #{extraBonus})
+	  </insert>
+	  
+	  <select id="findExtraBonus"  resultMap="extraBonusMap">
+	  		select 
+	  			* 
+	  		from 
+	  			dl_old_belt_new_extra_bonus
+	  </select>
+	  
+	  <insert id="insertUserAccount">
+	  insert into dl_old_belt_new_user_account
+         (id, order_sn, reward,note,create_time,status)
+        values
+            <foreach collection ="userAccountList" item="item" index= "index" separator =",">
+                (
+                 #{item.id}, 
+                 #{item.userId}, 
+			  #{item.orderSn},
+                 #{item.reward},
+                 #{item.note},
+                 #{item.createTime}, 
+			  #{item.status}
+                 )
+            </foreach >
+	  </insert>
+	  
+	  <update id="updateUserAccountStatus">
+		  UPDATE 
+		  	  dl_old_belt_new_user_account
+		  SET
+	           status  = 1 
+	 	  WHERE order_sn IN 
+	           <foreach collection ="userAccountList" item="item" index= "index" open="(" close=")"  separator =",">
+				  	#{item.orderSn}
+	           </foreach >
+	  </update>
+	  
+</mapper>
