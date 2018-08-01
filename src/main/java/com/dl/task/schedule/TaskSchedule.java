@@ -28,6 +28,7 @@ import com.dl.task.model.Order;
 import com.dl.task.model.ReqOrdeEntity;
 import com.dl.task.model.ReqOrdeEntityForUserAccount;
 import com.dl.task.model.UserWithdraw;
+import com.dl.task.service.DlMatchResultService;
 import com.dl.task.service.DlOldBeltNewService;
 import com.dl.task.service.DlPrintLotteryService;
 import com.dl.task.service.LotteryRewardService;
@@ -47,7 +48,7 @@ public class TaskSchedule {
 
 	@Resource
 	private LotteryRewardService lotteryRewardService;
-
+	
 	@Resource
 	private UserBonusService userBonusService;
 
@@ -68,6 +69,8 @@ public class TaskSchedule {
 
 	@Resource
 	private URLConfig urlConfig;
+	@Resource
+	private DlMatchResultService dlMatchResultService;
 
 	/**
 	 * 老带新活动 新用户更改状态
@@ -226,6 +229,16 @@ public class TaskSchedule {
 		}
 	}
 
+	
+	/**
+	 * 第一步： 出票任务 （每5分钟执行一次） 调用第三方接口出票定时任务 定时的对出票中的进行查询结果
+	 */
+	@Scheduled(cron = "${task.schedule.match.score.refreshMatchResult}")
+	public void refreshMatchResult() {
+		log.info("比分计算赛果定时任务启动");
+		dlMatchResultService.refreshMatchResult();
+		log.info("比分计算赛果定时任务结束");
+	}
 	/**
 	 * 第一步： 出票任务 （每5分钟执行一次） 调用第三方接口出票定时任务 定时的对出票中的进行查询结果
 	 */
