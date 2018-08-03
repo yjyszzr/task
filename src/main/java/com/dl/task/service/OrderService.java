@@ -43,6 +43,7 @@ import com.dl.base.result.ResultGenerator;
 import com.dl.base.service.AbstractService;
 import com.dl.base.util.DateUtil;
 import com.dl.base.util.DateUtilNew;
+import com.dl.base.util.JSONHelper;
 import com.dl.base.util.SNGenerator;
 import com.dl.task.core.ProjectConstant;
 import com.dl.task.dao.DlPrintLotteryMapper;
@@ -1275,75 +1276,82 @@ public class OrderService extends AbstractService<Order> {
 	@Transactional(value="transactionManager1")
 	public void doPaySuccessOrder(Order order) {
 		String orderSn = order.getOrderSn();
-		Integer userId = order.getUserId();
 //		更新order_status=1
 		int updateRow = orderMapper.updateOrderStatus0To1(orderSn);
-		if(updateRow==1){			
-//		生成支付流水
-			UserAccount queryUserAccount = new UserAccount();
-			queryUserAccount.setUserId(userId);
-			queryUserAccount.setPayId(orderSn);
-			queryUserAccount.setProcessType(3);
-			List<UserAccount> userThisWithdrawRollList = userAccountMapper.queryUserAccountBySelective(queryUserAccount);
-			if(CollectionUtils.isEmpty(userThisWithdrawRollList)){
-				User user = userMapper.queryUserByUserId(userId);
-				PayLog payLog = payLogMapper.findPayLogByOrderSn(orderSn);
-//				生成账户流水
-				UserAccount userAccount = new UserAccount();
-				userAccount.setUserId(userId);
-				String accountSn = SNGenerator.nextSN(SNBusinessCodeEnum.ACCOUNT_SN.getCode());
-				userAccount.setAmount(BigDecimal.ZERO.subtract(payLog.getOrderAmount()));
-				userAccount.setOrderSn(orderSn);
-				userAccount.setAccountSn(accountSn);
-				userAccount.setBonusPrice(BigDecimal.ZERO);
-				userAccount.setProcessType(3);
-				userAccount.setThirdPartName("");
-				userAccount.setPayId(""+payLog.getLogId());
-				userAccount.setAddTime(DateUtil.getCurrentTimeLong());
-				userAccount.setLastTime(DateUtil.getCurrentTimeLong());
-				userAccount.setCurBalance(user.getUserMoney().add(user.getUserMoneyLimit()));
-				userAccount.setStatus(1);
-				userAccount.setNote("支付成功");
-				String payCode = payLog.getPayCode();
-				String payName;
-				if(payCode.equals("app_weixin") || payCode.equals("app_weixin_h5")) {
-					payName = "微信";
-				}else {
-					payName = "银行卡";
-				}
-				userAccount.setPaymentName(payName);
-				userAccount.setThirdPartName(payName);
-				userAccount.setThirdPartPaid(payLog.getOrderAmount());
-				int rst = userAccountMapper.insertUserAccountBySelective(userAccount);
-				log.info("生成回滚账户流水返回值" + rst);				
+		if(updateRow==1){
+			if(order.getThirdPartyPaid().compareTo(BigDecimal.ZERO)>0){
+				insertThirdPayAccount(order);
+			}
 //		进行预出票
-				List<DlPrintLottery> dlPrints = dlPrintLotteryMapper.printLotterysByOrderSn(orderSn);
-				if(CollectionUtils.isEmpty(dlPrints)){
-					Integer lotteryClassifyId = order.getLotteryClassifyId();
-					Integer lotteryPlayClassifyId = order.getLotteryPlayClassifyId();
-					OrderInfoAndDetailDTO orderDetail = getOrderWithDetailByOrder(order);
-					if(1== lotteryClassifyId && 8 == lotteryPlayClassifyId) {
-						dlPrintLotteryService.saveLotteryPrintInfo(orderDetail, order.getOrderSn());
-						return;
-					}
-					List<LotteryPrintDTO> lotteryPrints = dlPrintLotteryService.getPrintLotteryListByOrderInfo(orderDetail,orderSn);
-					if(CollectionUtils.isNotEmpty(lotteryPrints)) {
-						Double printLotteryRoutAmount = dlPrintLotteryMapper.printLotteryRoutAmount();
-				        int printLotteryCom = 1 ;//河南出票公司
-				        log.info("save printLotteryCom orderSn={},ticketAmount={},canBetMoney={}",order.getOrderSn(),order.getTicketAmount(),printLotteryRoutAmount);
-				        if(order.getTicketAmount().subtract(new BigDecimal(printLotteryRoutAmount)).compareTo(BigDecimal.ZERO)<0){
-				            log.info("orderSn={},设置出票公司为西安出票公司",order.getOrderSn());
-				            printLotteryCom = 2;//西安出票公司
-				        }
-				        dlPrintLotteryService.saveLotteryPrintInfo(lotteryPrints, order.getOrderSn(),printLotteryCom);
-				        return;
-					}
+			List<DlPrintLottery> dlPrints = dlPrintLotteryMapper.printLotterysByOrderSn(orderSn);
+			if(CollectionUtils.isEmpty(dlPrints)){
+				Integer lotteryClassifyId = order.getLotteryClassifyId();
+				Integer lotteryPlayClassifyId = order.getLotteryPlayClassifyId();
+				OrderInfoAndDetailDTO orderDetail = getOrderWithDetailByOrder(order);
+				if(1== lotteryClassifyId && 8 == lotteryPlayClassifyId) {
+					dlPrintLotteryService.saveLotteryPrintInfo(orderDetail, order.getOrderSn());
+					return;
+				}
+				List<LotteryPrintDTO> lotteryPrints = dlPrintLotteryService.getPrintLotteryListByOrderInfo(orderDetail,orderSn);
+				if(CollectionUtils.isNotEmpty(lotteryPrints)) {
+					Double printLotteryRoutAmount = dlPrintLotteryMapper.printLotteryRoutAmount();
+			        int printLotteryCom = 1 ;//河南出票公司
+			        log.info("save printLotteryCom orderSn={},ticketAmount={},canBetMoney={}",order.getOrderSn(),order.getTicketAmount(),printLotteryRoutAmount);
+			        if(order.getTicketAmount().subtract(new BigDecimal(printLotteryRoutAmount)).compareTo(BigDecimal.ZERO)<0){
+			            log.info("orderSn={},设置出票公司为西安出票公司",order.getOrderSn());
+			            printLotteryCom = 2;//西安出票公司
+			        }
+			        dlPrintLotteryService.saveLotteryPrintInfo(lotteryPrints, order.getOrderSn(),printLotteryCom);
+			        return;
 				}
 			}
 		}else{
 			log.info("order_sn={},支付成功,更新状态1失败 where 0 ",orderSn);
 		}
 	}
+	/**
+	 * 插入第三方支付流水
+	 * @param order
+	 */
+	private void insertThirdPayAccount(Order order) {
+		Integer userId = order.getUserId();
+		String orderSn = order.getOrderSn();
+		User user = userMapper.queryUserByUserId(userId);
+		PayLog payLog = payLogMapper.findPayLogByOrderSn(orderSn);
+//		生成账户流水
+		UserAccount userAccount = new UserAccount();
+		userAccount.setUserId(userId);
+		String accountSn = SNGenerator.nextSN(SNBusinessCodeEnum.ACCOUNT_SN.getCode());
+		userAccount.setAmount(BigDecimal.ZERO.subtract(payLog.getOrderAmount()));
+		userAccount.setOrderSn(orderSn);
+		userAccount.setAccountSn(accountSn);
+		userAccount.setBonusPrice(BigDecimal.ZERO);
+		userAccount.setProcessType(3);
+		userAccount.setThirdPartName("");
+		userAccount.setPayId(""+payLog.getLogId());
+		userAccount.setAddTime(DateUtil.getCurrentTimeLong());
+		userAccount.setLastTime(DateUtil.getCurrentTimeLong());
+		userAccount.setCurBalance(user.getUserMoney().add(user.getUserMoneyLimit()));
+		userAccount.setStatus(1);
+		userAccount.setNote("支付成功");
+		String payCode = payLog.getPayCode();
+		String payName;
+		if(payCode.equals("app_weixin") || payCode.equals("app_weixin_h5")) {
+			payName = "微信";
+		}else {
+			payName = "银行卡";
+		}
+		userAccount.setPaymentName(payName);
+		userAccount.setThirdPartName(payName);
+		userAccount.setThirdPartPaid(payLog.getOrderAmount());
+		int rst = userAccountMapper.insertUserAccountBySelective(userAccount);
+		if(rst>0){
+			log.info("插入提三方支付流水成功 orderSn={},insertRow={}",orderSn,rst);
+		}else{
+			log.info("插入提三方支付流水失败 orderSn={},insertRow={},accountInfo={}",orderSn,rst,JSONHelper.bean2json(userAccount));
+		}
+	}
+
 	/**
 	 * 根据订单编号查询订单及订单详情
 	 * 
