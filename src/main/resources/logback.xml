@@ -41,7 +41,7 @@
 
 	<logger name="com.dl.task" level="INFO" />
 	<logger name="org.springframework" level="INFO"/>
-	<logger name="com.dl.task.dao" level="trace" />
+	<logger name="com.dl.task.dao" level="INFO" />
 	<logger name="com.alibaba.druid" level="WARN" />
 
 	<root level="INFO">
