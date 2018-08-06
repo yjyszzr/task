@@ -92,10 +92,10 @@
   
   
   <select id="selectPaySuccessOrdersList" resultMap="BaseResultMap">
-  select * from dl_order where order_status = 0 and pay_status = 1
+  select * from dl_order where order_status = 0 and pay_status = 1 and is_delete!=1
   </select>
   <select id="selectPayFailOrdersList" resultMap="BaseResultMap">
-  select * from dl_order where order_status = 0 and pay_status = 2
+  select * from dl_order where order_status = 0 and pay_status = 2 and is_delete!=1 
   </select>
   <update id="updateOrderStatus0To1">
   update dl_order set order_status = 1 where order_status = 0 and order_sn = #{orderSn} 
