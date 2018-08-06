@@ -20,7 +20,7 @@ import com.dl.base.param.EmptyParam;
 import com.dl.base.util.DateUtilNew;
 import com.dl.base.util.SNGenerator;
 import com.dl.shop.payment.api.IpaymentService;
-import com.dl.task.configurer.URLConfig;
+//import com.dl.task.configurer.URLConfig;
 import com.dl.task.model.DlOldBeltNew;
 import com.dl.task.model.ExtraBonus;
 import com.dl.task.model.InvitationsNum;
@@ -67,178 +67,178 @@ public class TaskSchedule {
 	@Resource
 	private DlOldBeltNewService dlOldBeltNewService;
 
-	@Resource
-	private URLConfig urlConfig;
+//	@Resource
+//	private URLConfig urlConfig;
 	@Resource
 	private DlMatchResultService dlMatchResultService;
 
-	/**
-	 * 老带新活动 新用户更改状态
-	 */
-	// @Scheduled(cron =
-	// "${task.schedule.activity.oldBeltNew.updateUserStatus}")
-	public void oldBeltNewUpdateUserStatus() {
-		dlOldBeltNewService.updateConformingUser();// 更新符合条件的用户
-		Integer status = 1;
-		// 查询出当前status = 1 的人
-		List<DlOldBeltNew> toBeConfirmedInvitationsList = dlOldBeltNewService.findInvitationsByUserId(status);
-		// 查询出来每个用户下邀请了多少人 status != 0
-		List<InvitationsNum> invitationsNumList = dlOldBeltNewService.findAllInvitationsNum();
-		// 获取额外奖励列表
-		List<ExtraBonus> extraBonusList = dlOldBeltNewService.findExtraBonus();
-		Map<Integer, ExtraBonus> extraBonusMap = new HashMap<Integer, ExtraBonus>();
-		extraBonusList.forEach(item -> extraBonusMap.put(item.getUserId(), item));
-		List<ReqOrdeEntity> userIdAndRewardList = new ArrayList<ReqOrdeEntity>();
-
-		for (int i = 0; i < invitationsNumList.size(); i++) {
-			Integer userId = invitationsNumList.get(i).getUserId();
-			Integer num = 0;
-			List<Integer> userIds = new ArrayList<Integer>();
-			ReqOrdeEntity reqOrdeEntity = new ReqOrdeEntity();
-			for (int j = 0; j < toBeConfirmedInvitationsList.size(); j++) {
-				Integer invitationsUserId = toBeConfirmedInvitationsList.get(j).getInviterUserId();
-				if (userId == invitationsUserId) {
-					num++;
-					userIds.add(toBeConfirmedInvitationsList.get(j).getRegisterUserId());
-					log.info("userId----------------------------------------------------------------------" + userId);
-				}
-			}
-			if (num > 0) {
-				dlOldBeltNewService.updateConformingUserToAward(userIds);
-				// 更新该用户的邀请奖励
-				String sn = SNGenerator.nextSN(9);// 生成订单号
-				reqOrdeEntity.setOrderSn(sn);
-				Integer amount = num * 20;
-				reqOrdeEntity.setReward(Double.parseDouble(amount.toString()));
-				reqOrdeEntity.setUserId(userId);
-				reqOrdeEntity.setUserMoney(0);
-				reqOrdeEntity.setBetMoney(0);
-				reqOrdeEntity.setBetTime(DateUtilNew.getCurrentTimeString(Long.valueOf(DateUtilNew.getCurrentTimeLong()), DateUtilNew.datetimeFormat));
-				reqOrdeEntity.setNote("邀请" + num + "个用户奖励" + amount + "元!");
-				userIdAndRewardList.add(reqOrdeEntity);
-			}
-			// 组装额外奖励
-			Integer extraBonus = 0;
-			ExtraBonus extraBonusForMap = extraBonusMap.get(userId);
-			if (invitationsNumList.get(i).getUserNum() >= 10 && invitationsNumList.get(i).getUserNum() < 20) { // 邀请人数-当前人数>10
-				extraBonus = 15;
-				if (extraBonusForMap == null) {
-					// 第一次操作为插入 其余为修改
-					ExtraBonus extraBonusInsert = new ExtraBonus();
-					extraBonusInsert.setId(0);
-					extraBonusInsert.setUserId(userId);
-					extraBonusInsert.setExtraBonus(extraBonus);
-					dlOldBeltNewService.insertExtraBonus(extraBonusInsert);
-				} else {
-					extraBonus -= extraBonusForMap.getExtraBonus();
-				}
-			} else if (invitationsNumList.get(i).getUserNum() >= 20 && invitationsNumList.get(i).getUserNum() < 30) {
-				extraBonus = 15 + 30;
-				if (extraBonusForMap == null) {
-					// 第一次操作为插入 其余为修改
-					ExtraBonus extraBonusInsert = new ExtraBonus();
-					extraBonusInsert.setId(0);
-					extraBonusInsert.setUserId(userId);
-					extraBonusInsert.setExtraBonus(extraBonus);
-					dlOldBeltNewService.insertExtraBonus(extraBonusInsert);
-				} else {
-					extraBonus -= extraBonusForMap.getExtraBonus();
-				}
-			} else if (invitationsNumList.get(i).getUserNum() >= 30 && invitationsNumList.get(i).getUserNum() < 40) {
-				extraBonus = 15 + 30 + 50;
-				if (extraBonusForMap == null) {
-					// 第一次操作为插入 其余为修改
-					ExtraBonus extraBonusInsert = new ExtraBonus();
-					extraBonusInsert.setId(0);
-					extraBonusInsert.setUserId(userId);
-					extraBonusInsert.setExtraBonus(extraBonus);
-					dlOldBeltNewService.insertExtraBonus(extraBonusInsert);
-				} else {
-					extraBonus -= extraBonusForMap.getExtraBonus();
-				}
-			} else if (invitationsNumList.get(i).getUserNum() >= 40 && invitationsNumList.get(i).getUserNum() < 50) {
-				extraBonus = 15 + 30 + 50 + 70;
-				if (extraBonusForMap == null) {
-					// 第一次操作为插入 其余为修改
-					ExtraBonus extraBonusInsert = new ExtraBonus();
-					extraBonusInsert.setId(0);
-					extraBonusInsert.setUserId(userId);
-					extraBonusInsert.setExtraBonus(extraBonus);
-					dlOldBeltNewService.insertExtraBonus(extraBonusInsert);
-				} else {
-					extraBonus -= extraBonusForMap.getExtraBonus();
-				}
-			} else if (invitationsNumList.get(i).getUserNum() >= 50 && invitationsNumList.get(i).getUserNum() < 100) {
-				extraBonus = 15 + 30 + 50 + 70 + 80;
-				if (extraBonusForMap == null) {
-					// 第一次操作为插入 其余为修改
-					ExtraBonus extraBonusInsert = new ExtraBonus();
-					extraBonusInsert.setId(0);
-					extraBonusInsert.setUserId(userId);
-					extraBonusInsert.setExtraBonus(extraBonus);
-					dlOldBeltNewService.insertExtraBonus(extraBonusInsert);
-				} else {
-					extraBonus -= extraBonusForMap.getExtraBonus();
-				}
-			} else if (invitationsNumList.get(i).getUserNum() >= 100) {
-				extraBonus = 15 + 30 + 50 + 70 + 80 + 200;
-				if (extraBonusForMap == null) {
-					// 第一次操作为插入 其余为修改
-					ExtraBonus extraBonusInsert = new ExtraBonus();
-					extraBonusInsert.setId(0);
-					extraBonusInsert.setUserId(userId);
-					extraBonusInsert.setExtraBonus(extraBonus);
-					dlOldBeltNewService.insertExtraBonus(extraBonusInsert);
-				} else {
-					extraBonus -= extraBonusForMap.getExtraBonus();
-				}
-			}
-			// 如果额外奖励>0 进行一下操作
-			if (extraBonus > 0) {
-				reqOrdeEntity.setOrderSn(SNGenerator.nextSN(9));
-				reqOrdeEntity.setReward(Double.parseDouble(extraBonus.toString()));
-				reqOrdeEntity.setUserId(userId);
-				reqOrdeEntity.setUserMoney(0);
-				reqOrdeEntity.setBetMoney(0);
-				reqOrdeEntity.setBetTime(DateUtilNew.getCurrentTimeString(Long.valueOf(DateUtilNew.getCurrentTimeLong()), DateUtilNew.datetimeFormat));
-				reqOrdeEntity.setNote("邀请到" + invitationsNumList.get(i).getUserNum() + "个用户,额外奖励" + extraBonus + "元!");
-				userIdAndRewardList.add(reqOrdeEntity);
-
-			}
-		}
-		if (userIdAndRewardList.size() > 0) {
-			String reqStr = "{'userIdAndRewardList':" + JSON.toJSONString(userIdAndRewardList) + "}";
-			log.info("请求reqStr===========================" + reqStr);
-			// 保存奖励记录
-			List<ReqOrdeEntityForUserAccount> userAccountList = new ArrayList<ReqOrdeEntityForUserAccount>(userIdAndRewardList.size());
-			for (int j = 0; j < userIdAndRewardList.size(); j++) {
-				ReqOrdeEntityForUserAccount userAccount = new ReqOrdeEntityForUserAccount();
-				userAccount.setId(0);
-				userAccount.setCreateTime(userIdAndRewardList.get(j).getBetTime());
-				userAccount.setNote(userIdAndRewardList.get(j).getNote());
-				userAccount.setOrderSn(userIdAndRewardList.get(j).getOrderSn());
-				userAccount.setReward(userIdAndRewardList.get(j).getReward());
-				userAccount.setUserId(userIdAndRewardList.get(j).getUserId());
-				userAccount.setStatus(0);
-				userAccountList.add(userAccount);
-			}
-			dlOldBeltNewService.insertUserAccount(userAccountList);
-			ManualAuditUtil.ManualAuditUtil(reqStr, urlConfig.getManualRewardToUserMoneyLimitUrl(), true);
-			// 更改奖励状态
-			dlOldBeltNewService.updateUserAccount(userAccountList);
-		}
-	}
+//	/**
+//	 * 老带新活动 新用户更改状态
+//	 */
+//	// @Scheduled(cron =
+//	// "${task.schedule.activity.oldBeltNew.updateUserStatus}")
+//	public void oldBeltNewUpdateUserStatus() {
+//		dlOldBeltNewService.updateConformingUser();// 更新符合条件的用户
+//		Integer status = 1;
+//		// 查询出当前status = 1 的人
+//		List<DlOldBeltNew> toBeConfirmedInvitationsList = dlOldBeltNewService.findInvitationsByUserId(status);
+//		// 查询出来每个用户下邀请了多少人 status != 0
+//		List<InvitationsNum> invitationsNumList = dlOldBeltNewService.findAllInvitationsNum();
+//		// 获取额外奖励列表
+//		List<ExtraBonus> extraBonusList = dlOldBeltNewService.findExtraBonus();
+//		Map<Integer, ExtraBonus> extraBonusMap = new HashMap<Integer, ExtraBonus>();
+//		extraBonusList.forEach(item -> extraBonusMap.put(item.getUserId(), item));
+//		List<ReqOrdeEntity> userIdAndRewardList = new ArrayList<ReqOrdeEntity>();
+//
+//		for (int i = 0; i < invitationsNumList.size(); i++) {
+//			Integer userId = invitationsNumList.get(i).getUserId();
+//			Integer num = 0;
+//			List<Integer> userIds = new ArrayList<Integer>();
+//			ReqOrdeEntity reqOrdeEntity = new ReqOrdeEntity();
+//			for (int j = 0; j < toBeConfirmedInvitationsList.size(); j++) {
+//				Integer invitationsUserId = toBeConfirmedInvitationsList.get(j).getInviterUserId();
+//				if (userId == invitationsUserId) {
+//					num++;
+//					userIds.add(toBeConfirmedInvitationsList.get(j).getRegisterUserId());
+//					log.info("userId----------------------------------------------------------------------" + userId);
+//				}
+//			}
+//			if (num > 0) {
+//				dlOldBeltNewService.updateConformingUserToAward(userIds);
+//				// 更新该用户的邀请奖励
+//				String sn = SNGenerator.nextSN(9);// 生成订单号
+//				reqOrdeEntity.setOrderSn(sn);
+//				Integer amount = num * 20;
+//				reqOrdeEntity.setReward(Double.parseDouble(amount.toString()));
+//				reqOrdeEntity.setUserId(userId);
+//				reqOrdeEntity.setUserMoney(0);
+//				reqOrdeEntity.setBetMoney(0);
+//				reqOrdeEntity.setBetTime(DateUtilNew.getCurrentTimeString(Long.valueOf(DateUtilNew.getCurrentTimeLong()), DateUtilNew.datetimeFormat));
+//				reqOrdeEntity.setNote("邀请" + num + "个用户奖励" + amount + "元!");
+//				userIdAndRewardList.add(reqOrdeEntity);
+//			}
+//			// 组装额外奖励
+//			Integer extraBonus = 0;
+//			ExtraBonus extraBonusForMap = extraBonusMap.get(userId);
+//			if (invitationsNumList.get(i).getUserNum() >= 10 && invitationsNumList.get(i).getUserNum() < 20) { // 邀请人数-当前人数>10
+//				extraBonus = 15;
+//				if (extraBonusForMap == null) {
+//					// 第一次操作为插入 其余为修改
+//					ExtraBonus extraBonusInsert = new ExtraBonus();
+//					extraBonusInsert.setId(0);
+//					extraBonusInsert.setUserId(userId);
+//					extraBonusInsert.setExtraBonus(extraBonus);
+//					dlOldBeltNewService.insertExtraBonus(extraBonusInsert);
+//				} else {
+//					extraBonus -= extraBonusForMap.getExtraBonus();
+//				}
+//			} else if (invitationsNumList.get(i).getUserNum() >= 20 && invitationsNumList.get(i).getUserNum() < 30) {
+//				extraBonus = 15 + 30;
+//				if (extraBonusForMap == null) {
+//					// 第一次操作为插入 其余为修改
+//					ExtraBonus extraBonusInsert = new ExtraBonus();
+//					extraBonusInsert.setId(0);
+//					extraBonusInsert.setUserId(userId);
+//					extraBonusInsert.setExtraBonus(extraBonus);
+//					dlOldBeltNewService.insertExtraBonus(extraBonusInsert);
+//				} else {
+//					extraBonus -= extraBonusForMap.getExtraBonus();
+//				}
+//			} else if (invitationsNumList.get(i).getUserNum() >= 30 && invitationsNumList.get(i).getUserNum() < 40) {
+//				extraBonus = 15 + 30 + 50;
+//				if (extraBonusForMap == null) {
+//					// 第一次操作为插入 其余为修改
+//					ExtraBonus extraBonusInsert = new ExtraBonus();
+//					extraBonusInsert.setId(0);
+//					extraBonusInsert.setUserId(userId);
+//					extraBonusInsert.setExtraBonus(extraBonus);
+//					dlOldBeltNewService.insertExtraBonus(extraBonusInsert);
+//				} else {
+//					extraBonus -= extraBonusForMap.getExtraBonus();
+//				}
+//			} else if (invitationsNumList.get(i).getUserNum() >= 40 && invitationsNumList.get(i).getUserNum() < 50) {
+//				extraBonus = 15 + 30 + 50 + 70;
+//				if (extraBonusForMap == null) {
+//					// 第一次操作为插入 其余为修改
+//					ExtraBonus extraBonusInsert = new ExtraBonus();
+//					extraBonusInsert.setId(0);
+//					extraBonusInsert.setUserId(userId);
+//					extraBonusInsert.setExtraBonus(extraBonus);
+//					dlOldBeltNewService.insertExtraBonus(extraBonusInsert);
+//				} else {
+//					extraBonus -= extraBonusForMap.getExtraBonus();
+//				}
+//			} else if (invitationsNumList.get(i).getUserNum() >= 50 && invitationsNumList.get(i).getUserNum() < 100) {
+//				extraBonus = 15 + 30 + 50 + 70 + 80;
+//				if (extraBonusForMap == null) {
+//					// 第一次操作为插入 其余为修改
+//					ExtraBonus extraBonusInsert = new ExtraBonus();
+//					extraBonusInsert.setId(0);
+//					extraBonusInsert.setUserId(userId);
+//					extraBonusInsert.setExtraBonus(extraBonus);
+//					dlOldBeltNewService.insertExtraBonus(extraBonusInsert);
+//				} else {
+//					extraBonus -= extraBonusForMap.getExtraBonus();
+//				}
+//			} else if (invitationsNumList.get(i).getUserNum() >= 100) {
+//				extraBonus = 15 + 30 + 50 + 70 + 80 + 200;
+//				if (extraBonusForMap == null) {
+//					// 第一次操作为插入 其余为修改
+//					ExtraBonus extraBonusInsert = new ExtraBonus();
+//					extraBonusInsert.setId(0);
+//					extraBonusInsert.setUserId(userId);
+//					extraBonusInsert.setExtraBonus(extraBonus);
+//					dlOldBeltNewService.insertExtraBonus(extraBonusInsert);
+//				} else {
+//					extraBonus -= extraBonusForMap.getExtraBonus();
+//				}
+//			}
+//			// 如果额外奖励>0 进行一下操作
+//			if (extraBonus > 0) {
+//				reqOrdeEntity.setOrderSn(SNGenerator.nextSN(9));
+//				reqOrdeEntity.setReward(Double.parseDouble(extraBonus.toString()));
+//				reqOrdeEntity.setUserId(userId);
+//				reqOrdeEntity.setUserMoney(0);
+//				reqOrdeEntity.setBetMoney(0);
+//				reqOrdeEntity.setBetTime(DateUtilNew.getCurrentTimeString(Long.valueOf(DateUtilNew.getCurrentTimeLong()), DateUtilNew.datetimeFormat));
+//				reqOrdeEntity.setNote("邀请到" + invitationsNumList.get(i).getUserNum() + "个用户,额外奖励" + extraBonus + "元!");
+//				userIdAndRewardList.add(reqOrdeEntity);
+//
+//			}
+//		}
+//		if (userIdAndRewardList.size() > 0) {
+//			String reqStr = "{'userIdAndRewardList':" + JSON.toJSONString(userIdAndRewardList) + "}";
+//			log.info("请求reqStr===========================" + reqStr);
+//			// 保存奖励记录
+//			List<ReqOrdeEntityForUserAccount> userAccountList = new ArrayList<ReqOrdeEntityForUserAccount>(userIdAndRewardList.size());
+//			for (int j = 0; j < userIdAndRewardList.size(); j++) {
+//				ReqOrdeEntityForUserAccount userAccount = new ReqOrdeEntityForUserAccount();
+//				userAccount.setId(0);
+//				userAccount.setCreateTime(userIdAndRewardList.get(j).getBetTime());
+//				userAccount.setNote(userIdAndRewardList.get(j).getNote());
+//				userAccount.setOrderSn(userIdAndRewardList.get(j).getOrderSn());
+//				userAccount.setReward(userIdAndRewardList.get(j).getReward());
+//				userAccount.setUserId(userIdAndRewardList.get(j).getUserId());
+//				userAccount.setStatus(0);
+//				userAccountList.add(userAccount);
+//			}
+//			dlOldBeltNewService.insertUserAccount(userAccountList);
+//			ManualAuditUtil.ManualAuditUtil(reqStr, urlConfig.getManualRewardToUserMoneyLimitUrl(), true);
+//			// 更改奖励状态
+//			dlOldBeltNewService.updateUserAccount(userAccountList);
+//		}
+//	}
 
 	
-	/**
-	 * 第一步： 出票任务 （每5分钟执行一次） 调用第三方接口出票定时任务 定时的对出票中的进行查询结果
-	 */
-	@Scheduled(cron = "${task.schedule.match.score.refreshMatchResult}")
-	public void refreshMatchResult() {
-		log.info("比分计算赛果定时任务启动");
-		dlMatchResultService.refreshMatchResult();
-		log.info("比分计算赛果定时任务结束");
-	}
+//	/**
+//	 * 第一步： 出票任务 （每5分钟执行一次） 调用第三方接口出票定时任务 定时的对出票中的进行查询结果
+//	 */
+//	@Scheduled(cron = "${task.schedule.match.score.refreshMatchResult}")
+//	public void refreshMatchResult() {
+//		log.info("比分计算赛果定时任务启动");
+//		dlMatchResultService.refreshMatchResult();
+//		log.info("比分计算赛果定时任务结束");
+//	}
 	/**
 	 * 第一步： 出票任务 （每5分钟执行一次） 调用第三方接口出票定时任务 定时的对出票中的进行查询结果
 	 */
