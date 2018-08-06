@@ -113,7 +113,7 @@
      from 
         dl_order
      where 
-     print_lottery_status = 1 and pay_status=1 
+     print_lottery_status = 1 and pay_status=1 and order_status=1
      order by pay_time 
   </select>
   <update id="updateOrderStatus1To3">
