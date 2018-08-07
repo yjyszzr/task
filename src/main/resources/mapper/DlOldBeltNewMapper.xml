@@ -58,7 +58,7 @@
 				user_id 
 				) a 
 			WHERE
-				a.surplus &gt;= 20 
+				a.surplus &gt;= 30 
 	  </select>
 	  
 <!-- 	  更新用户状态 -->
