@@ -271,7 +271,8 @@ public class TaskSchedule {
 	/**
 	 * 老带新活动 新用户更改状态
 	 */
-	@Scheduled(cron = "${task.schedule.activity.oldBeltNew.updateUserStatus}")
+	// @Scheduled(cron =
+	// "${task.schedule.activity.oldBeltNew.updateUserStatus}")
 	public void oldBeltNewUpdateUserStatus() {
 		log.info("老带新活动定时开始=======================================");
 		dlOldBeltNewService.updateConformingUser();// 更新符合条件的用户
