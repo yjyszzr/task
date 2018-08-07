@@ -47,7 +47,6 @@ public class PrintChannelHenanServiceImpl  implements IPrintChannelService{
 	 * @return
 	 */
 	private ToStakeResponseDTO toStakeHenan(CommonToStakeParam param,DlTicketChannel dlTicketChannel,DlPrintLotteryMapper dlPrintLotteryMapper) {
-		param.setTimestamp(DateUtil.getCurrentTimeString(DateUtil.getCurrentTimeLong().longValue(), DateUtil.datetimeFormat));
 		JSONObject jo = JSONObject.fromObject(param);
 		String backStr = defaultCommonRestRequest(dlTicketChannel, dlPrintLotteryMapper, jo, "/stake", ThirdApiEnum.HE_NAN_LOTTERY);
 		JSONObject backJo = JSONObject.fromObject(backStr);

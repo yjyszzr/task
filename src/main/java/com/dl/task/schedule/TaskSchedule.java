@@ -87,17 +87,25 @@ public class TaskSchedule {
 	 */
 	@Scheduled(cron = "${task.schedule.lottery.print.lottery}")
 	public void printLottery() {
-		log.info("出票定时任务启动");
-		dlPrintLotteryService.goPrintLottery();
-		log.info("出票定时任务结束");
-		// 每天9点前不作查询处理，只作出票处理
-		LocalTime localTime = LocalTime.now(ZoneId.systemDefault());
-		int hour = localTime.getHour();
-		if (hour < 1 || hour >= 9) {
-			log.info("彩票出票状态查询定时任务启动");
-			dlPrintLotteryService.goQueryStake();
-			log.info("彩票出票状态查询定时任务结束");
-		}
+//		log.info("出票定时任务启动");
+//		dlPrintLotteryService.goPrintLottery();
+//		log.info("出票定时任务结束");
+//		// 每天9点前不作查询处理，只作出票处理
+//		LocalTime localTime = LocalTime.now(ZoneId.systemDefault());
+//		int hour = localTime.getHour();
+//		if (hour < 1 || hour >= 9) {
+//			log.info("彩票出票状态查询定时任务启动");
+//			dlPrintLotteryService.goQueryStake();
+//			log.info("彩票出票状态查询定时任务结束");
+//		}
+		dlPrintLotteryService.goPrintLotteryVersion2();
+	}
+	/**
+	 * 第一步： 出票任务 （每5分钟执行一次） 调用第三方接口出票定时任务 定时的对出票中的进行查询结果
+	 */
+	@Scheduled(cron = "${task.schedule.lottery.print.lottery}")
+	public void queryPrintLottery() {
+		dlPrintLotteryService.queryPrintLotteryVersion2();
 	}
 
 	/**
