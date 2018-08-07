@@ -536,7 +536,6 @@ public class OrderService extends AbstractService<Order> {
 						continue;
 					}
 					Integer playType = Integer.valueOf(ticketData.substring(0, ticketData.indexOf("|")));
-					Boolean isResultGet=Boolean.TRUE;
 					if (playType.equals(MatchPlayTypeEnum.PLAY_TYPE_TSO.getcode())) {
 						String hhadRst = null;
 						String hadRst = null;
