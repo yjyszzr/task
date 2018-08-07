@@ -191,6 +191,11 @@
    <select id="printLotteryRoutAmount" resultType="java.lang.Double">
   	 select value from dl_sys_config where business_id=10;
   </select>
+  <select id="lotteryPrintsByUnPrintByChannelId" resultMap="BaseResultMap">
+  	select * from dl_print_lottery 
+  	where status=#{status} and print_lottery_com = #{printChannelId}
+     order by order_sn
+  </select>
   <update id="updatePrintLotteryFailStatus">
     update dl_print_lottery set 
   	error_code='55555', 

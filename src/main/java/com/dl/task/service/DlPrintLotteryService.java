@@ -76,15 +76,23 @@ import com.dl.task.dto.XianDlQueryStakeDTO;
 import com.dl.task.dto.XianDlQueryStakeDTO.XianBackQueryStake;
 import com.dl.task.dto.XianDlToStakeDTO;
 import com.dl.task.dto.XianDlToStakeDTO.XianBackOrderDetail;
+import com.dl.task.enums.PrintLotteryStatusEnum;
 import com.dl.task.model.BetResultInfo;
 import com.dl.task.model.DlLeagueMatchResult;
 import com.dl.task.model.DlPrintLottery;
+import com.dl.task.model.DlTicketChannel;
 import com.dl.task.model.LotteryThirdApiLog;
 import com.dl.task.param.DlJcZqMatchBetParam;
 import com.dl.task.param.DlQueryPrizeFileParam;
 import com.dl.task.param.DlQueryStakeParam;
 import com.dl.task.param.DlToStakeParam;
 import com.dl.task.param.DlToStakeParam.PrintTicketOrderParam;
+import com.dl.task.printlottery.PrintComEnums;
+import com.dl.task.printlottery.PrintLotteryAdapter;
+import com.dl.task.printlottery.responseDto.QueryStakeResponseDTO;
+import com.dl.task.printlottery.responseDto.QueryStakeResponseDTO.QueryStakeOrderResponse;
+import com.dl.task.printlottery.responseDto.ToStakeResponseDTO;
+import com.dl.task.printlottery.responseDto.ToStakeResponseDTO.ToStakeBackOrderDetail;
 import com.google.common.collect.Lists;
 
 @Service
@@ -111,6 +119,9 @@ public class DlPrintLotteryService {
 	@Resource
 	private RestTemplate restTemplate;
 
+	@Resource
+	private PrintLotteryAdapter printLotteryAdapter;
+	
 	@Value("${print.ticket.url}")
 	private String printTicketUrl;
 
@@ -1660,5 +1671,115 @@ public class DlPrintLotteryService {
 		JSONObject backJo = JSONObject.fromObject(backStr);
 		DlQueryPrizeFileDTO dlQueryPrizeFileDTO = (DlQueryPrizeFileDTO) JSONObject.toBean(backJo, DlQueryPrizeFileDTO.class); 
 		return dlQueryPrizeFileDTO;
+	}
+
+	/**
+	 * 出票 版本2.0
+	 */
+	public void goPrintLotteryVersion2() {
+		for(PrintComEnums printComEnums:PrintComEnums.values()){
+			try{
+				DlTicketChannel dlTicketChannel = printLotteryAdapter.selectChannelByChannelId(printComEnums);
+				List<DlPrintLottery> lotteryLists = printLotteryAdapter.getLotteryList(printComEnums,PrintLotteryStatusEnum.INIT);
+				while(!CollectionUtils.isEmpty(lotteryLists)){
+					int endIndex = lotteryLists.size()>50?50:lotteryLists.size();
+					List<DlPrintLottery> subList = lotteryLists.subList(0, endIndex);
+					ToStakeResponseDTO stakeResponseDto = printLotteryAdapter.toStake(printComEnums,subList,dlTicketChannel);
+					if(stakeResponseDto==null){
+						log.error("出票返回空，channelId={},channelName={}",printComEnums.getPrintChannelId(),printComEnums.getPrintChannelName());
+					}else if(!stakeResponseDto.getRetSucc()){
+						log.error("出票失败，channelId={},channelName={},errorCode={},errorMsg={}",printComEnums.getPrintChannelId(),printComEnums.getPrintChannelName(),
+								stakeResponseDto.getRetCode(),stakeResponseDto.getRetDesc());
+					}else if(stakeResponseDto.getRetSucc()){
+						updatePrintLottery(stakeResponseDto);	
+					}
+					lotteryLists.removeAll(subList);
+				}
+			}catch(Exception e){
+				log.error("投注接口 printChannelId={},printChannelName={}投注异常",printComEnums.getPrintChannelId(),printComEnums.getPrintChannelName(),e);
+				continue;
+			}
+		}
+	}
+	public void queryPrintLotteryVersion2() {
+		for(PrintComEnums printComEnums:PrintComEnums.values()){
+			try{
+				DlTicketChannel dlTicketChannel = printLotteryAdapter.selectChannelByChannelId(printComEnums);
+				List<DlPrintLottery> lotteryLists = printLotteryAdapter.getLotteryList(printComEnums,PrintLotteryStatusEnum.DOING);
+				while(!CollectionUtils.isEmpty(lotteryLists)){
+					int endIndex = lotteryLists.size()>50?50:lotteryLists.size();
+					List<DlPrintLottery> subList = lotteryLists.subList(0, endIndex);
+					QueryStakeResponseDTO queryStakeResponseDTO = printLotteryAdapter.queryStake(printComEnums,subList,dlTicketChannel);
+					if(queryStakeResponseDTO==null){
+						log.error("出票查询返回空，channelId={},channelName={}",printComEnums.getPrintChannelId(),printComEnums.getPrintChannelName());
+					}else if(!queryStakeResponseDTO.getQuerySuccess()){
+						log.error("出票查询失败，channelId={},channelName={},errorCode={},errorMsg={}",printComEnums.getPrintChannelId(),printComEnums.getPrintChannelName(),
+								queryStakeResponseDTO.getRetCode(),queryStakeResponseDTO.getRetDesc());
+					}else if(queryStakeResponseDTO.getQuerySuccess()){
+						List<QueryStakeOrderResponse> queryStakes = queryStakeResponseDTO.getOrders();
+						List<DlPrintLottery> lotteryPrints = new ArrayList<>();
+						for(QueryStakeOrderResponse stake: queryStakes) {
+							if(stake==null||!stake.getQuerySuccess()){
+								continue;
+							}
+							PrintLotteryStatusEnum statusEnum = stake.getStatusEnum();
+							if(PrintLotteryStatusEnum.INIT==statusEnum){
+								continue;
+							}
+							DlPrintLottery lotteryPrint = new DlPrintLottery();
+							lotteryPrint.setTicketId(stake.getTicketId());
+							lotteryPrint.setStatus(statusEnum.getStatus());
+							lotteryPrint.setPlatformId(stake.getPlatformId());
+							lotteryPrint.setPrintNo(stake.getPrintNo());
+							lotteryPrint.setPrintSp(stake.getSp());
+							lotteryPrint.setPrintStatus(stake.getPrintStatus());
+							lotteryPrint.setPrintTime(stake.getPrintTimeDate());
+							lotteryPrints.add(lotteryPrint);
+						}
+						for (DlPrintLottery print : lotteryPrints) {
+							dlPrintLotteryMapper.updateLotteryPrintByCallBack(print);
+						}
+					}
+					lotteryLists.removeAll(subList);
+				}
+			}catch(Exception e){
+				log.error("投注查询接口 printChannelId={},printChannelName={}投注查询异常",printComEnums.getPrintChannelId(),printComEnums.getPrintChannelName(),e);
+				continue;
+			}
+		}
+	}
+	/**
+	 * 根据查询结果进行查询出票
+	 * @param stakeResponseDto
+	 */
+	private void updatePrintLottery(ToStakeResponseDTO stakeResponseDto) {
+		if(null == stakeResponseDto||CollectionUtils.isEmpty(stakeResponseDto.getOrders())){
+			log.error("出票后，更新出票数据，没有对应的数据,stakeResponseDto={}",stakeResponseDto==null?"":JSONHelper.bean2json(stakeResponseDto));
+			return ;
+		}
+		List<DlPrintLottery> lotteryPrints = new LinkedList<DlPrintLottery>();
+		for(ToStakeBackOrderDetail backOrderDetail : stakeResponseDto.getOrders()) {
+			DlPrintLottery lotteryPrint = new DlPrintLottery();
+			lotteryPrint.setTicketId(backOrderDetail.getTicketId());
+			Integer errorCode = backOrderDetail.getErrorCode();
+			if(backOrderDetail.getPrintLotteryDoing()){
+				//出票中
+				lotteryPrint.setStatus(3);
+				lotteryPrints.add(lotteryPrint);
+			}else if(!backOrderDetail.getPrintLotteryDoing()){
+				lotteryPrint.setErrorCode(errorCode);
+				//出票失败
+				lotteryPrint.setStatus(2);
+				lotteryPrint.setPrintTime(new Date());
+				lotteryPrints.add(lotteryPrint);
+			}
+		}
+		for(DlPrintLottery lotteryPrint:lotteryPrints) {
+			log.info("更新出票信息tikectInfo={}",JSONHelper.bean2json(lotteryPrint));
+			int rst = this.updatePrintStatusByTicketId(lotteryPrint);
+			if(rst<1){
+				log.error("更新出票信息tikectInfo={},更新失败，updateRow={}",JSONHelper.bean2json(lotteryPrint),rst);
+			}
+		}
 	}
 }
