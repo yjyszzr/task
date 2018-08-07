@@ -64,7 +64,7 @@
 <!-- 	  更新用户状态 -->
 	  <update id="updateConformingUser">
 			UPDATE dl_old_belt_new 
-			SET consumption_status = 2 
+			SET consumption_status = #{status}
  			WHERE
 				register_user_id IN 
 			<foreach collection="userIdsArr" item="userId" index="index" open="(" close=")" separator=",">
