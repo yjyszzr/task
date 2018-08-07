@@ -57,7 +57,7 @@ public class DlOldBeltNewService extends AbstractService<DlOldBeltNew> {
 	}
 
 	public void updateUserAccount(List<ReqOrdeEntityForUserAccount> userAccountList) {
-		dlOldBeltNewMapper.updateUserAccount(userAccountList);
+		dlOldBeltNewMapper.updateUserAccountStatus(userAccountList);
 
 	}
 

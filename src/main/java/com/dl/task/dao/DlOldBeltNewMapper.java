@@ -26,5 +26,5 @@ public interface DlOldBeltNewMapper extends Mapper<DlOldBeltNew> {
 
 	public void insertUserAccount(List<ReqOrdeEntityForUserAccount> userAccountList);
 
-	public void updateUserAccount(List<ReqOrdeEntityForUserAccount> userAccountList);
+	public void updateUserAccountStatus(List<ReqOrdeEntityForUserAccount> userAccountList);
 }

@@ -104,17 +104,17 @@
 	  
 	  <insert id="insertUserAccount">
 	  insert into dl_old_belt_new_user_account
-         (id, order_sn, reward,note,create_time,status)
+         (id, user_id,order_sn, reward,note,create_time,status)
         values
-            <foreach collection ="userAccountList" item="item" index= "index" separator =",">
+            <foreach collection ="list" item="item" index= "index" separator =",">
                 (
-                 #{item.id}, 
-                 #{item.userId}, 
-			  #{item.orderSn},
-                 #{item.reward},
-                 #{item.note},
-                 #{item.createTime}, 
-			  #{item.status}
+                 	#{item.id}, 
+                	#{item.userId}, 
+			  		#{item.orderSn},
+                 	#{item.reward},
+                 	#{item.note},
+                 	#{item.createTime}, 
+			  		#{item.status}
                  )
             </foreach >
 	  </insert>
@@ -125,7 +125,7 @@
 		  SET
 	           status  = 1 
 	 	  WHERE order_sn IN 
-	           <foreach collection ="userAccountList" item="item" index= "index" open="(" close=")"  separator =",">
+	           <foreach collection ="list" item="item" index= "index" open="(" close=")"  separator =",">
 				  	#{item.orderSn}
 	           </foreach >
 	  </update>

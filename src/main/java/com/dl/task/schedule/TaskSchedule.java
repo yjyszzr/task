@@ -293,7 +293,7 @@ public class TaskSchedule {
 			ReqOrdeEntity reqOrdeEntity = new ReqOrdeEntity();
 			for (int j = 0; j < toBeConfirmedInvitationsList.size(); j++) {
 				Integer invitationsUserId = toBeConfirmedInvitationsList.get(j).getInviterUserId();
-				if (userId == invitationsUserId) {
+				if (userId.equals(invitationsUserId)) {
 					num++;
 					userIds.add(toBeConfirmedInvitationsList.get(j).getRegisterUserId());
 					log.info("userId----------------------------------------------------------------------" + userId);
