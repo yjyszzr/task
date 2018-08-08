@@ -80,7 +80,7 @@ public class PrintChannelXianServiceImpl  implements IPrintChannelService{
 	public QueryStakeResponseDTO queryStake(List<DlPrintLottery> dlPrintLotterys,DlTicketChannel dlTicketChannel,DlPrintLotteryMapper dlPrintLotteryMapper) {
 		CommonQueryStakeParam commonQueryStakeParam = defaultCommonQueryStakeParam(dlPrintLotterys, dlTicketChannel.getTicketMerchant(), version);
 		JSONObject jo = JSONObject.fromObject(commonQueryStakeParam);
-		String backStr = defaultCommonRestRequest(dlTicketChannel, dlPrintLotteryMapper, jo, "/stake_query", ThirdApiEnum.HE_NAN_LOTTERY);
+		String backStr = defaultCommonRestRequest(dlTicketChannel, dlPrintLotteryMapper, jo, "/order/query", ThirdApiEnum.HE_NAN_LOTTERY);
 		JSONObject backJo = JSONObject.fromObject(backStr);
 		@SuppressWarnings("rawtypes")
 		Map<String,Class> mapClass = new HashMap<String,Class>();

@@ -2,6 +2,8 @@ package com.dl.task.printlottery;
 
 import java.util.List;
 
+import javax.annotation.Resource;
+
 import org.springframework.stereotype.Service;
 
 import com.dl.task.dao.DlPrintLotteryMapper;
@@ -19,16 +21,17 @@ import com.dl.task.printlottery.responseDto.ToStakeResponseDTO;
 @Service
 public class PrintLotteryAdapter {
 
+	@Resource
 	private PrintChannelHenanServiceImpl printChannelHeNanServiceImpl;
-	
+	@Resource
 	private PrintChannelXianServiceImpl printChannelXianServiceImpl;
-	
+	@Resource
 	private PrintChannelCaixiaomiServiceImpl printChannelCaixiaomiServiceImpl;
-	
+	@Resource
 	private PrintChannelWeicaishidaiServiceImpl printChannelWeicaishidaiServiceImpl;
-	
+	@Resource
 	private DlPrintLotteryMapper dlPrintLotteryMapper;
-	
+	@Resource
 	private DlTicketChannelMapper dlTicketChannelMapper;
 	
 	/**
