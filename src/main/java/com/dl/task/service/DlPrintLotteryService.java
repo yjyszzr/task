@@ -1682,7 +1682,7 @@ public class DlPrintLotteryService {
 			try{
 				DlTicketChannel dlTicketChannel = printLotteryAdapter.selectChannelByChannelId(printComEnums);
 				List<DlPrintLottery> lotteryLists = printLotteryAdapter.getLotteryList(printComEnums,PrintLotteryStatusEnum.INIT);
-				log.info("渠道channelId={},channelName={},查询待出票状态个数={}",printComEnums.getPrintChannelId(),printComEnums.getPrintChannelName(),lotteryLists);
+				log.info("渠道channelId={},channelName={},查询待出票状态个数={}",printComEnums.getPrintChannelId(),printComEnums.getPrintChannelName(),lotteryLists.size());
 				while(!CollectionUtils.isEmpty(lotteryLists)){
 					int endIndex = lotteryLists.size()>50?50:lotteryLists.size();
 					List<DlPrintLottery> subList = lotteryLists.subList(0, endIndex);
@@ -1710,7 +1710,7 @@ public class DlPrintLotteryService {
 			try{
 				DlTicketChannel dlTicketChannel = printLotteryAdapter.selectChannelByChannelId(printComEnums);
 				List<DlPrintLottery> lotteryLists = printLotteryAdapter.getLotteryList(printComEnums,PrintLotteryStatusEnum.DOING);
-				log.info("渠道channelId={},channelName={},查询出票状态个数={}",printComEnums.getPrintChannelId(),printComEnums.getPrintChannelName(),lotteryLists);
+				log.info("渠道channelId={},channelName={},查询出票状态个数={}",printComEnums.getPrintChannelId(),printComEnums.getPrintChannelName(),lotteryLists.size());
 				while(!CollectionUtils.isEmpty(lotteryLists)){
 					int endIndex = lotteryLists.size()>50?50:lotteryLists.size();
 					List<DlPrintLottery> subList = lotteryLists.subList(0, endIndex);
