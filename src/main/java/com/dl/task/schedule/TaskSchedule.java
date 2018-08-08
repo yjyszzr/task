@@ -111,16 +111,17 @@ public class TaskSchedule {
 	 */
 	@Scheduled(cron = "${task.schedule.lottery.print.third.reward}")
 	public void updatePrintLotteryThirdRewardInfo() {
-		try {
-			dlPrintLotteryService.updatePrintLotterysThirdRewardXian();
-		} catch (Exception e) {
-			log.error("定时更新西安获奖信息失败", e);
-		}
-		try {
-			dlPrintLotteryService.updatePrintLotteryThirdRewardHeNan();
-		} catch (Exception e) {
-			log.error("定时更新河南获奖信息失败", e);
-		}
+		dlPrintLotteryService.rewardPrintLotteryVersion2();
+//		try {
+//			dlPrintLotteryService.updatePrintLotterysThirdRewardXian();
+//		} catch (Exception e) {
+//			log.error("定时更新西安获奖信息失败", e);
+//		}
+//		try {
+//			dlPrintLotteryService.updatePrintLotteryThirdRewardHeNan();
+//		} catch (Exception e) {
+//			log.error("定时更新河南获奖信息失败", e);
+//		}
 	}
 
 	/**

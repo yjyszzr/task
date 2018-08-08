@@ -51,4 +51,5 @@ public interface DlPrintLotteryMapper extends Mapper<DlPrintLottery> {
 	public List<String> selectIssuesNotUpdateReward();
 	public List<DlPrintLottery> selectFinishPrintLotteryButNotRewardHeNan();
 	public List<DlPrintLottery> lotteryPrintsByUnPrintByChannelId(@Param("printChannelId") Integer printChannelId,@Param("status") Integer status);
+	public List<DlPrintLottery> selectRewardLotterys(@Param("printChannelId") Integer printChannelId,@Param("thirdRewardStatus") Integer thirdRewardStatus);
 }

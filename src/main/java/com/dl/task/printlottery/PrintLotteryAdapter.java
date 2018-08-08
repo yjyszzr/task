@@ -9,12 +9,14 @@ import org.springframework.stereotype.Service;
 import com.dl.task.dao.DlPrintLotteryMapper;
 import com.dl.task.dao.DlTicketChannelMapper;
 import com.dl.task.enums.PrintLotteryStatusEnum;
+import com.dl.task.enums.ThirdRewardStatusEnum;
 import com.dl.task.model.DlPrintLottery;
 import com.dl.task.model.DlTicketChannel;
 import com.dl.task.printlottery.channelImpl.PrintChannelCaixiaomiServiceImpl;
 import com.dl.task.printlottery.channelImpl.PrintChannelHenanServiceImpl;
 import com.dl.task.printlottery.channelImpl.PrintChannelWeicaishidaiServiceImpl;
 import com.dl.task.printlottery.channelImpl.PrintChannelXianServiceImpl;
+import com.dl.task.printlottery.responseDto.QueryRewardResponseDTO;
 import com.dl.task.printlottery.responseDto.QueryStakeResponseDTO;
 import com.dl.task.printlottery.responseDto.ToStakeResponseDTO;
 
@@ -40,6 +42,9 @@ public class PrintLotteryAdapter {
 	 */
 	public List<DlPrintLottery> getLotteryList(PrintComEnums printComEnums,PrintLotteryStatusEnum lotteryStatus){
 		return dlPrintLotteryMapper.lotteryPrintsByUnPrintByChannelId(printComEnums.getPrintChannelId(),lotteryStatus.getStatus());
+	}
+	public List<DlPrintLottery> getReWardLotteryList(PrintComEnums printComEnums,ThirdRewardStatusEnum thirdRewardStatusEnum) {
+		return dlPrintLotteryMapper.selectRewardLotterys(printComEnums.getPrintChannelId(),thirdRewardStatusEnum.getStatus());
 	}
 	/**
 	 * 投注
@@ -76,11 +81,13 @@ public class PrintLotteryAdapter {
 	public void award(PrintComEnums printComEnums){
 		IPrintChannelService iPrintChannelService = getIPrintChannelServiceImpl(printComEnums);
 	}
-	/**
-	 * 查询第三方奖金
-	 */
-	public void queryAward(PrintComEnums printComEnums){
+	public QueryRewardResponseDTO queryLotterysReward(PrintComEnums printComEnums, List<DlPrintLottery> dlPrintLotterys,DlTicketChannel dlTicketChannel) {
 		IPrintChannelService iPrintChannelService = getIPrintChannelServiceImpl(printComEnums);
+		return iPrintChannelService.queryRewardByLottery(dlPrintLotterys,dlTicketChannel,dlPrintLotteryMapper);
+	}
+	public QueryRewardResponseDTO queryLotterysRewardByIssue(PrintComEnums printComEnums, String issue,DlTicketChannel dlTicketChannel) {
+		IPrintChannelService iPrintChannelService = getIPrintChannelServiceImpl(printComEnums);
+		return iPrintChannelService.queryRewardByIssue(issue,dlTicketChannel,dlPrintLotteryMapper);
 	}
 	
 	/**

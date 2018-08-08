@@ -1,5 +1,6 @@
 package com.dl.task.printlottery.channelImpl;
 
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -7,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 import net.sf.json.JSONObject;
@@ -18,11 +20,14 @@ import org.springframework.stereotype.Service;
 import com.dl.base.enums.ThirdApiEnum;
 import com.dl.task.dao.DlPrintLotteryMapper;
 import com.dl.task.enums.PrintLotteryStatusEnum;
+import com.dl.task.enums.ThirdRewardStatusEnum;
 import com.dl.task.model.DlPrintLottery;
 import com.dl.task.model.DlTicketChannel;
 import com.dl.task.printlottery.IPrintChannelService;
 import com.dl.task.printlottery.requestDto.CommonQueryStakeParam;
 import com.dl.task.printlottery.requestDto.CommonToStakeParam;
+import com.dl.task.printlottery.responseDto.QueryRewardResponseDTO;
+import com.dl.task.printlottery.responseDto.QueryRewardResponseDTO.QueryRewardOrderResponse;
 import com.dl.task.printlottery.responseDto.QueryStakeResponseDTO;
 import com.dl.task.printlottery.responseDto.ToStakeResponseDTO;
 import com.dl.task.printlottery.responseDto.QueryStakeResponseDTO.QueryStakeOrderResponse;
@@ -78,14 +83,7 @@ public class PrintChannelXianServiceImpl  implements IPrintChannelService{
 
 	@Override
 	public QueryStakeResponseDTO queryStake(List<DlPrintLottery> dlPrintLotterys,DlTicketChannel dlTicketChannel,DlPrintLotteryMapper dlPrintLotteryMapper) {
-		CommonQueryStakeParam commonQueryStakeParam = defaultCommonQueryStakeParam(dlPrintLotterys, dlTicketChannel.getTicketMerchant(), version);
-		JSONObject jo = JSONObject.fromObject(commonQueryStakeParam);
-		String backStr = defaultCommonRestRequest(dlTicketChannel, dlPrintLotteryMapper, jo, "/order/query", ThirdApiEnum.HE_NAN_LOTTERY);
-		JSONObject backJo = JSONObject.fromObject(backStr);
-		@SuppressWarnings("rawtypes")
-		Map<String,Class> mapClass = new HashMap<String,Class>();
-		mapClass.put("orders", XianQueryStakeOrderResponse.class);
-		XianQueryStakeResponseDTO dlQueryStakeDTO = (XianQueryStakeResponseDTO) JSONObject.toBean(backJo, XianQueryStakeResponseDTO.class, mapClass); 
+		XianQueryStakeResponseDTO dlQueryStakeDTO = queryXianStake(dlPrintLotterys, dlTicketChannel, dlPrintLotteryMapper); 
 		QueryStakeResponseDTO queryStakeResponseDto = new QueryStakeResponseDTO();
 		queryStakeResponseDto.setQuerySuccess(Boolean.FALSE);
 		if(dlQueryStakeDTO==null){
@@ -134,7 +132,7 @@ public class PrintChannelXianServiceImpl  implements IPrintChannelService{
 						printTimeStr = printTimeStr.replaceAll("/", "-");
 						printTime = sdf.parse(printTimeStr);
 					}catch(Exception e){
-						log.error("河南出票时间转化出错 ticketId={},printTimeStr={}",heNanQueryOrderResponse.getTicketId(),heNanQueryOrderResponse.getPrintTime());
+						log.error("西安出票时间转化出错 ticketId={},printTimeStr={}",heNanQueryOrderResponse.getTicketId(),heNanQueryOrderResponse.getPrintTime());
 					}
 					queryStakeOrderResponse.setPrintTimeDate(printTime);	
 				}
@@ -143,6 +141,19 @@ public class PrintChannelXianServiceImpl  implements IPrintChannelService{
 			queryStakeResponseDto.setOrders(orders);
 		}
 		return queryStakeResponseDto;
+	}
+
+	private XianQueryStakeResponseDTO queryXianStake(List<DlPrintLottery> dlPrintLotterys,DlTicketChannel dlTicketChannel,
+			DlPrintLotteryMapper dlPrintLotteryMapper) {
+		CommonQueryStakeParam commonQueryStakeParam = defaultCommonQueryStakeParam(dlPrintLotterys, dlTicketChannel.getTicketMerchant(), version);
+		JSONObject jo = JSONObject.fromObject(commonQueryStakeParam);
+		String backStr = defaultCommonRestRequest(dlTicketChannel, dlPrintLotteryMapper, jo, "/order/query", ThirdApiEnum.HE_NAN_LOTTERY);
+		JSONObject backJo = JSONObject.fromObject(backStr);
+		@SuppressWarnings("rawtypes")
+		Map<String,Class> mapClass = new HashMap<String,Class>();
+		mapClass.put("orders", XianQueryStakeOrderResponse.class);
+		XianQueryStakeResponseDTO dlQueryStakeDTO = (XianQueryStakeResponseDTO) JSONObject.toBean(backJo, XianQueryStakeResponseDTO.class, mapClass);
+		return dlQueryStakeDTO;
 	}
 	/**
 	 * 处理投注信息转化
@@ -188,6 +199,52 @@ public class PrintChannelXianServiceImpl  implements IPrintChannelService{
 			}
 		}
 		return ourStakeSpResult.length()==0?"":ourStakeSpResult.toString();
+	}
+
+	@Override
+	public QueryRewardResponseDTO queryRewardByLottery(List<DlPrintLottery> dlPrintLotterys,DlTicketChannel dlTicketChannel,
+			DlPrintLotteryMapper dlPrintLotteryMapper) {
+		XianQueryStakeResponseDTO dlQueryStakeDTO = queryXianStake(dlPrintLotterys, dlTicketChannel, dlPrintLotteryMapper);
+		QueryRewardResponseDTO toStakeResponseDTO = new QueryRewardResponseDTO();
+		toStakeResponseDTO.setQuerySuccess(Boolean.FALSE);
+		if(dlQueryStakeDTO==null){
+			return toStakeResponseDTO;
+		}
+		toStakeResponseDTO.setRetCode(dlQueryStakeDTO.getRetCode());
+		toStakeResponseDTO.setRetDesc(dlQueryStakeDTO.getRetDesc());
+		if(!CollectionUtils.isEmpty(dlQueryStakeDTO.getOrders())){
+			toStakeResponseDTO.setQuerySuccess(Boolean.TRUE);
+			List<QueryRewardOrderResponse> orders = new ArrayList<QueryRewardOrderResponse>();
+			 for(XianQueryStakeOrderResponse xianResponse : dlQueryStakeDTO.getOrders()){
+				 Integer prizeStatus = xianResponse.getPrizeStatus();
+					if(Integer.valueOf(1).equals(prizeStatus) || Integer.valueOf(2).equals(prizeStatus)){
+						String ticketId = xianResponse.getTicketId();
+						Integer money = xianResponse.getPrizeMoney();
+						if(money==null){
+							money=Integer.valueOf(0);
+						}
+						QueryRewardOrderResponse response = new QueryRewardOrderResponse();
+						response.setQuerySuccess(Boolean.TRUE);
+						response.setPrizeMoney(money);
+						response.setThirdRewardStatusEnum(ThirdRewardStatusEnum.REWARD_OVER);
+						response.setTicketId(ticketId);
+						orders.add(response);
+					}
+			 }
+			 toStakeResponseDTO.setOrders(orders);
+		}
+		return toStakeResponseDTO;
+	}
+
+	@Override
+	public QueryRewardResponseDTO queryRewardByIssue(String issue,
+			DlTicketChannel dlTicketChannel,
+			DlPrintLotteryMapper dlPrintLotteryMapper) {
+		QueryRewardResponseDTO notSupport = new QueryRewardResponseDTO();
+		notSupport.setQuerySuccess(Boolean.FALSE);
+		notSupport.setRetCode("-1");
+		notSupport.setRetDesc("notSupprt");
+		return notSupport;
 	}
 
 }

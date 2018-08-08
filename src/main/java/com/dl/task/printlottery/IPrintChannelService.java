@@ -28,6 +28,7 @@ import com.dl.task.param.DlQueryStakeParam;
 import com.dl.task.printlottery.requestDto.CommonQueryStakeParam;
 import com.dl.task.printlottery.requestDto.CommonToStakeParam;
 import com.dl.task.printlottery.requestDto.CommonToStakeParam.CommonPrintTicketOrderParam;
+import com.dl.task.printlottery.responseDto.QueryRewardResponseDTO;
 import com.dl.task.printlottery.responseDto.QueryStakeResponseDTO;
 import com.dl.task.printlottery.responseDto.ToStakeResponseDTO;
 import com.google.common.collect.Lists;
@@ -96,6 +97,7 @@ public interface IPrintChannelService {
         restTemplate.setMessageConverters(messageConverters);
         return restTemplate;
 	}
+	
 	/**
 	 * 通用的出票公司请求
 	 * @param channelInfo 出票通道信息 账户、密码、出票地址不能为空
@@ -123,4 +125,7 @@ public interface IPrintChannelService {
 		dlPrintLotteryMapper.saveLotteryThirdApiLog(thirdApiLog);
 		return response;
 	}
+	QueryRewardResponseDTO queryRewardByLottery(List<DlPrintLottery> dlPrintLotterys,DlTicketChannel dlTicketChannel,DlPrintLotteryMapper dlPrintLotteryMapper);
+	
+	QueryRewardResponseDTO queryRewardByIssue(String issue,DlTicketChannel dlTicketChannel,DlPrintLotteryMapper dlPrintLotteryMapper);
 }
