@@ -1677,6 +1677,7 @@ public class DlPrintLotteryService {
 	 * 出票 版本2.0
 	 */
 	public void goPrintLotteryVersion2() {
+		log.info("出票版本2.0出票开始");
 		for(PrintComEnums printComEnums:PrintComEnums.values()){
 			try{
 				DlTicketChannel dlTicketChannel = printLotteryAdapter.selectChannelByChannelId(printComEnums);
@@ -1704,6 +1705,7 @@ public class DlPrintLotteryService {
 		}
 	}
 	public void queryPrintLotteryVersion2() {
+		log.info("出票查询版本2.0出票查询开始");
 		for(PrintComEnums printComEnums:PrintComEnums.values()){
 			try{
 				DlTicketChannel dlTicketChannel = printLotteryAdapter.selectChannelByChannelId(printComEnums);
