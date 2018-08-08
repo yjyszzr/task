@@ -95,9 +95,9 @@ public class PrintLotteryAdapter {
 		IPrintChannelService iPrintChannelService=null;
 		switch(printComEnums){
 			case HENAN : iPrintChannelService = printChannelHeNanServiceImpl; break;
-			case XIAN : iPrintChannelService = printChannelHeNanServiceImpl ; break;
-			case CAIXIAOMI : iPrintChannelService = printChannelHeNanServiceImpl; break;
-			case WEICAISHIDAI : iPrintChannelService = printChannelHeNanServiceImpl; break;
+			case XIAN : iPrintChannelService = printChannelXianServiceImpl ; break;
+			case CAIXIAOMI : iPrintChannelService = printChannelCaixiaomiServiceImpl; break;
+			case WEICAISHIDAI : iPrintChannelService = printChannelWeicaishidaiServiceImpl; break;
 			default :;
 		}
 		return iPrintChannelService;
