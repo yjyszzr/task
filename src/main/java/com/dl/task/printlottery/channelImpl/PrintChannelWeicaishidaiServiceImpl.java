@@ -101,7 +101,7 @@ public class PrintChannelWeicaishidaiServiceImpl  implements IPrintChannelServic
 	private String sendHttpMessage(String requestUrl,String header, String body,DlPrintLotteryMapper dlPrintLotteryMapper) {
 		RestTemplate rest = getRestTemplate();
 		HttpHeaders headers = new HttpHeaders();
-		MediaType type = MediaType.parseMediaType("Content-Type:application/x-www-form-urlencoded");
+		MediaType type = MediaType.parseMediaType("application/x-www-form-urlencoded");
 		headers.setContentType(type);
 		JSONObject jo = new JSONObject();
 		HttpEntity<JSONObject> requestEntity = new HttpEntity<JSONObject>(jo, headers);
