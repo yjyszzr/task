@@ -37,7 +37,7 @@ public class ToStakeResponseDTO implements Serializable{
 	    private Integer errorCode;
 		
 		@ApiModelProperty(value = "处理结果", required = true)
-		private Integer errorDesc;
+		private String errorDesc;
 		private Boolean printLotteryDoing;
 	}
 }

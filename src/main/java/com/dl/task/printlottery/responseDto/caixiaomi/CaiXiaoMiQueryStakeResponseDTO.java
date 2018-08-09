@@ -1,4 +1,4 @@
-package com.dl.task.printlottery.responseDto.henan;
+package com.dl.task.printlottery.responseDto.caixiaomi;
 
 import java.io.Serializable;
 import java.util.List;
@@ -7,7 +7,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 @Data
-public class HeNanDlToStakeDTO implements Serializable{
+public class CaiXiaoMiQueryStakeResponseDTO implements Serializable{
 	
 	private static final long serialVersionUID = 1L;
 
@@ -26,11 +26,15 @@ public class HeNanDlToStakeDTO implements Serializable{
 	@ApiModelProperty(value = "返回码描述信息", required = true)
     private String retDesc;
 	
+	
 	@ApiModelProperty(value = "返回订单详情", required = true)
-    private List<HeNanBackOrderDetail> orders;
+    private List<CaiXiaoMiQueryStakeOrderResponse> orders;
 	
 	@Data
-	public static class HeNanBackOrderDetail {
+	public static class CaiXiaoMiQueryStakeOrderResponse {
+		
+		@ApiModelProperty(value = "返回码 0-成功 4-票不存在", required = true)
+	    private Integer retCode;
 		
 		@ApiModelProperty(value = "商户订单号", required = true)
 	    private String ticketId;
@@ -38,10 +42,16 @@ public class HeNanDlToStakeDTO implements Serializable{
 		@ApiModelProperty(value = "中心平台订单编号", required = true)
 	    private String platformId;
 		
-		@ApiModelProperty(value = "处理结果", required = true)
-	    private Integer errorCode;
+		@ApiModelProperty(value = "订单状态 8-出票中 16-成功 17-失败", required = true)
+	    private Integer printStatus;
 		
-		@ApiModelProperty(value = "处理结果", required = true)
-		private String errorDesc;
+		@ApiModelProperty(value = "赔率数据", required = true)
+	    private String sp;
+		
+		@ApiModelProperty(value = "票面上的票号", required = true)
+	    private String printNo;
+		
+		@ApiModelProperty(value = "票面上的出票时间", required = true)
+	    private String printTime;
 	}
 }
