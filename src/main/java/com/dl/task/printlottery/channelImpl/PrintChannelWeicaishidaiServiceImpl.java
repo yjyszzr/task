@@ -113,7 +113,7 @@ public class PrintChannelWeicaishidaiServiceImpl  implements IPrintChannelServic
 			}
 		MultiValueMap<String, String> map= new LinkedMultiValueMap<String, String>();
 		map.add("head", header);
-		map.add("body", header);
+		map.add("body", body);
 		parentLog.info("通用的访问第三方请求reqTime={},url={},header={},requestParams={},",System.currentTimeMillis(),requestUrl,JSONHelper.bean2json(headers),JSONHelper.bean2json(map));
 		HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<MultiValueMap<String, String>>(map, headers);
 		ResponseEntity<String> responseEntity = restTemplate.postForEntity(requestUrl, request , String.class );
@@ -136,7 +136,7 @@ public class PrintChannelWeicaishidaiServiceImpl  implements IPrintChannelServic
 		String md5DigestBerfore = dlTicketChannel.getTicketMerchantPassword()+body+timeStamp;
 		String md5After = MD5Utils.MD5(md5DigestBerfore);
 		headerMap.put("digest", MD5Utils.MD5(md5After));
-		return headerMap.toString();
+		return JSONHelper.bean2json(headerMap);
 	}
 
 	private String createBody(String cmd,List<DlPrintLottery> dlPrintLotterys) {
@@ -159,13 +159,13 @@ public class PrintChannelWeicaishidaiServiceImpl  implements IPrintChannelServic
 				ticketMap.put("term_code", termCode);
 				tickets.add(ticketMap);
 			}
-			body.put("tickets", tickets.toString());	
+			body.put("tickets", JSONHelper.bean2json(tickets));	
 		}else if(CMDQUERYSTAKE.equals(cmd)){
 			List<String> ticketIds = dlPrintLotterys.stream().map(print-> print.getTicketId()).collect(Collectors.toList());
 			body.put("out_id", ticketIds.toString());	
 		}
 		body.put("uuid", UUID.randomUUID().toString());
-		return body.toString();
+		return JSONHelper.bean2json(body);
 	}
 
 	/**
