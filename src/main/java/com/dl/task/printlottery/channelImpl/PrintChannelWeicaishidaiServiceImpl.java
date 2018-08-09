@@ -2,9 +2,11 @@ package com.dl.task.printlottery.channelImpl;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -16,7 +18,6 @@ import lombok.extern.slf4j.Slf4j;
 import net.sf.json.JSONObject;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.httpclient.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
@@ -86,34 +87,18 @@ public class PrintChannelWeicaishidaiServiceImpl  implements IPrintChannelServic
 	public ToStakeResponseDTO toStake(List<DlPrintLottery> dlPrintLotterys, DlTicketChannel dlTicketChannel,DlPrintLotteryMapper dlPrintLotteryMapper) {
 		WeiCaiShiDaiBodyRequesDto body = createBody(CMDSTAKE,dlPrintLotterys);
 		String bodyStr =JSONHelper.bean2json(body);
-//		try{
-//			bodyStr = java.net.URLEncoder.encode(bodyStr, "UTF-8");
-//		}catch(Exception e){
-//			log.error("微彩时代 地址转换异常",e);
-//		}
 		WeiCaiShiDaiHearRequestDto header = createHeader(CMDSTAKE,dlTicketChannel,bodyStr);
 		String headerStr  = JSONHelper.bean2json(header);
-//		try{
-//			bodyStr = java.net.URLEncoder.encode(bodyStr, "UTF-8");
-//			headerStr= java.net.URLEncoder.encode(headerStr, "UTF-8");
-//		}catch(Exception e){
-//			log.error("微彩时代 地址转换异常",e);
-//		}
-//		String backStr = sendHttpMessage(dlTicketChannel.getTicketUrl(),headerStr,bodyStr,dlPrintLotteryMapper);
-        String requestParam = "?head="+headerStr+"&body="+bodyStr;
-//		try{
-//			requestParam= java.net.URLEncoder.encode(requestParam, "UTF-8");
-//		}catch(Exception e){
-//			log.error("微彩时代 地址转换异常",e);
-//		}
-        String requestUrlReal = dlTicketChannel.getTicketUrl();//+requestParam;
+        String requestUrlReal = dlTicketChannel.getTicketUrl();
         parentLog.info("通用的访问第三方请求reqTime={},url={}",System.currentTimeMillis(),requestUrlReal);
         Map<String, String> headerParams =new HashMap<String, String>();
         Map<String, String> requestParams =new HashMap<String, String>();
         requestParams.put("head", headerStr);
         requestParams.put("body", bodyStr);
         headerParams.put("Content-Type", "application/x-www-form-urlencoded");
+        log.info("head={},body={}",headerStr,bodyStr);
         String response = httpPost(requestUrlReal,headerParams,requestParams,"UTF-8");
+        log.info("response={}",response);
 		JSONObject backJo = JSONObject.fromObject(response);
 		@SuppressWarnings("rawtypes")
 		Map<String,Class> mapClass = new HashMap<String,Class>();
@@ -262,47 +247,25 @@ public class PrintChannelWeicaishidaiServiceImpl  implements IPrintChannelServic
 	}
 	private WeiCaiShiDaiBodyRequesDto createBody(String cmd,List<DlPrintLottery> dlPrintLotterys) {
 		WeiCaiShiDaiBodyRequesDto body = new WeiCaiShiDaiBodyRequesDto();
-//		Map<String,String> body = new HashMap<String, String>();
-//		if(CMDSTAKE.equals(cmd)){
-//			List<Map<String,Object>> tickets = new ArrayList<Map<String,Object>>();
-			List<WeiCaiShiDaiBodyTicketRequesDto> tickets = new ArrayList<WeiCaiShiDaiBodyTicketRequesDto>();
-			for(DlPrintLottery lottery:dlPrintLotterys){
-				WeiCaiShiDaiBodyTicketRequesDto ticket = new WeiCaiShiDaiBodyTicketRequesDto();
-				String gameId = getGameId(lottery);
-				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-				String termCode = sdf.format(new Date());
-				ticket.setAmount(""+lottery.getMoney().intValue());
-				ticket.setBet_type(getBetType(lottery.getBetType()));
-				ticket.setGame_id(gameId);
-				ticket.setIcount("1");
-				ticket.setMultiple(""+lottery.getTimes());
-				ticket.setNumber(getNumber(lottery.getGame(),lottery.getPlayType(),lottery.getBetType(),lottery.getStakes()));
-				ticket.setOut_id(lottery.getTicketId());
-				ticket.setPlay_type(getWeiCaiShiDaiPlayType(lottery.getTicketId(),lottery.getPlayType()));
-				ticket.setTerm_code(termCode);
-//				Map<String,Object> ticketMap = new HashMap<String, Object>();
-//				String gameId = getGameId(lottery);
-//				ticketMap.put("game_id", gameId);
-//				ticketMap.put("play_type", getWeiCaiShiDaiPlayType(lottery.getTicketId(),lottery.getPlayType()));
-//				ticketMap.put("bet_type", getBetType(lottery.getBetType()));
-//				ticketMap.put("out_id", lottery.getTicketId());
-//				ticketMap.put("multiple", lottery.getTimes());
-//				ticketMap.put("number", getNumber(lottery.getGame(),lottery.getPlayType(),lottery.getBetType(),lottery.getStakes()));
-//				ticketMap.put("icount",1);
-//				ticketMap.put("amount", lottery.getMoney().intValue());
-//				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-//				String termCode = sdf.format(new Date());
-//				ticketMap.put("term_code", termCode);
-				tickets.add(ticket);
-			}
-//			body.put("tickets", JSONHelper.bean2json(tickets));
-			body.setTickets(tickets);
-//		}else if(CMDQUERYSTAKE.equals(cmd)){
-//			List<String> ticketIds = dlPrintLotterys.stream().map(print-> print.getTicketId()).collect(Collectors.toList());
-//			body.put("out_id", ticketIds.toString());
-//		}
+		List<WeiCaiShiDaiBodyTicketRequesDto> tickets = new ArrayList<WeiCaiShiDaiBodyTicketRequesDto>();
+		for(DlPrintLottery lottery:dlPrintLotterys){
+			WeiCaiShiDaiBodyTicketRequesDto ticket = new WeiCaiShiDaiBodyTicketRequesDto();
+			String gameId = getGameId(lottery);
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+			String termCode = sdf.format(new Date());
+			ticket.setAmount(""+lottery.getMoney().intValue());
+			ticket.setBet_type(getBetType(lottery.getBetType()));
+			ticket.setGame_id(gameId);
+			ticket.setIcount("1");
+			ticket.setMultiple(""+lottery.getTimes());
+			ticket.setNumber(getNumber(lottery.getGame(),lottery.getPlayType(),lottery.getBetType(),lottery.getStakes()));
+			ticket.setOut_id(lottery.getTicketId());
+			ticket.setPlay_type(getWeiCaiShiDaiPlayType(lottery.getTicketId(),lottery.getPlayType()));
+			ticket.setTerm_code(termCode);
+			tickets.add(ticket);
+		}
+		body.setTickets(tickets);
 		body.setUuid(UUID.randomUUID().toString());
-//		body.put("uuid", UUID.randomUUID().toString());
 		return body;
 	}
 
@@ -348,7 +311,7 @@ public class PrintChannelWeicaishidaiServiceImpl  implements IPrintChannelServic
 			String[] issueStakes = caixiaomiStatke.split(";");
 			for(String issueStake:issueStakes){				
 				String[] stakesArr = issueStake.split("\\|");
-				weicaishidaiStake.append(stakesArr[1]);
+				weicaishidaiStake.append(removeIssueWeekDay(stakesArr[1]));
 				weicaishidaiStake.append(":");
 				weicaishidaiStake.append(playTypeRelationMap.get(playTypeCTW+stakesArr[0]));
 				weicaishidaiStake.append(":");
@@ -362,9 +325,9 @@ public class PrintChannelWeicaishidaiServiceImpl  implements IPrintChannelServic
 			StringBuffer weicaishidaiStake = new StringBuffer();
 			String[] issueStakes = caixiaomiStatke.split(";");
 			log.info("issueStakes={}",Arrays.toString(issueStakes));
-			for(String issueStake:issueStakes){				
+			for(String issueStake:issueStakes){
 				String[] stakesArr = issueStake.split("\\|");
-				weicaishidaiStake.append(stakesArr[1]);
+				weicaishidaiStake.append(removeIssueWeekDay(stakesArr[1]));
 				weicaishidaiStake.append(":");
 				weicaishidaiStake.append(stakesArr[2]);
 				weicaishidaiStake.append(";");
@@ -377,7 +340,26 @@ public class PrintChannelWeicaishidaiServiceImpl  implements IPrintChannelServic
 		}
 		return null;
 	}
-
+	public static String removeIssueWeekDay(String isssue){
+		String sumIsssue = isssue.substring(0, 8)+isssue.substring(9, isssue.length()); 
+		return sumIsssue;
+	}
+	public static String addIssueWeekDay(String isssue){
+		String yyyymmdd = isssue.substring(0, 8);
+		String theEnd = isssue.substring(8, isssue.length());
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+		Date issueDay=null;
+		try {
+			issueDay = sdf.parse(yyyymmdd);
+		} catch (ParseException e) {
+			log.error("日期格式转化异常 日期串={}",yyyymmdd);
+		}
+		 Calendar cal = Calendar.getInstance();
+		cal.setTime(issueDay);
+		int week = cal.get(Calendar.DAY_OF_WEEK)-1;
+		String sumIsssue = yyyymmdd+week+theEnd;
+		return sumIsssue;
+	}
 	private String getGameId(DlPrintLottery lottery) {
 		String game = lottery.getGame();
 		String betType=lottery.getBetType();
@@ -465,11 +447,13 @@ public class PrintChannelWeicaishidaiServiceImpl  implements IPrintChannelServic
 //		String[] stakesArr = "01|201806111101|3".split("\\|");
 //		System.out.println(stakesArr[0]);
 		
-		String game="T51";
-		String playType="01";
-		String betType="41";
-		String caixiaomiStatke="01|201806111101|3;01|201806111102|3;01|201806122101|3;01|201806122102|3";
-		System.out.println(getNumber(game, playType, betType, caixiaomiStatke));
+//		String game="T51";
+//		String playType="01";
+//		String betType="41";
+//		String caixiaomiStatke="01|201806111101|3;01|201806111102|3;01|201806122101|3;01|201806122102|3";
+//		System.out.println(getNumber(game, playType, betType, caixiaomiStatke));
+		System.out.println(removeIssueWeekDay("201808105001"));
+		System.out.println(addIssueWeekDay("20180810001"));
 	}
 	/**
 	 * 将微彩时代的赔率转化为我们的

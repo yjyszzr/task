@@ -19,6 +19,6 @@ public class WeiCaiShiDaiBodyRequesDto {
 		private String icount;
 		private String amount;
 		private String term_code;
-		private String end_time;
+//		private String end_time;
 	}
 }
