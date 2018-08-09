@@ -1,5 +1,6 @@
 package com.dl.task.printlottery.channelImpl;
 
+import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -13,6 +14,7 @@ import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.json.JSONObject;
 
+import org.apache.catalina.util.URLEncoder;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -106,6 +108,11 @@ public class PrintChannelWeicaishidaiServiceImpl  implements IPrintChannelServic
 		JSONObject jo = new JSONObject();
 		HttpEntity<JSONObject> requestEntity = new HttpEntity<JSONObject>(jo, headers);
 		requestUrl = requestUrl+"?head="+header+"&body="+body;
+		try{
+		requestUrl = java.net.URLEncoder.encode(requestUrl, "UTF-8");
+		}catch(Exception e){
+			log.error("微彩时代 地址转换异常",e);
+		}
 		parentLog.info("通用的访问第三方请求reqTime={},url={},header={},requestParams={},",System.currentTimeMillis(),requestUrl,JSONHelper.bean2json(headers),JSONHelper.bean2json(requestEntity));
 		String response = rest.postForObject(requestUrl, requestEntity, String.class);
 		parentLog.info("restreqTime={}, response={}",System.currentTimeMillis(),response);
