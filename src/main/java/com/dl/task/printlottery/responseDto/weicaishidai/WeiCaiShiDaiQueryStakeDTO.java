@@ -12,7 +12,7 @@ public class WeiCaiShiDaiQueryStakeDTO implements Serializable{
 	private static final long serialVersionUID = 1L;
 	@ApiModelProperty(value = "返回订单详情", required = true)
 	private WeiCaiShiDaiToStakeRetCode err;
-	
+	private String uuid;
 	@ApiModelProperty(value = "返回订单详情", required = true)
     private List<WeiCaiShiDaiQueryStakeResponse> tickets;
 	
@@ -21,6 +21,8 @@ public class WeiCaiShiDaiQueryStakeDTO implements Serializable{
 		
 		@ApiModelProperty(value = "#订单编号", required = true)
 	    private String orderId;
+		
+		private String uuid;
 		
 		@ApiModelProperty(value = "#出票的内部流水编号", required = true)
 	    private String ticketId;

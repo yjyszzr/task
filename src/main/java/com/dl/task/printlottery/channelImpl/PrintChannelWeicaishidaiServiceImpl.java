@@ -99,6 +99,7 @@ public class PrintChannelWeicaishidaiServiceImpl  implements IPrintChannelServic
         log.info("head={},body={}",headerStr,bodyStr);
         String response = httpPost(requestUrlReal,headerParams,requestParams,"UTF-8");
         log.info("response={}",response);
+        LotteryThirdApiLog thirdApiLog = new LotteryThirdApiLog(requestUrlReal,ThirdApiEnum.WEI_CAI_LOTTERY.getCode(), JSONHelper.bean2json(requestParams), response);
 		JSONObject backJo = JSONObject.fromObject(response);
 		@SuppressWarnings("rawtypes")
 		Map<String,Class> mapClass = new HashMap<String,Class>();
@@ -129,6 +130,83 @@ public class PrintChannelWeicaishidaiServiceImpl  implements IPrintChannelServic
 		return toStakeResponseDTO;
 	}
 
+	@Override
+	public QueryStakeResponseDTO queryStake(List<DlPrintLottery> dlPrintLotterys,DlTicketChannel dlTicketChannel,
+			DlPrintLotteryMapper dlPrintLotteryMapper) {
+		WeiCaiShiDaiQueryBodyRequesDto body = createQueryBody(CMDQUERYSTAKE, dlPrintLotterys);
+		String bodyStr= JSONHelper.bean2json(body);
+		WeiCaiShiDaiHearRequestDto header = createHeader(CMDQUERYSTAKE, dlTicketChannel, bodyStr);
+		String headerStr=JSONHelper.bean2json(header);
+        String requestUrlReal = dlTicketChannel.getTicketUrl();
+        parentLog.info("通用的访问第三方请求reqTime={},url={}",System.currentTimeMillis(),requestUrlReal);
+        Map<String, String> headerParams =new HashMap<String, String>();
+        Map<String, String> requestParams =new HashMap<String, String>();
+        requestParams.put("head", headerStr);
+        requestParams.put("body", bodyStr);
+        headerParams.put("Content-Type", "application/x-www-form-urlencoded");
+        log.info("head={},body={}",headerStr,bodyStr);
+        String response = httpPost(requestUrlReal,headerParams,requestParams,"UTF-8");
+        log.info("response={}",response);
+        LotteryThirdApiLog thirdApiLog = new LotteryThirdApiLog(requestUrlReal,ThirdApiEnum.WEI_CAI_LOTTERY.getCode(), JSONHelper.bean2json(requestParams), response);
+		JSONObject backJo = JSONObject.fromObject(response);
+		@SuppressWarnings("rawtypes")
+		Map<String,Class> mapClass = new HashMap<String,Class>();
+		mapClass.put("err", WeiCaiShiDaiToStakeRetCode.class);
+		mapClass.put("tickets", WeiCaiShiDaiQueryStakeResponse.class);
+		WeiCaiShiDaiQueryStakeDTO dlQueryStakeDTO = (WeiCaiShiDaiQueryStakeDTO) JSONObject.toBean(backJo, WeiCaiShiDaiQueryStakeDTO.class, mapClass); 
+		QueryStakeResponseDTO queryStakeResponseDto = new QueryStakeResponseDTO();
+		queryStakeResponseDto.setQuerySuccess(Boolean.FALSE);
+		if(dlQueryStakeDTO==null){
+			return queryStakeResponseDto;
+		}
+		queryStakeResponseDto.setRetCode(dlQueryStakeDTO.getErr().getCode());
+		queryStakeResponseDto.setRetDesc(dlQueryStakeDTO.getErr().getDes());
+		if(!CollectionUtils.isEmpty(dlQueryStakeDTO.getTickets())){
+			queryStakeResponseDto.setQuerySuccess(Boolean.TRUE);
+			List<QueryStakeOrderResponse> orders = new ArrayList<QueryStakeResponseDTO.QueryStakeOrderResponse>();
+			for(WeiCaiShiDaiQueryStakeResponse weicaishidaiQueryResponse:dlQueryStakeDTO.getTickets()){
+				QueryStakeOrderResponse queryStakeOrderResponse = new QueryStakeOrderResponse();
+				String printStatus=weicaishidaiQueryResponse.getOrderStatus();
+				PrintLotteryStatusEnum statusEnum = PrintLotteryStatusEnum.DOING;
+				Boolean querySuccess = Boolean.FALSE;
+				if("1".equals(printStatus)){
+					statusEnum = PrintLotteryStatusEnum.SUCCESS;
+					querySuccess = Boolean.TRUE;
+				}else if("3".equals(printStatus)){
+					statusEnum = PrintLotteryStatusEnum.FAIL;
+					querySuccess = Boolean.TRUE;
+				}else if("0".equals(printStatus)){
+					statusEnum = PrintLotteryStatusEnum.DOING;
+					querySuccess = Boolean.FALSE;
+				}else{
+					log.error("微彩时代出票查询出现非预定状态printStatus={}",printStatus);
+					querySuccess = Boolean.FALSE;	
+				}
+				queryStakeOrderResponse.setQuerySuccess(querySuccess);
+				if(querySuccess){
+					queryStakeOrderResponse.setStatusEnum(statusEnum);
+					queryStakeOrderResponse.setPrintStatus(Integer.parseInt(printStatus));
+					queryStakeOrderResponse.setPlatformId(weicaishidaiQueryResponse.getTicketId());
+					queryStakeOrderResponse.setPrintNo(weicaishidaiQueryResponse.getTicketNumber());
+					queryStakeOrderResponse.setSp(getCaiXiaoMiSpFromTicketNumber(weicaishidaiQueryResponse.getTicketNumber()));
+					queryStakeOrderResponse.setTicketId(weicaishidaiQueryResponse.getOrderId());
+					queryStakeOrderResponse.setPrintTime(weicaishidaiQueryResponse.getPrintTime());
+					Date printTime = new Date();
+					try{
+						SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+						String printTimeStr = weicaishidaiQueryResponse.getPrintTime();
+						printTime = sdf.parse(printTimeStr);
+					}catch(Exception e){
+						log.error("微彩时代出票时间转化出错 ticketId={},printTimeStr={}",weicaishidaiQueryResponse.getTicketId(),weicaishidaiQueryResponse.getPrintTime());
+					}
+					queryStakeOrderResponse.setPrintTimeDate(printTime);	
+				}
+				orders.add(queryStakeOrderResponse);
+			}
+			queryStakeResponseDto.setOrders(orders);
+		}
+		return queryStakeResponseDto;
+	}
 	private String sendHttpMessage(String requestUrl,String header, String body,DlPrintLotteryMapper dlPrintLotteryMapper) {
 		RestTemplate restTemplate = new RestTemplate();
 		HttpHeaders headers = new HttpHeaders();
@@ -373,73 +451,6 @@ public class PrintChannelWeicaishidaiServiceImpl  implements IPrintChannelServic
 		return null;
 	}
 
-	@Override
-	public QueryStakeResponseDTO queryStake(List<DlPrintLottery> dlPrintLotterys,DlTicketChannel dlTicketChannel,
-			DlPrintLotteryMapper dlPrintLotteryMapper) {
-		WeiCaiShiDaiQueryBodyRequesDto body = createQueryBody(CMDQUERYSTAKE, dlPrintLotterys);
-		String bodyStr= JSONHelper.bean2json(body);
-		WeiCaiShiDaiHearRequestDto header = createHeader(CMDQUERYSTAKE, dlTicketChannel, bodyStr);
-		String headerStr=JSONHelper.bean2json(header);
-		String response = sendHttpMessage(dlTicketChannel.getTicketUrl(), headerStr, bodyStr, dlPrintLotteryMapper);
-		JSONObject backJo = JSONObject.fromObject(response);
-		@SuppressWarnings("rawtypes")
-		Map<String,Class> mapClass = new HashMap<String,Class>();
-		mapClass.put("err", WeiCaiShiDaiToStakeRetCode.class);
-		mapClass.put("tickets", WeiCaiShiDaiQueryStakeResponse.class);
-		WeiCaiShiDaiQueryStakeDTO dlQueryStakeDTO = (WeiCaiShiDaiQueryStakeDTO) JSONObject.toBean(backJo, WeiCaiShiDaiQueryStakeDTO.class, mapClass); 
-		QueryStakeResponseDTO queryStakeResponseDto = new QueryStakeResponseDTO();
-		queryStakeResponseDto.setQuerySuccess(Boolean.FALSE);
-		if(dlQueryStakeDTO==null){
-			return queryStakeResponseDto;
-		}
-		queryStakeResponseDto.setRetCode(dlQueryStakeDTO.getErr().getCode());
-		queryStakeResponseDto.setRetDesc(dlQueryStakeDTO.getErr().getDes());
-		if(!CollectionUtils.isEmpty(dlQueryStakeDTO.getTickets())){
-			queryStakeResponseDto.setQuerySuccess(Boolean.TRUE);
-			List<QueryStakeOrderResponse> orders = new ArrayList<QueryStakeResponseDTO.QueryStakeOrderResponse>();
-			for(WeiCaiShiDaiQueryStakeResponse weicaishidaiQueryResponse:dlQueryStakeDTO.getTickets()){
-				QueryStakeOrderResponse queryStakeOrderResponse = new QueryStakeOrderResponse();
-				String printStatus=weicaishidaiQueryResponse.getOrderStatus();
-				PrintLotteryStatusEnum statusEnum = PrintLotteryStatusEnum.DOING;
-				Boolean querySuccess = Boolean.FALSE;
-				if("1".equals(printStatus)){
-					statusEnum = PrintLotteryStatusEnum.SUCCESS;
-					querySuccess = Boolean.TRUE;
-				}else if("3".equals(printStatus)){
-					statusEnum = PrintLotteryStatusEnum.FAIL;
-					querySuccess = Boolean.TRUE;
-				}else if("0".equals(printStatus)){
-					statusEnum = PrintLotteryStatusEnum.DOING;
-					querySuccess = Boolean.FALSE;
-				}else{
-					log.error("河南出票查询出现非预定状态printStatus={}",printStatus);
-					querySuccess = Boolean.FALSE;	
-				}
-				queryStakeOrderResponse.setQuerySuccess(querySuccess);
-				if(querySuccess){
-					queryStakeOrderResponse.setStatusEnum(statusEnum);
-					queryStakeOrderResponse.setPrintStatus(Integer.parseInt(printStatus));
-					queryStakeOrderResponse.setPlatformId(weicaishidaiQueryResponse.getTicketId());
-					queryStakeOrderResponse.setPrintNo(weicaishidaiQueryResponse.getTicketNumber());
-					queryStakeOrderResponse.setSp(getCaiXiaoMiSpFromTicketNumber(weicaishidaiQueryResponse.getTicketNumber()));
-					queryStakeOrderResponse.setTicketId(weicaishidaiQueryResponse.getOrderId());
-					queryStakeOrderResponse.setPrintTime(weicaishidaiQueryResponse.getPrintTime());
-					Date printTime = new Date();
-					try{
-						SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-						String printTimeStr = weicaishidaiQueryResponse.getPrintTime();
-						printTime = sdf.parse(printTimeStr);
-					}catch(Exception e){
-						log.error("河南出票时间转化出错 ticketId={},printTimeStr={}",weicaishidaiQueryResponse.getTicketId(),weicaishidaiQueryResponse.getPrintTime());
-					}
-					queryStakeOrderResponse.setPrintTimeDate(printTime);	
-				}
-				orders.add(queryStakeOrderResponse);
-			}
-			queryStakeResponseDto.setOrders(orders);
-		}
-		return queryStakeResponseDto;
-	}
 
 	public static void main(String[] args) {
 //		String tikectNUmber = "20180517001:3(2.39),0(2.39),1(2.39);20180517002:3(2.39)|2*1";
@@ -469,7 +480,7 @@ public class PrintChannelWeicaishidaiServiceImpl  implements IPrintChannelServic
 		for(String isssueAndSp:isssueAndSps){
 			String[] isssueAndSpArr = isssueAndSp.split(":");
 			String issue = isssueAndSpArr[0];
-			caiXiaoMiSp.append(issue);
+			caiXiaoMiSp.append(addIssueWeekDay(issue));
 			caiXiaoMiSp.append("|");
 //			3(2.39),0(2.39),1(2.39)
 			for(String onePlayAndSp:isssueAndSpArr[1].split(",")){

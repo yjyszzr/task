@@ -1762,6 +1762,9 @@ public class DlPrintLotteryService {
 		log.info("出奖奖金查询版本2.0奖金查询开始");
 		for(PrintComEnums printComEnums:PrintComEnums.values()){
 			try{
+				if(PrintComEnums.CAIXIAOMI==printComEnums||PrintComEnums.WEICAISHIDAI==printComEnums){
+					continue;//暂未实现的公司不进行第三方开奖
+				}
 				DlTicketChannel dlTicketChannel = printLotteryAdapter.selectChannelByChannelId(printComEnums);
 				ThirdRewardStatusEnum thirdRewardStatusEnum = ThirdRewardStatusEnum.REWARD_INIT;
 				if(PrintComEnums.CAIXIAOMI==printComEnums){
