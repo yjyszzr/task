@@ -3,12 +3,10 @@ package com.dl.task.printlottery.responseDto;
 import io.swagger.annotations.ApiModelProperty;
 
 import java.io.Serializable;
-import java.util.Date;
 import java.util.List;
 
 import lombok.Data;
 
-import com.dl.task.enums.PrintLotteryStatusEnum;
 import com.dl.task.enums.ThirdRewardStatusEnum;
 
 @Data

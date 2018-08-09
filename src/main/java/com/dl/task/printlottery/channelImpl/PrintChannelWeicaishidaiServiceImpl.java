@@ -289,7 +289,6 @@ public class PrintChannelWeicaishidaiServiceImpl  implements IPrintChannelServic
 				if(querySuccess){
 					queryStakeOrderResponse.setStatusEnum(statusEnum);
 					queryStakeOrderResponse.setPrintStatus(Integer.parseInt(printStatus));
-					queryStakeOrderResponse.setOrderId(weicaishidaiQueryResponse.getOrderId());
 					queryStakeOrderResponse.setPlatformId(weicaishidaiQueryResponse.getTicketId());
 					queryStakeOrderResponse.setPrintNo(weicaishidaiQueryResponse.getTicketNumber());
 					queryStakeOrderResponse.setSp(getCaiXiaoMiSpFromTicketNumber(weicaishidaiQueryResponse.getTicketNumber()));

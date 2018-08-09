@@ -42,6 +42,6 @@ public class XiAnDlToStakeDTO implements Serializable{
 	    private Integer errorCode;
 		
 		@ApiModelProperty(value = "处理结果", required = true)
-		private Integer errorDesc;
+		private String errorDesc;
 	}
 }

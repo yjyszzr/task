@@ -1,6 +1,5 @@
 package com.dl.task.printlottery.channelImpl;
 
-import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -8,7 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 import net.sf.json.JSONObject;
@@ -29,13 +27,9 @@ import com.dl.task.printlottery.requestDto.CommonToStakeParam;
 import com.dl.task.printlottery.responseDto.QueryRewardResponseDTO;
 import com.dl.task.printlottery.responseDto.QueryRewardResponseDTO.QueryRewardOrderResponse;
 import com.dl.task.printlottery.responseDto.QueryStakeResponseDTO;
-import com.dl.task.printlottery.responseDto.ToStakeResponseDTO;
 import com.dl.task.printlottery.responseDto.QueryStakeResponseDTO.QueryStakeOrderResponse;
+import com.dl.task.printlottery.responseDto.ToStakeResponseDTO;
 import com.dl.task.printlottery.responseDto.ToStakeResponseDTO.ToStakeBackOrderDetail;
-import com.dl.task.printlottery.responseDto.henan.HeNanDlToStakeDTO;
-import com.dl.task.printlottery.responseDto.henan.HenanQueryStakeResponseDTO;
-import com.dl.task.printlottery.responseDto.henan.HeNanDlToStakeDTO.HeNanBackOrderDetail;
-import com.dl.task.printlottery.responseDto.henan.HenanQueryStakeResponseDTO.HenanQueryStakeOrderResponse;
 import com.dl.task.printlottery.responseDto.xian.XiAnDlToStakeDTO;
 import com.dl.task.printlottery.responseDto.xian.XiAnDlToStakeDTO.XIANBackOrderDetail;
 import com.dl.task.printlottery.responseDto.xian.XianQueryStakeResponseDTO;
@@ -116,7 +110,6 @@ public class PrintChannelXianServiceImpl  implements IPrintChannelService{
 				if(querySuccess){
 					queryStakeOrderResponse.setStatusEnum(statusEnum);
 					queryStakeOrderResponse.setPrintStatus(printStatus);
-					queryStakeOrderResponse.setOrderId(heNanQueryOrderResponse.getOrderId());
 					queryStakeOrderResponse.setPlatformId(heNanQueryOrderResponse.getPlatformId());
 					queryStakeOrderResponse.setPrintNo(heNanQueryOrderResponse.getPrintNo());
 					log.info("西安赔率处理 ticketId={},sp={}",heNanQueryOrderResponse.getTicketId(),heNanQueryOrderResponse.getSp());

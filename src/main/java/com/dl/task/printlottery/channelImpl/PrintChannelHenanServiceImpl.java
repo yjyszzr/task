@@ -129,7 +129,6 @@ public class PrintChannelHenanServiceImpl  implements IPrintChannelService{
 				if(querySuccess){
 					queryStakeOrderResponse.setStatusEnum(statusEnum);
 					queryStakeOrderResponse.setPrintStatus(printStatus);
-					queryStakeOrderResponse.setOrderId(heNanQueryOrderResponse.getOrderId());
 					queryStakeOrderResponse.setPlatformId(heNanQueryOrderResponse.getPlatformId());
 					queryStakeOrderResponse.setPrintNo(heNanQueryOrderResponse.getPrintNo());
 					queryStakeOrderResponse.setSp(heNanQueryOrderResponse.getSp());

@@ -23,17 +23,13 @@ import com.dl.task.printlottery.requestDto.CommonQueryStakeParam;
 import com.dl.task.printlottery.requestDto.CommonToStakeParam;
 import com.dl.task.printlottery.responseDto.QueryRewardResponseDTO;
 import com.dl.task.printlottery.responseDto.QueryStakeResponseDTO;
-import com.dl.task.printlottery.responseDto.ToStakeResponseDTO;
 import com.dl.task.printlottery.responseDto.QueryStakeResponseDTO.QueryStakeOrderResponse;
+import com.dl.task.printlottery.responseDto.ToStakeResponseDTO;
 import com.dl.task.printlottery.responseDto.ToStakeResponseDTO.ToStakeBackOrderDetail;
 import com.dl.task.printlottery.responseDto.caixiaomi.CaiXiaoMiDlToStakeDTO;
 import com.dl.task.printlottery.responseDto.caixiaomi.CaiXiaoMiDlToStakeDTO.CaiXiaoBackOrderDetail;
-import com.dl.task.printlottery.responseDto.caixiaomi.CaiXiaoMiQueryStakeResponseDTO.CaiXiaoMiQueryStakeOrderResponse;
 import com.dl.task.printlottery.responseDto.caixiaomi.CaiXiaoMiQueryStakeResponseDTO;
-import com.dl.task.printlottery.responseDto.henan.HeNanDlToStakeDTO;
-import com.dl.task.printlottery.responseDto.henan.HenanQueryStakeResponseDTO;
-import com.dl.task.printlottery.responseDto.henan.HeNanDlToStakeDTO.HeNanBackOrderDetail;
-import com.dl.task.printlottery.responseDto.henan.HenanQueryStakeResponseDTO.HenanQueryStakeOrderResponse;
+import com.dl.task.printlottery.responseDto.caixiaomi.CaiXiaoMiQueryStakeResponseDTO.CaiXiaoMiQueryStakeOrderResponse;
 
 @Service
 @Slf4j
