@@ -1,6 +1,7 @@
 package com.dl.task.printlottery.channelImpl;
 
-import java.nio.charset.Charset;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -14,12 +15,24 @@ import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.json.JSONObject;
 
-import org.apache.catalina.util.URLEncoder;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.http.Header;
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.util.EntityUtils;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 
@@ -101,25 +114,92 @@ public class PrintChannelWeicaishidaiServiceImpl  implements IPrintChannelServic
 	}
 
 	private String sendHttpMessage(String requestUrl,String header, String body,DlPrintLotteryMapper dlPrintLotteryMapper) {
-		RestTemplate rest = getRestTemplate();
+		RestTemplate restTemplate = new RestTemplate();
 		HttpHeaders headers = new HttpHeaders();
-		MediaType type = MediaType.parseMediaType("application/x-www-form-urlencoded");
-		headers.setContentType(type);
-		JSONObject jo = new JSONObject();
-		HttpEntity<JSONObject> requestEntity = new HttpEntity<JSONObject>(jo, headers);
-		requestUrl = requestUrl+"?head="+header+"&body="+body;
+		headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 		try{
-		requestUrl = java.net.URLEncoder.encode(requestUrl, "UTF-8");
-		}catch(Exception e){
-			log.error("微彩时代 地址转换异常",e);
-		}
-		parentLog.info("通用的访问第三方请求reqTime={},url={},header={},requestParams={},",System.currentTimeMillis(),requestUrl,JSONHelper.bean2json(headers),JSONHelper.bean2json(requestEntity));
-		String response = rest.postForObject(requestUrl, requestEntity, String.class);
+			header= java.net.URLEncoder.encode(header, "UTF-8");
+			body = java.net.URLEncoder.encode(body, "UTF-8");
+			}catch(Exception e){
+				log.error("微彩时代 地址转换异常",e);
+			}
+		MultiValueMap<String, String> map= new LinkedMultiValueMap<String, String>();
+		map.add("head", header);
+		map.add("body", header);
+		String requestParam = map.toString();
+		HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<MultiValueMap<String, String>>(map, headers);
+		ResponseEntity<String> responseEntity = restTemplate.postForEntity(requestUrl, request , String.class );
+		String response = responseEntity.getBody();
+//		RestTemplate rest = getRestTemplate();
+//		HttpHeaders headers = new HttpHeaders();
+//		MediaType type = MediaType.parseMediaType("application/x-www-form-urlencoded");
+//		headers.setContentType(type);
+//		JSONObject jo = new JSONObject();
+//		HttpEntity<JSONObject> requestEntity = new HttpEntity<JSONObject>(jo, headers);
+//		try{
+//			header= java.net.URLEncoder.encode(header, "UTF-8");
+//			body = java.net.URLEncoder.encode(body, "UTF-8");
+//			}catch(Exception e){
+//				log.error("微彩时代 地址转换异常",e);
+//			}
+//		String requestParam = "?head="+header+"&body="+body;
+//		String requestUrlReal = requestUrl+requestParam;
+////		parentLog.info("通用的访问第三方请求reqTime={},url={},header={},requestParams={},",System.currentTimeMillis(),requestUrl,JSONHelper.bean2json(headers),JSONHelper.bean2json(requestEntity));
+//		parentLog.info("通用的访问第三方请求reqTime={},url={}",System.currentTimeMillis(),requestUrlReal);
+////		String response = rest.postForObject(requestUrl, requestEntity, String.class);
+//		Map<String, String> headerParams =new HashMap<String, String>();
+//		Map<String, String> requestParams =new HashMap<String, String>();
+//		headerParams.put("Content-Type", "application/x-www-form-urlencoded");
+//		String response = httpPost(requestUrlReal,headerParams,requestParams,"UTF-8");
 		parentLog.info("restreqTime={}, response={}",System.currentTimeMillis(),response);
-		String requestParam = JSONHelper.bean2json(requestEntity);
 		LotteryThirdApiLog thirdApiLog = new LotteryThirdApiLog(requestUrl,ThirdApiEnum.WEI_CAI_LOTTERY.getCode(), requestParam, response);
 		dlPrintLotteryMapper.saveLotteryThirdApiLog(thirdApiLog);
 		return response;
+	}
+
+	private String httpPost(String url, Map<String, String> headerParams,
+			Map<String, String> requestParams, String urlEncode) {
+		String str = null;
+		HttpPost httpPost = null;
+		HttpClient httpClient =  HttpClientBuilder.create().build();// new DefaultHttpClient();
+		try {
+			// 参数设置
+			List<NameValuePair> params = new ArrayList<NameValuePair>();
+			for (Map.Entry<String, String> entry : requestParams.entrySet()) {
+				params.add(new BasicNameValuePair((String) entry.getKey(),
+						(String) entry.getValue()));
+			}
+			httpPost = new HttpPost(url);
+			httpPost.setEntity(new UrlEncodedFormEntity(params, urlEncode));
+
+			if (headerParams != null) {
+				for (Map.Entry<String, String> entry : headerParams.entrySet()) {
+					httpPost.setHeader(entry.getKey(), entry.getValue());
+				}
+			}
+			// reponse header
+			HttpResponse response = httpClient.execute(httpPost);
+			log.info("statusCode={}",response.getStatusLine().getStatusCode());
+
+			Header[] headers = response.getAllHeaders();
+			for (Header header : headers) {
+				log.info(header.getName() + ": " + header.getValue());
+			}
+			// 网页内容
+			org.apache.http.HttpEntity httpEntity = response.getEntity();
+			str = EntityUtils.toString(httpEntity);
+		} catch (UnsupportedEncodingException e) {
+			log.error("",e);
+		} catch (ClientProtocolException e) {
+			log.error("",e);
+		} catch (IOException e) {
+			log.error("",e);
+		} finally {
+			if (httpPost != null) {
+				httpPost.abort();
+			}
+		}
+		return str;
 	}
 
 	private String createHeader(String cmd, DlTicketChannel dlTicketChannel,
