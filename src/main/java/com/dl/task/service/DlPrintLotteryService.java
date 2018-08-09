@@ -82,6 +82,7 @@ import com.dl.task.model.BetResultInfo;
 import com.dl.task.model.DlLeagueMatchResult;
 import com.dl.task.model.DlPrintLottery;
 import com.dl.task.model.DlTicketChannel;
+import com.dl.task.model.DlTicketChannelLotteryClassify;
 import com.dl.task.model.LotteryThirdApiLog;
 import com.dl.task.param.DlJcZqMatchBetParam;
 import com.dl.task.param.DlQueryPrizeFileParam;
@@ -1868,6 +1869,10 @@ public class DlPrintLotteryService {
 				log.error("更新出票信息tikectInfo={},更新失败，updateRow={}",JSONHelper.bean2json(lotteryPrint),rst);
 			}
 		}
+	}
+
+	public void saveLotteryPrintInfo(List<LotteryPrintDTO> lotteryPrints,String orderSn, DlTicketChannelLotteryClassify classify) {
+		
 	}
 
 	

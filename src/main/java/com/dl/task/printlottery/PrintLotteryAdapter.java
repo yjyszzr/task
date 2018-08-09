@@ -1,5 +1,6 @@
 package com.dl.task.printlottery;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import javax.annotation.Resource;
@@ -7,11 +8,13 @@ import javax.annotation.Resource;
 import org.springframework.stereotype.Service;
 
 import com.dl.task.dao.DlPrintLotteryMapper;
+import com.dl.task.dao.DlTicketChannelLotteryClassifyMapper;
 import com.dl.task.dao.DlTicketChannelMapper;
 import com.dl.task.enums.PrintLotteryStatusEnum;
 import com.dl.task.enums.ThirdRewardStatusEnum;
 import com.dl.task.model.DlPrintLottery;
 import com.dl.task.model.DlTicketChannel;
+import com.dl.task.model.DlTicketChannelLotteryClassify;
 import com.dl.task.printlottery.channelImpl.PrintChannelCaixiaomiServiceImpl;
 import com.dl.task.printlottery.channelImpl.PrintChannelHenanServiceImpl;
 import com.dl.task.printlottery.channelImpl.PrintChannelWeicaishidaiServiceImpl;
@@ -35,7 +38,8 @@ public class PrintLotteryAdapter {
 	private DlPrintLotteryMapper dlPrintLotteryMapper;
 	@Resource
 	private DlTicketChannelMapper dlTicketChannelMapper;
-	
+	@Resource
+	private DlTicketChannelLotteryClassifyMapper dlTicketChannelLotteryClassifyMapper;
 	/**
 	 * 投注
 	 * @return 
@@ -88,6 +92,10 @@ public class PrintLotteryAdapter {
 	public QueryRewardResponseDTO queryLotterysRewardByIssue(PrintComEnums printComEnums, String issue,DlTicketChannel dlTicketChannel) {
 		IPrintChannelService iPrintChannelService = getIPrintChannelServiceImpl(printComEnums);
 		return iPrintChannelService.queryRewardByIssue(issue,dlTicketChannel,dlPrintLotteryMapper);
+	}
+	
+	public List<DlTicketChannelLotteryClassify> getPrintChannelId(Integer lotteryClassifyId,BigDecimal ticketMoney){
+		return dlTicketChannelLotteryClassifyMapper.selectOpenPrintChanel(lotteryClassifyId,ticketMoney);
 	}
 	
 	/**
