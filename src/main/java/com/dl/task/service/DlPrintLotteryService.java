@@ -920,6 +920,7 @@ public class DlPrintLotteryService {
 			}
 		}
 		log.info("updatePrintLotteryCompareStatus 未更新状态彩票对应其次数，size=" + unPlayCodes.size());
+		log.info("updatePrintLotteryCompareStatus 未更新状态彩票对应期次={}",unPlayCodes);
 		if (CollectionUtils.isEmpty(unPlayCodes)) {
 			return;
 		}
