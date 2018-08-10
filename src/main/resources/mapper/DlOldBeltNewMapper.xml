@@ -48,7 +48,7 @@
 			FROM
 				(
 			SELECT
-				SUM( surplus ) AS surplus,
+				SUM( money_paid ) AS surplus,
 				user_id 
 			FROM
 				dl_order 
@@ -59,7 +59,7 @@
 				user_id 
 				) a 
 			WHERE
-				a.surplus >= 30
+				a.surplus &gt;= 30
 	  </select>
 	  
 <!-- 	  更新用户状态 -->
