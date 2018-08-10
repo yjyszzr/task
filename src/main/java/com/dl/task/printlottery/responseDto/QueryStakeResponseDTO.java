@@ -31,9 +31,6 @@ public class QueryStakeResponseDTO implements Serializable{
 		@ApiModelProperty(value = "彩小秘出票状态 0-待出票 1-已出票 2-出票失败 3-出票中", required = true)
 		private PrintLotteryStatusEnum statusEnum;
 
-		@ApiModelProperty(value = "订单id", required = true)
-	    private String orderId;
-		
 		@ApiModelProperty(value = "商户订单号", required = true)
 	    private String ticketId;
 		

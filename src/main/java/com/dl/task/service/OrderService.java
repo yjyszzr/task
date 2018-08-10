@@ -72,6 +72,7 @@ import com.dl.task.model.DlChannelConsumer;
 import com.dl.task.model.DlChannelDistributor;
 import com.dl.task.model.DlLeagueMatchResult;
 import com.dl.task.model.DlPrintLottery;
+import com.dl.task.model.DlTicketChannelLotteryClassify;
 import com.dl.task.model.Order;
 import com.dl.task.model.OrderDetail;
 import com.dl.task.model.PayLog;
@@ -83,6 +84,7 @@ import com.dl.task.param.AddMessageParam;
 import com.dl.task.param.MessageAddParam;
 import com.dl.task.param.OrderSnParam;
 import com.dl.task.param.UpdateOrderInfoParam;
+import com.dl.task.printlottery.PrintLotteryAdapter;
 
 @Slf4j
 @Service
@@ -126,7 +128,8 @@ public class OrderService extends AbstractService<Order> {
 	
     @Resource
     private UserMatchCollectMapper userMatchCollectMapper;
-    
+    @Resource
+    private PrintLotteryAdapter printLotteryAdapter;
     
 	/**
 	 * 更新订单状态
@@ -1286,6 +1289,7 @@ public class OrderService extends AbstractService<Order> {
 			List<DlPrintLottery> dlPrints = dlPrintLotteryMapper.printLotterysByOrderSn(orderSn);
 			if(CollectionUtils.isEmpty(dlPrints)){
 				Integer lotteryClassifyId = order.getLotteryClassifyId();
+				BigDecimal amount = order.getTicketAmount();
 				Integer lotteryPlayClassifyId = order.getLotteryPlayClassifyId();
 				OrderInfoAndDetailDTO orderDetail = getOrderWithDetailByOrder(order);
 				if(1== lotteryClassifyId && 8 == lotteryPlayClassifyId) {
@@ -1299,9 +1303,18 @@ public class OrderService extends AbstractService<Order> {
 			        log.info("save printLotteryCom orderSn={},ticketAmount={},canBetMoney={}",order.getOrderSn(),order.getTicketAmount(),printLotteryRoutAmount);
 			        if(order.getTicketAmount().subtract(new BigDecimal(printLotteryRoutAmount)).compareTo(BigDecimal.ZERO)<0){
 			            log.info("orderSn={},设置出票公司为西安出票公司",order.getOrderSn());
-			            printLotteryCom = 2;//西安出票公司
+			            printLotteryCom = 4;//西安出票公司
 			        }
-			        dlPrintLotteryService.saveLotteryPrintInfo(lotteryPrints, order.getOrderSn(),printLotteryCom);
+					dlPrintLotteryService.saveLotteryPrintInfo(lotteryPrints, order.getOrderSn(),printLotteryCom);
+//					List<DlTicketChannelLotteryClassify> isOkChannels = printLotteryAdapter.getPrintChannelId(lotteryClassifyId,amount);
+//					if(!CollectionUtils.isEmpty(isOkChannels)){
+//						Integer tailNumber = Integer.parseInt(orderSn.substring(orderSn.length()-4,orderSn.length()));
+//						int channelIndex = tailNumber%isOkChannels.size();
+//						DlTicketChannelLotteryClassify classify = isOkChannels.get(channelIndex);
+//						dlPrintLotteryService.saveLotteryPrintInfo(lotteryPrints, order.getOrderSn(),classify);
+//					}else{
+//						log.error("严重：order_sn={},出票失败，未找到对应的出票公司classfyId={},ticketAmount={}",order.getOrderSn(),order.getLotteryClassifyId(),order.getTicketAmount());
+//					}
 			        return;
 				}
 			}

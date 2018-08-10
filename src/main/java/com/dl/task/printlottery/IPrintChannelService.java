@@ -28,6 +28,7 @@ import com.dl.task.param.DlQueryStakeParam;
 import com.dl.task.printlottery.requestDto.CommonQueryStakeParam;
 import com.dl.task.printlottery.requestDto.CommonToStakeParam;
 import com.dl.task.printlottery.requestDto.CommonToStakeParam.CommonPrintTicketOrderParam;
+import com.dl.task.printlottery.responseDto.QueryRewardResponseDTO;
 import com.dl.task.printlottery.responseDto.QueryStakeResponseDTO;
 import com.dl.task.printlottery.responseDto.ToStakeResponseDTO;
 import com.google.common.collect.Lists;
@@ -96,6 +97,7 @@ public interface IPrintChannelService {
         restTemplate.setMessageConverters(messageConverters);
         return restTemplate;
 	}
+	
 	/**
 	 * 通用的出票公司请求
 	 * @param channelInfo 出票通道信息 账户、密码、出票地址不能为空
@@ -106,7 +108,6 @@ public interface IPrintChannelService {
 	 * @return
 	 */
 	default String defaultCommonRestRequest(DlTicketChannel channelInfo,DlPrintLotteryMapper dlPrintLotteryMapper,JSONObject jo, String inter,ThirdApiEnum thirdApiEnum){
-		parentLog.info("通用的访问第三方请求");
 		RestTemplate rest = getRestTemplate();
 		HttpHeaders headers = new HttpHeaders();
 		MediaType type = MediaType.parseMediaType("application/json;charset=UTF-8");
@@ -114,13 +115,17 @@ public interface IPrintChannelService {
 		String authStr = channelInfo.getTicketMerchant() + channelInfo.getTicketMerchantPassword() + jo.toString();
 		String authorization = MD5Utils.MD5(authStr);
 		headers.add("Authorization", authorization);
-		HttpEntity<JSONObject> requestEntity = new HttpEntity<JSONObject>(jo, headers);
 		String requestUrl = channelInfo.getTicketUrl() + inter;
+		HttpEntity<JSONObject> requestEntity = new HttpEntity<JSONObject>(jo, headers);
+		parentLog.info("通用的访问第三方请求reqTime={},url={},header={},requestParams={},",System.currentTimeMillis(),requestUrl,JSONHelper.bean2json(headers),JSONHelper.bean2json(requestEntity));
 		String response = rest.postForObject(requestUrl, requestEntity, String.class);
-		parentLog.info("rest url={},header={},requestParams={},response={}",requestUrl,JSONHelper.bean2json(headers),JSONHelper.bean2json(requestEntity),response);
+		parentLog.info("restreqTime={}, response={}",System.currentTimeMillis(),response);
 		String requestParam = JSONHelper.bean2json(requestEntity);
 		LotteryThirdApiLog thirdApiLog = new LotteryThirdApiLog(requestUrl, thirdApiEnum.getCode(), requestParam, response);
 		dlPrintLotteryMapper.saveLotteryThirdApiLog(thirdApiLog);
 		return response;
 	}
+	QueryRewardResponseDTO queryRewardByLottery(List<DlPrintLottery> dlPrintLotterys,DlTicketChannel dlTicketChannel,DlPrintLotteryMapper dlPrintLotteryMapper);
+	
+	QueryRewardResponseDTO queryRewardByIssue(String issue,DlTicketChannel dlTicketChannel,DlPrintLotteryMapper dlPrintLotteryMapper);
 }

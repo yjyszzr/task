@@ -1,5 +1,9 @@
 package com.dl.task.printlottery.channelImpl;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -11,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.sf.json.JSONObject;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 
 import com.dl.base.enums.ThirdApiEnum;
@@ -22,12 +27,16 @@ import com.dl.task.model.DlTicketChannel;
 import com.dl.task.printlottery.IPrintChannelService;
 import com.dl.task.printlottery.requestDto.CommonQueryStakeParam;
 import com.dl.task.printlottery.requestDto.CommonToStakeParam;
+import com.dl.task.printlottery.requestDto.henan.HeNanQueryPrizeFileParam;
+import com.dl.task.printlottery.responseDto.QueryRewardResponseDTO;
+import com.dl.task.printlottery.responseDto.QueryRewardResponseDTO.QueryRewardOrderResponse;
 import com.dl.task.printlottery.responseDto.QueryStakeResponseDTO;
 import com.dl.task.printlottery.responseDto.QueryStakeResponseDTO.QueryStakeOrderResponse;
 import com.dl.task.printlottery.responseDto.ToStakeResponseDTO;
 import com.dl.task.printlottery.responseDto.ToStakeResponseDTO.ToStakeBackOrderDetail;
 import com.dl.task.printlottery.responseDto.henan.HeNanDlToStakeDTO;
 import com.dl.task.printlottery.responseDto.henan.HeNanDlToStakeDTO.HeNanBackOrderDetail;
+import com.dl.task.printlottery.responseDto.henan.HeNanQueryPrizeFileDTO;
 import com.dl.task.printlottery.responseDto.henan.HenanQueryStakeResponseDTO;
 import com.dl.task.printlottery.responseDto.henan.HenanQueryStakeResponseDTO.HenanQueryStakeOrderResponse;
 
@@ -120,7 +129,6 @@ public class PrintChannelHenanServiceImpl  implements IPrintChannelService{
 				if(querySuccess){
 					queryStakeOrderResponse.setStatusEnum(statusEnum);
 					queryStakeOrderResponse.setPrintStatus(printStatus);
-					queryStakeOrderResponse.setOrderId(heNanQueryOrderResponse.getOrderId());
 					queryStakeOrderResponse.setPlatformId(heNanQueryOrderResponse.getPlatformId());
 					queryStakeOrderResponse.setPrintNo(heNanQueryOrderResponse.getPrintNo());
 					queryStakeOrderResponse.setSp(heNanQueryOrderResponse.getSp());
@@ -142,5 +150,65 @@ public class PrintChannelHenanServiceImpl  implements IPrintChannelService{
 			queryStakeResponseDto.setOrders(orders);
 		}
 		return queryStakeResponseDto;
+	}
+	@Override
+	public QueryRewardResponseDTO queryRewardByLottery(
+			List<DlPrintLottery> dlPrintLotterys,
+			DlTicketChannel dlTicketChannel,
+			DlPrintLotteryMapper dlPrintLotteryMapper) {
+		QueryRewardResponseDTO notSupport = new QueryRewardResponseDTO();
+		notSupport.setQuerySuccess(Boolean.FALSE);
+		notSupport.setRetCode("-1");
+		notSupport.setRetDesc("notSupprt");
+		return notSupport;
+	}
+	@Override
+	public QueryRewardResponseDTO queryRewardByIssue(String issueAndGame,DlTicketChannel dlTicketChannel,DlPrintLotteryMapper dlPrintLotteryMapper) {
+		QueryRewardResponseDTO resultDto = new QueryRewardResponseDTO();
+		resultDto.setQuerySuccess(Boolean.FALSE);
+		String[] issueAndGameArr = issueAndGame.split(";");
+		HeNanQueryPrizeFileParam param = new HeNanQueryPrizeFileParam();
+		param.setMerchant(dlTicketChannel.getTicketMerchant());
+		param.setVersion(version);
+		param.setGame(issueAndGameArr[0]);
+		param.setIssue(issueAndGameArr[1]);
+		param.setTimestamp(DateUtil.getCurrentTimeString(DateUtil.getCurrentTimeLong().longValue(), DateUtil.datetimeFormat));
+		JSONObject jo = JSONObject.fromObject(param);
+		String backStr = defaultCommonRestRequest(dlTicketChannel, dlPrintLotteryMapper, jo,  "/prize_file", ThirdApiEnum.HE_NAN_LOTTERY);
+		JSONObject backJo = JSONObject.fromObject(backStr);
+		HeNanQueryPrizeFileDTO dlQueryPrizeFileDTO = (HeNanQueryPrizeFileDTO) JSONObject.toBean(backJo, HeNanQueryPrizeFileDTO.class); 
+		if(dlQueryPrizeFileDTO!=null&&StringUtils.isNotEmpty(dlQueryPrizeFileDTO.getUrl())){
+			resultDto.setQuerySuccess(Boolean.TRUE);
+			List<QueryRewardOrderResponse> ticketIds = new ArrayList<QueryRewardResponseDTO.QueryRewardOrderResponse>();
+//			读取文件内容
+			try {
+				log.info("解析河南出票兑奖信息 文件地址={}",dlQueryPrizeFileDTO.getUrl());
+				 URL url = new URL(dlQueryPrizeFileDTO.getUrl());
+		        BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
+		        String s;
+		        int row=0;
+		        while ((s = reader.readLine()) != null) {
+		        	log.info("查询河南出奖信息内容为={}",s);
+		        	row++;
+		        	if(row==1){
+		        		continue;
+		        	}
+		        	String[] printPrizeInfoArr = s.split("\t");
+		        	log.info("出奖信息={}",printPrizeInfoArr);
+		        	String ticketId = printPrizeInfoArr[1];
+		        	String thirdReward = printPrizeInfoArr[3];
+		        	QueryRewardOrderResponse response = new QueryRewardOrderResponse();
+		        	response.setQuerySuccess(Boolean.TRUE);
+		        	response.setPrizeMoney(Integer.parseInt(thirdReward));
+		        	response.setTicketId(ticketId);
+		        	ticketIds.add(response);
+		        }
+		        resultDto.setOrders(ticketIds);
+		        reader.close();
+			} catch (IOException e) {
+				log.info("解析河南出票奖金文件失败",e);
+			}
+		}
+		return resultDto;
 	}
 }

@@ -99,13 +99,13 @@ public class TaskSchedule {
 //			log.info("彩票出票状态查询定时任务结束");
 //		}
 		dlPrintLotteryService.goPrintLotteryVersion2();
-	}
-	/**
-	 * 第一步： 出票任务 （每5分钟执行一次） 调用第三方接口出票定时任务 定时的对出票中的进行查询结果
-	 */
-	@Scheduled(cron = "${task.schedule.lottery.print.lottery}")
-	public void queryPrintLottery() {
-		dlPrintLotteryService.queryPrintLotteryVersion2();
+		LocalTime localTime = LocalTime.now(ZoneId.systemDefault());
+		int hour = localTime.getHour();
+		if (hour < 1 || hour >= 9) {
+			log.info("彩票出票状态查询定时任务启动");
+			dlPrintLotteryService.queryPrintLotteryVersion2();
+			log.info("彩票出票状态查询定时任务结束");
+		}
 	}
 
 	/**
@@ -113,16 +113,17 @@ public class TaskSchedule {
 	 */
 	@Scheduled(cron = "${task.schedule.lottery.print.third.reward}")
 	public void updatePrintLotteryThirdRewardInfo() {
-		try {
-			dlPrintLotteryService.updatePrintLotterysThirdRewardXian();
-		} catch (Exception e) {
-			log.error("定时更新西安获奖信息失败", e);
-		}
-		try {
-			dlPrintLotteryService.updatePrintLotteryThirdRewardHeNan();
-		} catch (Exception e) {
-			log.error("定时更新河南获奖信息失败", e);
-		}
+		dlPrintLotteryService.rewardPrintLotteryVersion2();
+//		try {
+//			dlPrintLotteryService.updatePrintLotterysThirdRewardXian();
+//		} catch (Exception e) {
+//			log.error("定时更新西安获奖信息失败", e);
+//		}
+//		try {
+//			dlPrintLotteryService.updatePrintLotteryThirdRewardHeNan();
+//		} catch (Exception e) {
+//			log.error("定时更新河南获奖信息失败", e);
+//		}
 	}
 
 	/**

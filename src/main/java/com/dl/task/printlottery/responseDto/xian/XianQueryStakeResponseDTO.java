@@ -56,5 +56,16 @@ public class XianQueryStakeResponseDTO implements Serializable{
 		
 		@ApiModelProperty(value = "票面上的出票时间", required = true)
 	    private String printTime;
+
+		@ApiModelProperty(value = "中奖状态0未开奖,1中奖,2未中奖", required = true)
+	    private Integer prizeStatus;
+		@ApiModelProperty(value = "格式为:玩法|场次|结果@赔率.多个结果间;分隔.串关的结果,分隔", required = true)
+	    private String prizeNo;
+		@ApiModelProperty(value = "中奖的注数", required = true)
+	    private Integer prizeCount;
+		@ApiModelProperty(value = "中奖金额 分为单位", required = true)
+	    private Integer prizeMoney;
+		@ApiModelProperty(value = "结算状态", required = true)
+	    private Integer settleStatus;
 	}
 }
