@@ -189,8 +189,8 @@ public class PrintChannelWeicaishidaiServiceImpl  implements IPrintChannelServic
 					queryStakeOrderResponse.setStatusEnum(statusEnum);
 					queryStakeOrderResponse.setPrintStatus(Integer.parseInt(printStatus));
 					queryStakeOrderResponse.setPlatformId(weicaishidaiQueryResponse.getTicketId());
-					queryStakeOrderResponse.setPrintNo(weicaishidaiQueryResponse.getTicketNumber());
-					queryStakeOrderResponse.setSp(getCaiXiaoMiSpFromTicketNumber(weicaishidaiQueryResponse.getTicketNumber()));
+					queryStakeOrderResponse.setPrintNo(weicaishidaiQueryResponse.getNumber());
+					queryStakeOrderResponse.setSp(getCaiXiaoMiSpFromTicketNumber(weicaishidaiQueryResponse.getNumber()));
 					queryStakeOrderResponse.setTicketId(weicaishidaiQueryResponse.getOrderId());
 					queryStakeOrderResponse.setPrintTime(weicaishidaiQueryResponse.getPrintTime());
 					Date printTime = new Date();
