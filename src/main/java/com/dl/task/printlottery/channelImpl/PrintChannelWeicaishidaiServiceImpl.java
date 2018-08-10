@@ -336,7 +336,7 @@ public class PrintChannelWeicaishidaiServiceImpl  implements IPrintChannelServic
 			ticket.setAmount(""+lottery.getMoney().intValue());
 			ticket.setBet_type(getBetType(lottery.getBetType()));
 			ticket.setGame_id(gameId);
-			ticket.setIcount("1");
+			ticket.setIcount(getIcount(lottery.getMoney().intValue(),lottery.getTimes()));
 			ticket.setMultiple(""+lottery.getTimes());
 			ticket.setNumber(getNumber(lottery.getGame(),lottery.getPlayType(),lottery.getBetType(),lottery.getStakes()));
 			ticket.setOut_id(lottery.getTicketId());
@@ -347,6 +347,11 @@ public class PrintChannelWeicaishidaiServiceImpl  implements IPrintChannelServic
 		body.setTickets(tickets);
 		body.setUuid(UUID.randomUUID().toString());
 		return body;
+	}
+
+	private static String getIcount(Integer money,Integer times) {
+		Integer icount = money/(100*times*2);
+		return icount.toString();
 	}
 
 	/**
@@ -465,8 +470,9 @@ public class PrintChannelWeicaishidaiServiceImpl  implements IPrintChannelServic
 //		String betType="41";
 //		String caixiaomiStatke="01|201806111101|3;01|201806111102|3;01|201806122101|3;01|201806122102|3";
 //		System.out.println(getNumber(game, playType, betType, caixiaomiStatke));
-		System.out.println(removeIssueWeekDay("201808105001"));
-		System.out.println(addIssueWeekDay("20180810001"));
+//		System.out.println(removeIssueWeekDay("201808105001"));
+//		System.out.println(addIssueWeekDay("20180810001"));
+		System.out.println(getIcount(12000,5));
 	}
 	/**
 	 * 将微彩时代的赔率转化为我们的
