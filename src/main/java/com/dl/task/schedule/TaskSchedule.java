@@ -99,6 +99,12 @@ public class TaskSchedule {
 //			log.info("彩票出票状态查询定时任务结束");
 //		}
 		dlPrintLotteryService.goPrintLotteryVersion2();
+	}
+	/**
+	 *查询出票信息任务 （每12分钟执行一次） 调用第三方接口出票定时任务 定时的对出票中的进行查询结果
+	 */
+	@Scheduled(cron = "${task.schedule.lottery.print.querylottery}")
+	public void quereyPrintLottery() {
 		LocalTime localTime = LocalTime.now(ZoneId.systemDefault());
 		int hour = localTime.getHour();
 		if (hour < 1 || hour >= 9) {
@@ -107,7 +113,6 @@ public class TaskSchedule {
 			log.info("彩票出票状态查询定时任务结束");
 		}
 	}
-
 	/**
 	 * 更新出票的中奖信息
 	 */
