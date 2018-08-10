@@ -100,6 +100,7 @@ public class PrintChannelWeicaishidaiServiceImpl  implements IPrintChannelServic
         String response = httpPost(requestUrlReal,headerParams,requestParams,"UTF-8");
         log.info("response={}",response);
         LotteryThirdApiLog thirdApiLog = new LotteryThirdApiLog(requestUrlReal,ThirdApiEnum.WEI_CAI_LOTTERY.getCode(), JSONHelper.bean2json(requestParams), response);
+        dlPrintLotteryMapper.saveLotteryThirdApiLog(thirdApiLog);
 		JSONObject backJo = JSONObject.fromObject(response);
 		@SuppressWarnings("rawtypes")
 		Map<String,Class> mapClass = new HashMap<String,Class>();
@@ -148,6 +149,7 @@ public class PrintChannelWeicaishidaiServiceImpl  implements IPrintChannelServic
         String response = httpPost(requestUrlReal,headerParams,requestParams,"UTF-8");
         log.info("response={}",response);
         LotteryThirdApiLog thirdApiLog = new LotteryThirdApiLog(requestUrlReal,ThirdApiEnum.WEI_CAI_LOTTERY.getCode(), JSONHelper.bean2json(requestParams), response);
+        dlPrintLotteryMapper.saveLotteryThirdApiLog(thirdApiLog);
 		JSONObject backJo = JSONObject.fromObject(response);
 		@SuppressWarnings("rawtypes")
 		Map<String,Class> mapClass = new HashMap<String,Class>();
