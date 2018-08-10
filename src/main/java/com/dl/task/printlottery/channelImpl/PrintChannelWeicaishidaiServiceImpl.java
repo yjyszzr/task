@@ -491,7 +491,11 @@ public class PrintChannelWeicaishidaiServiceImpl  implements IPrintChannelServic
 			caiXiaoMiSp.append(addIssueWeekDay(issue));
 			caiXiaoMiSp.append("|");
 //			3(2.39),0(2.39),1(2.39)
-			for(String onePlayAndSp:isssueAndSpArr[1].split(",")){
+			int spIndex=1;
+			if(isssueAndSpArr.length>2){
+				spIndex=2;
+			}
+			for(String onePlayAndSp:isssueAndSpArr[spIndex].split(",")){
 				String betCell = onePlayAndSp.substring(0, onePlayAndSp.indexOf("("));
 				caiXiaoMiSp.append(betCell);
 				caiXiaoMiSp.append("@");
