@@ -1,10 +1,13 @@
 package com.dl.task;
 
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 import org.springframework.cloud.netflix.feign.EnableFeignClients;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
@@ -25,5 +28,10 @@ public class TaskServiceApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(TaskServiceApplication.class, args);
 	}
+	@Bean  
+    public ScheduledThreadPoolExecutor scheduledExecutorService() {  
+        ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(10);  
+        return executor;  
+    } 
 
 }
