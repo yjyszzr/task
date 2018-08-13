@@ -26,8 +26,10 @@ import com.dl.task.model.DlPrintLottery;
 import com.dl.task.model.DlTicketChannel;
 import com.dl.task.printlottery.IPrintChannelService;
 import com.dl.task.printlottery.requestDto.CommonQueryStakeParam;
+import com.dl.task.printlottery.requestDto.CommonToQueryBanlanceParam;
 import com.dl.task.printlottery.requestDto.CommonToStakeParam;
 import com.dl.task.printlottery.requestDto.henan.HeNanQueryPrizeFileParam;
+import com.dl.task.printlottery.responseDto.QueryPrintBalanceDTO;
 import com.dl.task.printlottery.responseDto.QueryRewardResponseDTO;
 import com.dl.task.printlottery.responseDto.QueryRewardResponseDTO.QueryRewardOrderResponse;
 import com.dl.task.printlottery.responseDto.QueryStakeResponseDTO;
@@ -210,5 +212,21 @@ public class PrintChannelHenanServiceImpl  implements IPrintChannelService{
 			}
 		}
 		return resultDto;
+	}
+	@Override
+	public QueryPrintBalanceDTO queryBalance(DlTicketChannel dlTicketChannel,DlPrintLotteryMapper dlPrintLotteryMapper) {
+		CommonToQueryBanlanceParam querybalance = defaultCommonToQueryBanlanceParam(dlTicketChannel.getTicketMerchant(),version);
+		JSONObject jo = JSONObject.fromObject(querybalance);
+		String backStr = defaultCommonRestRequest(dlTicketChannel, dlPrintLotteryMapper, jo, "/account", ThirdApiEnum.HE_NAN_LOTTERY);
+		JSONObject backJo = JSONObject.fromObject(backStr);
+		log.info("河南查询余额返回信息={}",backStr);
+		QueryPrintBalanceDTO dlQueryStakeDTO = (QueryPrintBalanceDTO) JSONObject.toBean(backJo, QueryPrintBalanceDTO.class); 
+		if(dlQueryStakeDTO==null||dlQueryStakeDTO.getBalance()==null||Integer.valueOf(0).equals(dlQueryStakeDTO.getBalance())){
+			dlQueryStakeDTO = new QueryPrintBalanceDTO();
+			dlQueryStakeDTO.setQuerySuccess(Boolean.FALSE);
+			return dlQueryStakeDTO;
+		}
+		dlQueryStakeDTO.setQuerySuccess(Boolean.TRUE);
+		return dlQueryStakeDTO;
 	}
 }

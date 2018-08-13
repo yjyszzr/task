@@ -19,6 +19,7 @@ import com.dl.task.printlottery.channelImpl.PrintChannelCaixiaomiServiceImpl;
 import com.dl.task.printlottery.channelImpl.PrintChannelHenanServiceImpl;
 import com.dl.task.printlottery.channelImpl.PrintChannelWeicaishidaiServiceImpl;
 import com.dl.task.printlottery.channelImpl.PrintChannelXianServiceImpl;
+import com.dl.task.printlottery.responseDto.QueryPrintBalanceDTO;
 import com.dl.task.printlottery.responseDto.QueryRewardResponseDTO;
 import com.dl.task.printlottery.responseDto.QueryStakeResponseDTO;
 import com.dl.task.printlottery.responseDto.ToStakeResponseDTO;
@@ -98,14 +99,12 @@ public class PrintLotteryAdapter {
 		return dlTicketChannelLotteryClassifyMapper.selectOpenPrintChanel(lotteryClassifyId,ticketMoney);
 	}
 	
-	/**
-	 * 查询账户余额
-	 */
-	private void queryAccountBalance(PrintComEnums printComEnums){
+	public QueryPrintBalanceDTO getBalance(PrintComEnums printComEnums) {
 		IPrintChannelService iPrintChannelService = getIPrintChannelServiceImpl(printComEnums);
-		
+		DlTicketChannel channel = selectChannelByChannelId(printComEnums);
+		QueryPrintBalanceDTO dto = iPrintChannelService.queryBalance(channel,dlPrintLotteryMapper);
+		return dto;
 	}
-	
 	private IPrintChannelService getIPrintChannelServiceImpl(PrintComEnums printComEnums){
 		IPrintChannelService iPrintChannelService=null;
 		switch(printComEnums){

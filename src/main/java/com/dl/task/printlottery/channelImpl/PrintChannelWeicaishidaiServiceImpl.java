@@ -2,6 +2,7 @@ package com.dl.task.printlottery.channelImpl;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -49,7 +50,9 @@ import com.dl.task.printlottery.IPrintChannelService;
 import com.dl.task.printlottery.requestDto.weicaishidai.WeiCaiShiDaiBodyRequesDto;
 import com.dl.task.printlottery.requestDto.weicaishidai.WeiCaiShiDaiBodyRequesDto.WeiCaiShiDaiBodyTicketRequesDto;
 import com.dl.task.printlottery.requestDto.weicaishidai.WeiCaiShiDaiHearRequestDto;
+import com.dl.task.printlottery.requestDto.weicaishidai.WeiCaiShiDaiQueryBalanceBodyRequesDto;
 import com.dl.task.printlottery.requestDto.weicaishidai.WeiCaiShiDaiQueryBodyRequesDto;
+import com.dl.task.printlottery.responseDto.QueryPrintBalanceDTO;
 import com.dl.task.printlottery.responseDto.QueryRewardResponseDTO;
 import com.dl.task.printlottery.responseDto.QueryStakeResponseDTO;
 import com.dl.task.printlottery.responseDto.QueryStakeResponseDTO.QueryStakeOrderResponse;
@@ -57,6 +60,8 @@ import com.dl.task.printlottery.responseDto.ToStakeResponseDTO;
 import com.dl.task.printlottery.responseDto.ToStakeResponseDTO.ToStakeBackOrderDetail;
 import com.dl.task.printlottery.responseDto.weicaishidai.WeiCaiShiDaiDlToStakeDTO;
 import com.dl.task.printlottery.responseDto.weicaishidai.WeiCaiShiDaiDlToStakeDTO.WeiCaiShiDaiBackOrderDetail;
+import com.dl.task.printlottery.responseDto.weicaishidai.WeiCaiShiDaiQueryBalanceDTO;
+import com.dl.task.printlottery.responseDto.weicaishidai.WeiCaiShiDaiQueryBalanceDTO.WeiCaiShiDaiQueryBalanceResponse;
 import com.dl.task.printlottery.responseDto.weicaishidai.WeiCaiShiDaiQueryStakeDTO;
 import com.dl.task.printlottery.responseDto.weicaishidai.WeiCaiShiDaiQueryStakeDTO.WeiCaiShiDaiQueryStakeResponse;
 import com.dl.task.printlottery.responseDto.weicaishidai.WeiCaiShiDaiToStakeRetCode;
@@ -67,6 +72,7 @@ public class PrintChannelWeicaishidaiServiceImpl  implements IPrintChannelServic
 	private static Map<String,String> playTypeRelationMap = new HashMap<String, String>();
 	private static String CMDSTAKE="CT01";
 	private static String CMDQUERYSTAKE="CT03";
+	private static String CMDQUERYBALANCE="CT04";
 	private static String playTypeCTW="CTOW";//彩小秘对微彩时代
 	private static String playTypeWTC="WTOC";//微彩时代对彩小秘
 	static{
@@ -525,4 +531,46 @@ public class PrintChannelWeicaishidaiServiceImpl  implements IPrintChannelServic
 		return null;
 	}
 
+
+	@Override
+	public QueryPrintBalanceDTO queryBalance(DlTicketChannel dlTicketChannel,
+			DlPrintLotteryMapper dlPrintLotteryMapper) {
+		WeiCaiShiDaiQueryBalanceBodyRequesDto body = new WeiCaiShiDaiQueryBalanceBodyRequesDto();
+		body.setUuid(UUID.randomUUID().toString());
+		String bodyStr =JSONHelper.bean2json(body);
+		WeiCaiShiDaiHearRequestDto header = createHeader(CMDQUERYBALANCE,dlTicketChannel,bodyStr);
+		String headerStr  = JSONHelper.bean2json(header);
+        String requestUrlReal = dlTicketChannel.getTicketUrl();
+        parentLog.info("通用的访问第三方请求reqTime={},url={}",System.currentTimeMillis(),requestUrlReal);
+        Map<String, String> headerParams =new HashMap<String, String>();
+        Map<String, String> requestParams =new HashMap<String, String>();
+        requestParams.put("head", headerStr);
+        requestParams.put("body", bodyStr);
+        headerParams.put("Content-Type", "application/x-www-form-urlencoded");
+        log.info("head={},body={}",headerStr,bodyStr);
+        String response = httpPost(requestUrlReal,headerParams,requestParams,"UTF-8");
+        log.info("response={}",response);
+//        LotteryThirdApiLog thirdApiLog = new LotteryThirdApiLog(requestUrlReal,ThirdApiEnum.WEI_CAI_LOTTERY.getCode(), JSONHelper.bean2json(requestParams), response);
+//        dlPrintLotteryMapper.saveLotteryThirdApiLog(thirdApiLog);
+		JSONObject backJo = JSONObject.fromObject(response);
+		@SuppressWarnings("rawtypes")
+		Map<String,Class> mapClass = new HashMap<String,Class>();
+		mapClass.put("err", WeiCaiShiDaiToStakeRetCode.class);
+		mapClass.put("account", WeiCaiShiDaiQueryBalanceResponse.class);
+		WeiCaiShiDaiQueryBalanceDTO dlToStakeDTO = (WeiCaiShiDaiQueryBalanceDTO) JSONObject.toBean(backJo, WeiCaiShiDaiQueryBalanceDTO.class, mapClass); 
+		QueryPrintBalanceDTO toStakeResponseDTO = new QueryPrintBalanceDTO();
+		toStakeResponseDTO.setQuerySuccess(Boolean.FALSE);
+		if(dlToStakeDTO==null){
+			return toStakeResponseDTO;
+		}
+		toStakeResponseDTO.setRetCode(dlToStakeDTO.getErr().getCode());
+		toStakeResponseDTO.setRetDesc(dlToStakeDTO.getErr().getDes());
+		if(dlToStakeDTO.getAccount()!=null&&!StringUtils.isEmpty(dlToStakeDTO.getAccount().getBalance())){
+			String balanceStr = dlToStakeDTO.getAccount().getBalance();
+			Integer balanceFen = new BigDecimal(balanceStr).multiply(new BigDecimal("100")).intValue();
+			toStakeResponseDTO.setQuerySuccess(Boolean.TRUE);
+			toStakeResponseDTO.setBalance(balanceFen);
+		}
+		return toStakeResponseDTO;
+	}
 }

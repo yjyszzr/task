@@ -24,6 +24,7 @@ import com.dl.task.model.DlTicketChannel;
 import com.dl.task.printlottery.IPrintChannelService;
 import com.dl.task.printlottery.requestDto.CommonQueryStakeParam;
 import com.dl.task.printlottery.requestDto.CommonToStakeParam;
+import com.dl.task.printlottery.responseDto.QueryPrintBalanceDTO;
 import com.dl.task.printlottery.responseDto.QueryRewardResponseDTO;
 import com.dl.task.printlottery.responseDto.QueryRewardResponseDTO.QueryRewardOrderResponse;
 import com.dl.task.printlottery.responseDto.QueryStakeResponseDTO;
@@ -240,4 +241,14 @@ public class PrintChannelXianServiceImpl  implements IPrintChannelService{
 		return notSupport;
 	}
 
+
+	@Override
+	public QueryPrintBalanceDTO queryBalance(DlTicketChannel channel,
+			DlPrintLotteryMapper dlPrintLotteryMapper) {
+		QueryPrintBalanceDTO notSupport = new QueryPrintBalanceDTO();
+		notSupport.setQuerySuccess(Boolean.FALSE);
+		notSupport.setRetCode("-1");
+		notSupport.setRetDesc("notSupprt");
+		return notSupport;
+	}
 }

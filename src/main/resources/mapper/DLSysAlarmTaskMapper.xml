@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dl.task.dao.DLSysAlarmTaskMapper">
+  <resultMap id="BaseResultMap" type="com.dl.task.model.DLSysAlarmTask">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="alarm_code" jdbcType="VARCHAR" property="alarmCode" />
+    <result column="open_status" jdbcType="INTEGER" property="openStatus" />
+    <result column="alarm_limit" jdbcType="INTEGER" property="alarmLimit" />
+    <result column="alarm_condition" jdbcType="VARCHAR" property="alarmCondition" />
+    <result column="send_method" jdbcType="VARCHAR" property="sendMethod" />
+    <result column="params_name" jdbcType="VARCHAR" property="paramsName" />
+    <result column="sms_send_content" jdbcType="VARCHAR" property="smsSendContent" />
+    <result column="sms_send_mobile" jdbcType="VARCHAR" property="smsSendMobile" />
+    <result column="sms_first_alarm_time" jdbcType="INTEGER" property="smsFirstAlarmTime" />
+    <result column="sms_alarm_time" jdbcType="VARCHAR" property="smsAlarmTime" />
+    <result column="sms_alarm_count" jdbcType="INTEGER" property="smsAlarmCount" />
+    <result column="dingding_url" jdbcType="VARCHAR" property="dingdingUrl" />
+    <result column="dingding_mobile" jdbcType="VARCHAR" property="dingdingMobile" />
+    <result column="dingding_send_content" jdbcType="VARCHAR" property="dingdingSendContent" />
+    <result column="dingding_first_alarm_time" jdbcType="INTEGER" property="dingdingFirstAlarmTime" />
+    <result column="dingding_alarm_time" jdbcType="VARCHAR" property="dingdingAlarmTime" />
+    <result column="dingding_alarm_count" jdbcType="INTEGER" property="dingdingAlarmCount" />
+  </resultMap>
+  <select id="selectSysAlarmOpenTask" resultMap="BaseResultMap">
+  select * from dl_sys_alarm_task where open_status=1
+  </select>
+  <update id="updateSmsCountPlusOne" parameterType="com.dl.task.model.DLSysAlarmTask">
+  update dl_sys_alarm_task set sms_alarm_count=sms_alarm_count+1 
+  <if test="smsFirstAlarmTime!=''">
+    ,sms_first_alarm_time=#{smsFirstAlarmTime}
+  </if>
+  where alarm_code=#{alarmCode}
+  </update>
+  <update id="updateDingDingCountPlusOne" parameterType="com.dl.task.model.DLSysAlarmTask">
+  update dl_sys_alarm_task set sms_alarm_count=sms_alarm_count+1 
+  <if test="dingdingFirstAlarmTime''">
+    ,dingding_first_alarm_time=#{dingdingFirstAlarmTime}
+  </if>
+  where alarm_code=#{alarmCode}
+  </update>
+</mapper>
