@@ -1,15 +1,22 @@
 package com.dl.task.printlottery;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import com.dl.task.dao.DlPrintLotteryMapper;
 import com.dl.task.dao.DlTicketChannelLotteryClassifyMapper;
 import com.dl.task.dao.DlTicketChannelMapper;
+import com.dl.task.dto.PrintChannelInfo;
 import com.dl.task.enums.PrintLotteryStatusEnum;
 import com.dl.task.enums.ThirdRewardStatusEnum;
 import com.dl.task.model.DlPrintLottery;
@@ -25,6 +32,7 @@ import com.dl.task.printlottery.responseDto.QueryStakeResponseDTO;
 import com.dl.task.printlottery.responseDto.ToStakeResponseDTO;
 
 @Service
+@Slf4j
 public class PrintLotteryAdapter {
 
 	@Resource
@@ -95,8 +103,28 @@ public class PrintLotteryAdapter {
 		return iPrintChannelService.queryRewardByIssue(issue,dlTicketChannel,dlPrintLotteryMapper);
 	}
 	
-	public List<DlTicketChannelLotteryClassify> getPrintChannelId(Integer lotteryClassifyId,BigDecimal ticketMoney){
-		return dlTicketChannelLotteryClassifyMapper.selectOpenPrintChanel(lotteryClassifyId,ticketMoney);
+	public PrintChannelInfo getPrintChannelId(Integer lotteryClassifyId,String orderSn,Date minMatchStartTime,BigDecimal ticketMoney){
+		log.info("进入出票路由设置 参数lotteryClassifyId={},orderSn={},minMatchStartTime={},ticketMoney={}",lotteryClassifyId,orderSn,minMatchStartTime,ticketMoney);
+		PrintChannelInfo printChannelInfo = null;
+		List<DlTicketChannelLotteryClassify> isOkChannels = dlTicketChannelLotteryClassifyMapper.selectOpenPrintChanel(lotteryClassifyId,minMatchStartTime,ticketMoney);
+		if(!CollectionUtils.isEmpty(isOkChannels)){
+			List<Integer> channelIds = isOkChannels.stream().map(channel-> channel.getId()).collect(Collectors.toList());
+			log.error("orderSn={},匹配到的所有出票路由集合={}",orderSn,channelIds);
+			Integer tailNumber = Integer.parseInt(orderSn.substring(orderSn.length()-4,orderSn.length()));
+			int channelIndex = tailNumber%isOkChannels.size();
+			DlTicketChannelLotteryClassify classify = isOkChannels.get(channelIndex);
+			DlTicketChannel channel = dlTicketChannelMapper.selectChannelByChannelId(classify.getTicketChannelId());
+			if(channel==null){
+				return printChannelInfo;
+			}
+			printChannelInfo = new PrintChannelInfo();
+			printChannelInfo.setClassify(classify);
+			printChannelInfo.setChannel(channel);
+			log.error("orderSn={},选中的出票路由id={}",orderSn,channel.getId());
+		}else{
+			log.error("orderSn={},未找到对应的出票路由",orderSn);
+		}
+		return printChannelInfo;
 	}
 	
 	public QueryPrintBalanceDTO getBalance(PrintComEnums printComEnums) {

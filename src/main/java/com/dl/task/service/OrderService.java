@@ -63,6 +63,7 @@ import com.dl.task.dto.OrderDetailDataDTO;
 import com.dl.task.dto.OrderInfoAndDetailDTO;
 import com.dl.task.dto.OrderInfoDTO;
 import com.dl.task.dto.OrderWithUserDTO;
+import com.dl.task.dto.PrintChannelInfo;
 import com.dl.task.dto.TMatchBetMaxAndMinOddsList;
 import com.dl.task.dto.TicketInfo;
 import com.dl.task.dto.TicketPlayInfo;
@@ -1298,23 +1299,21 @@ public class OrderService extends AbstractService<Order> {
 				}
 				List<LotteryPrintDTO> lotteryPrints = dlPrintLotteryService.getPrintLotteryListByOrderInfo(orderDetail,orderSn);
 				if(CollectionUtils.isNotEmpty(lotteryPrints)) {
-					Double printLotteryRoutAmount = dlPrintLotteryMapper.printLotteryRoutAmount();
-			        int printLotteryCom = 1 ;//河南出票公司
-			        log.info("save printLotteryCom orderSn={},ticketAmount={},canBetMoney={}",order.getOrderSn(),order.getTicketAmount(),printLotteryRoutAmount);
-			        if(order.getTicketAmount().subtract(new BigDecimal(printLotteryRoutAmount)).compareTo(BigDecimal.ZERO)<0){
-			            log.info("orderSn={},设置出票公司为西安出票公司",order.getOrderSn());
-			            printLotteryCom = 4;//西安出票公司
-			        }
-					dlPrintLotteryService.saveLotteryPrintInfo(lotteryPrints, order.getOrderSn(),printLotteryCom);
-//					List<DlTicketChannelLotteryClassify> isOkChannels = printLotteryAdapter.getPrintChannelId(lotteryClassifyId,amount);
-//					if(!CollectionUtils.isEmpty(isOkChannels)){
-//						Integer tailNumber = Integer.parseInt(orderSn.substring(orderSn.length()-4,orderSn.length()));
-//						int channelIndex = tailNumber%isOkChannels.size();
-//						DlTicketChannelLotteryClassify classify = isOkChannels.get(channelIndex);
-//						dlPrintLotteryService.saveLotteryPrintInfo(lotteryPrints, order.getOrderSn(),classify);
-//					}else{
-//						log.error("严重：order_sn={},出票失败，未找到对应的出票公司classfyId={},ticketAmount={}",order.getOrderSn(),order.getLotteryClassifyId(),order.getTicketAmount());
-//					}
+//					Double printLotteryRoutAmount = dlPrintLotteryMapper.printLotteryRoutAmount();
+//			        int printLotteryCom = 1 ;//河南出票公司
+//			        log.info("save printLotteryCom orderSn={},ticketAmount={},canBetMoney={}",order.getOrderSn(),order.getTicketAmount(),printLotteryRoutAmount);
+//			        if(order.getTicketAmount().subtract(new BigDecimal(printLotteryRoutAmount)).compareTo(BigDecimal.ZERO)<0){
+//			            log.info("orderSn={},设置出票公司为西安出票公司",order.getOrderSn());
+//			            printLotteryCom = 4;//西安出票公司
+//			        }
+//					dlPrintLotteryService.saveLotteryPrintInfo(lotteryPrints, order.getOrderSn(),printLotteryCom);
+					Date minMatchStartTime = orderDetail.getOrderInfoDTO().getMinMatchStartTime();
+					PrintChannelInfo isOkChannels = printLotteryAdapter.getPrintChannelId(orderSn,minMatchStartTime,lotteryClassifyId,amount);
+					if(isOkChannels!=null){
+						dlPrintLotteryService.saveLotteryPrintInfo(lotteryPrints, order.getOrderSn(),isOkChannels);
+					}else{
+						log.error("严重：order_sn={},出票失败，未找到对应的出票公司classfyId={},ticketAmount={}",order.getOrderSn(),order.getLotteryClassifyId(),order.getTicketAmount());
+					}
 			        return;
 				}
 			}
@@ -1380,6 +1379,7 @@ public class OrderService extends AbstractService<Order> {
 		orderInfoDTO.setLotteryPlayClassifyId(order.getLotteryPlayClassifyId());
 		orderInfoDTO.setPassType(order.getPassType());
 		orderInfoDTO.setPlayType(order.getPlayType());
+		Date minMatchStartTime = null;
 		orderInfoAndDetailDTO.setOrderInfoDTO(orderInfoDTO);
 		List<OrderDetailDataDTO> orderDetailDataDTOs = new LinkedList<OrderDetailDataDTO>();
 		if (CollectionUtils.isNotEmpty(orderDetails)) {
@@ -1392,11 +1392,19 @@ public class OrderService extends AbstractService<Order> {
 				orderDetailDataDTO.setMatchId(orderDetail.getMatchId());
 				orderDetailDataDTO.setMatchTeam(orderDetail.getMatchTeam());
 				orderDetailDataDTO.setMatchTime(orderDetail.getMatchTime());
+				if(minMatchStartTime==null){
+					minMatchStartTime = orderDetail.getMatchTime();
+				}else{
+					if(minMatchStartTime.after(orderDetail.getMatchTime())){
+						minMatchStartTime = orderDetail.getMatchTime();
+					}
+				}
 				orderDetailDataDTO.setTicketData(orderDetail.getTicketData());
 				orderDetailDataDTO.setIssue(orderDetail.getIssue());
 				orderDetailDataDTOs.add(orderDetailDataDTO);
 			}
 		}
+		orderInfoDTO.setMinMatchStartTime(minMatchStartTime);
 		orderInfoAndDetailDTO.setOrderDetailDataDTOs(orderDetailDataDTOs);
 		return orderInfoAndDetailDTO;
 	}

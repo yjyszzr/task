@@ -72,6 +72,7 @@ import com.dl.task.dto.MatchBetPlayDTO;
 import com.dl.task.dto.OrderDetailDataDTO;
 import com.dl.task.dto.OrderInfoAndDetailDTO;
 import com.dl.task.dto.OrderInfoDTO;
+import com.dl.task.dto.PrintChannelInfo;
 import com.dl.task.dto.XianDlQueryStakeDTO;
 import com.dl.task.dto.XianDlQueryStakeDTO.XianBackQueryStake;
 import com.dl.task.dto.XianDlToStakeDTO;
@@ -1875,8 +1876,45 @@ public class DlPrintLotteryService {
 		}
 	}
 
-	public void saveLotteryPrintInfo(List<LotteryPrintDTO> lotteryPrints,String orderSn, DlTicketChannelLotteryClassify classify) {
-		
+	/**
+	 * 新的根据出票路由选择后出票信息
+	 * @param lotteryPrints
+	 * @param orderSn
+	 * @param printChannelInfo
+	 */
+	public void saveLotteryPrintInfo(List<LotteryPrintDTO> lotteryPrints,String orderSn, PrintChannelInfo printChannelInfo) {
+
+		List<DlPrintLottery> printLotterysByOrderSn = dlPrintLotteryMapper.printLotterysByOrderSn(orderSn);
+		if(CollectionUtils.isNotEmpty(printLotterysByOrderSn)) {
+			log.info("订单orderSn={},已经出票",orderSn);
+			return ;
+		}
+		DlTicketChannelLotteryClassify classify = printChannelInfo.getClassify();
+		DlTicketChannel channel = printChannelInfo.getChannel();
+		List<DlPrintLottery> models = lotteryPrints.stream().map(dto->{
+			DlPrintLottery lotteryPrint = new DlPrintLottery();
+			lotteryPrint.setGame(classify.getGame());
+			lotteryPrint.setMerchant(channel.getTicketMerchant());//当初为啥存储这个？？？用户名？有何意义？？
+			lotteryPrint.setTicketId(dto.getTicketId());
+			lotteryPrint.setAcceptTime(DateUtil.getCurrentTimeLong());
+			lotteryPrint.setBetType(dto.getBetType());
+			lotteryPrint.setMoney(BigDecimal.valueOf(dto.getMoney()*100));
+			lotteryPrint.setIssue(dto.getIssue());
+			lotteryPrint.setPlayType(dto.getPlayType());
+			lotteryPrint.setTimes(dto.getTimes());
+			lotteryPrint.setStakes(dto.getStakes());
+			lotteryPrint.setOrderSn(orderSn);
+			lotteryPrint.setRealRewardMoney(BigDecimal.valueOf(0.00));
+			lotteryPrint.setThirdPartRewardMoney(BigDecimal.valueOf(0.00));
+			lotteryPrint.setCompareStatus("0");
+			lotteryPrint.setComparedStakes("");
+			lotteryPrint.setRewardStakes("");
+			lotteryPrint.setStatus(0);
+			lotteryPrint.setPrintLotteryCom(classify.getTicketChannelId());
+			return lotteryPrint;
+		}).collect(Collectors.toList());
+		dlPrintLotteryMapper.batchInsertDlPrintLottery(models);
+		return;
 	}
 
 	
