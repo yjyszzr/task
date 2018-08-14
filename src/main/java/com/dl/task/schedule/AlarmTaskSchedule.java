@@ -31,7 +31,7 @@ public class AlarmTaskSchedule {
 			try{
 				dLSysAlarmTaskService.alarmTask(alarmTask);
 			}catch(Exception e){
-				log.error("报警出错，dl_sys_alarm_task={}",JSONHelper.bean2json(alarmTask));
+				log.error("报警出错，dl_sys_alarm_task={}",JSONHelper.bean2json(alarmTask),e);
 				continue;
 			}
 		}

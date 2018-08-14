@@ -1,5 +1,4 @@
 package com.dl.task.service;
-import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -8,13 +7,9 @@ import javax.annotation.Resource;
 
 import lombok.extern.slf4j.Slf4j;
 
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
-import org.springframework.web.client.RestTemplate;
 
 import com.dl.base.util.DateUtil;
 import com.dl.base.util.JSONHelper;
@@ -27,11 +22,10 @@ import com.dl.task.printlottery.PrintComEnums;
 import com.dl.task.printlottery.PrintLotteryAdapter;
 import com.dl.task.printlottery.responseDto.QueryPrintBalanceDTO;
 import com.dl.task.util.DingDingUtil;
-import com.dl.task.util.RestTemplateFactory;
 import com.dl.task.util.SmsUtil;
 
 @Service
-@Transactional
+@Transactional("transactionManager1")
 @Slf4j
 public class DLSysAlarmTaskService {
 	
