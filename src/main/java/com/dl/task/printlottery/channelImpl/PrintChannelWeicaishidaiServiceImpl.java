@@ -567,7 +567,7 @@ public class PrintChannelWeicaishidaiServiceImpl  implements IPrintChannelServic
 		toStakeResponseDTO.setRetDesc(dlToStakeDTO.getErr().getDes());
 		if(dlToStakeDTO.getAccount()!=null&&!StringUtils.isEmpty(dlToStakeDTO.getAccount().getBalance())){
 			String balanceStr = dlToStakeDTO.getAccount().getBalance();
-			Integer balanceFen = new BigDecimal(balanceStr).multiply(new BigDecimal("100")).intValue();
+			long balanceFen = new BigDecimal(balanceStr).multiply(new BigDecimal("100")).longValue();
 			toStakeResponseDTO.setQuerySuccess(Boolean.TRUE);
 			toStakeResponseDTO.setBalance(balanceFen);
 		}

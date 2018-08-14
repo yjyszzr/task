@@ -32,7 +32,7 @@ public class DLSysAlarmTask {
      * 配置的数字限制条件
      */
     @Column(name = "alarm_limit")
-    private Integer alarmLimit;
+    private String alarmLimit;
 
     /**
      * 配置的运算限制条件:例如使用params_name字段中的一些组合运算条件，暂不实现
@@ -184,7 +184,7 @@ public class DLSysAlarmTask {
      *
      * @return alarm_limit - 配置的数字限制条件
      */
-    public Integer getAlarmLimit() {
+    public String getAlarmLimit() {
         return alarmLimit;
     }
 
@@ -193,7 +193,7 @@ public class DLSysAlarmTask {
      *
      * @param alarmLimit 配置的数字限制条件
      */
-    public void setAlarmLimit(Integer alarmLimit) {
+    public void setAlarmLimit(String alarmLimit) {
         this.alarmLimit = alarmLimit;
     }
 

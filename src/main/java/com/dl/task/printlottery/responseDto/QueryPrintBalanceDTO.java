@@ -12,5 +12,5 @@ public class QueryPrintBalanceDTO {
 	
 	@ApiModelProperty(value = "返回码描述信息", required = true)
     private String retDesc;
-	private Integer balance;
+	private Long balance;
 }

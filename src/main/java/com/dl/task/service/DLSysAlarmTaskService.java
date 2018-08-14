@@ -69,13 +69,34 @@ public class DLSysAlarmTaskService {
 	 */
 	private void alarmLotteryBalance(PrintComEnums printComEnums,
 			DLSysAlarmTask alarmTask) {
+		String smsLastAlarmDay = "";
+		if(alarmTask.getSmsFirstAlarmTime()!=null&&alarmTask.getSmsFirstAlarmTime()>0){
+			smsLastAlarmDay = DateUtil.getTimeString(alarmTask.getSmsFirstAlarmTime(), DateUtil.yyyyMMdd);
+		}
+		String dingdingLastAlarmDay = "";
+		if(alarmTask.getDingdingFirstAlarmTime()!=null&&alarmTask.getDingdingFirstAlarmTime()>0){
+			dingdingLastAlarmDay = DateUtil.getTimeString(alarmTask.getDingdingFirstAlarmTime(), DateUtil.yyyyMMdd);
+		}
+		String nowDay = DateUtil.getTimeString(DateUtil.getCurrentTimeLong(),DateUtil.yyyyMMdd);
+		if(!nowDay.equals(smsLastAlarmDay)||!nowDay.equals(dingdingLastAlarmDay)){
+			dLSysAlarmTaskMapper.reSetAlarmCode(alarmTask.getAlarmCode());
+			return ;
+		}
 //		获取余额
 		QueryPrintBalanceDTO printBalanceDto = printLotteryAdapter.getBalance(printComEnums);
+		if(!printBalanceDto.getQuerySuccess()){
+			log.info("查询出票余额失败,alramCode={},printChannelId={}",alarmTask.getAlarmCode(),printComEnums.getPrintChannelId());
+			return;
+		}
 //		检测是否超限制
-		Integer balance = printBalanceDto.getBalance();
+		Long balance = printBalanceDto.getBalance();
+		Long limit = Long.parseLong(alarmTask.getAlarmLimit());
 //		检测是否超限制
-		if(balance.compareTo(alarmTask.getAlarmLimit())>0){
+		if(balance.compareTo(limit)>0){
 //			未超过限制不报警
+			if(alarmTask.getSmsAlarmCount()>1||alarmTask.getDingdingAlarmCount()>1){
+				dLSysAlarmTaskMapper.reSetAlarmCode(alarmTask.getAlarmCode());
+			}
 			return;
 		}
 		Map<String,String> params = new HashMap<String, String>();
@@ -83,22 +104,38 @@ public class DLSysAlarmTaskService {
 		params.put("company", alarmTask.getAlarmName());
 		sendMsg(alarmTask,params);
 	}
-
 	/**
 	 * 获取先锋支付余额报警
 	 * @param alarmTask
 	 */
 	private void alarmXfPayBalance(DLSysAlarmTask alarmTask) {
+		String smsLastAlarmDay = "";
+		if(alarmTask.getSmsFirstAlarmTime()!=null&&alarmTask.getSmsFirstAlarmTime()>0){
+			smsLastAlarmDay = DateUtil.getTimeString(alarmTask.getSmsFirstAlarmTime(), DateUtil.yyyyMMdd);
+		}
+		String dingdingLastAlarmDay = "";
+		if(alarmTask.getDingdingFirstAlarmTime()!=null&&alarmTask.getDingdingFirstAlarmTime()>0){
+			dingdingLastAlarmDay = DateUtil.getTimeString(alarmTask.getDingdingFirstAlarmTime(), DateUtil.yyyyMMdd);
+		}
+		String nowDay = DateUtil.getTimeString(DateUtil.getCurrentTimeLong(),DateUtil.yyyyMMdd);
+		if(!nowDay.equals(smsLastAlarmDay)||!nowDay.equals(dingdingLastAlarmDay)){
+			dLSysAlarmTaskMapper.reSetAlarmCode(alarmTask.getAlarmCode());
+			return ;
+		}
 //		获取余额
 		XianfengQueryBalanceDto queryBalance = xianFengPayService.queryBalance();
 		if(!"00000".equals(queryBalance.getResCode())){
 			log.error("查询先锋支付余额报错返回信息={}",JSONHelper.bean2json(queryBalance));
 			return;
 		}
-		Integer balance = Integer.parseInt(queryBalance.getBalance());
+		Long balance = Long.parseLong(queryBalance.getBalance());
+		Long limit = Long.parseLong(alarmTask.getAlarmLimit());
 //		检测是否超限制
-		if(balance.compareTo(alarmTask.getAlarmLimit())>0){
+		if(balance.compareTo(limit)>0){
 //			未超过限制不报警
+			if(alarmTask.getSmsAlarmCount()>1||alarmTask.getDingdingAlarmCount()>1){
+				dLSysAlarmTaskMapper.reSetAlarmCode(alarmTask.getAlarmCode());
+			}
 			return;
 		}
 		Map<String,String> params = new HashMap<String, String>();
@@ -162,7 +199,7 @@ public class DLSysAlarmTaskService {
 				return send;
 			}
 			String[] timesArr = timesStr.split(";");
-			if(account<=timesArr.length){
+			if(account>timesArr.length){
 				log.info("已达发送上线，不再发送");
 				return send;
 			}
@@ -217,7 +254,7 @@ public class DLSysAlarmTaskService {
 				return send;
 			}
 			String[] timesArr = timesStr.split(";");
-			if(account<=timesArr.length){
+			if(account>timesArr.length){
 				log.info("已达发送上线，不再发送");
 				return send;
 			}

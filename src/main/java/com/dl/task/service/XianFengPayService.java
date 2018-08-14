@@ -52,6 +52,7 @@ public class XianFengPayService {
 			log.error("先锋支付查询用户余额解析响应异常,response={},rasKey={}",response,xianFengPayConfig.getMER_RSAKEY(),e);
 			return null;
 		}
+		log.info("先锋支付查询用户余额解密过后,dataResult={}",dataResult);
 		XianfengQueryBalanceDto queryBalance = JSON.parseObject(dataResult,XianfengQueryBalanceDto.class);
 		return queryBalance;
 	}
