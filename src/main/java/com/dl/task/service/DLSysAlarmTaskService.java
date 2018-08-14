@@ -158,10 +158,7 @@ public class DLSysAlarmTaskService {
 			if(send){
 				DLSysAlarmTask update = new DLSysAlarmTask();
 				update.setAlarmCode(alarmTask.getAlarmCode());
-				if(alarmTask.getSmsAlarmCount()==null||alarmTask.getSmsAlarmCount().equals(Integer.valueOf(0))){
-					update.setSmsFirstAlarmTime(DateUtil.getCurrentTimeLong());
-				}
-				log.info("update sms acunt+1 alarmCode={},nowAcccount={}",update.getAlarmCode(),alarmTask.getSmsAlarmCount());
+				update.setSmsFirstAlarmTime(DateUtil.getCurrentTimeLong());
 				dLSysAlarmTaskMapper.updateSmsCountPlusOne(update);
 			}
 		}
@@ -170,10 +167,7 @@ public class DLSysAlarmTaskService {
 			if(send){
 				DLSysAlarmTask update = new DLSysAlarmTask();
 				update.setAlarmCode(alarmTask.getAlarmCode());
-				Integer dingdingSendAcount = alarmTask.getDingdingAlarmCount();
-				if(dingdingSendAcount==null||dingdingSendAcount.equals(Integer.valueOf(0))){
-					update.setDingdingFirstAlarmTime(DateUtil.getCurrentTimeLong());
-				}
+				update.setDingdingFirstAlarmTime(DateUtil.getCurrentTimeLong());
 				dLSysAlarmTaskMapper.updateDingDingCountPlusOne(update);
 			}
 		}
@@ -210,13 +204,10 @@ public class DLSysAlarmTaskService {
 				log.info("已达发送上线，不再发送");
 				return send;
 			}
-			Integer sumTime = Integer.valueOf(0);
-			sumTime = sumTime+firstSendTime;
+			Integer sumTime = firstSendTime;
+			Integer timeTemp = Integer.parseInt(timesArr[account-1]);
+			sumTime = sumTime+timeTemp;
 			Integer currentTime = DateUtil.getCurrentTimeLong();
-			for(Integer i=0;i<account;i++){
-				Integer timeTemp = Integer.parseInt(timesArr[i]);
-				sumTime = sumTime+timeTemp;
-			}
 			if(currentTime.compareTo(sumTime)<0){
 				log.info("未达到时间发送间隔，不发送");
 				return send;
@@ -264,13 +255,10 @@ public class DLSysAlarmTaskService {
 				log.info("已达发送上线，不再发送");
 				return send;
 			}
-			Integer sumTime = Integer.valueOf(0);
-			sumTime = sumTime+firstSendTime;
+			Integer sumTime = firstSendTime;
+			Integer timeTemp = Integer.parseInt(timesArr[account-1]);
+			sumTime = sumTime+timeTemp;
 			Integer currentTime = DateUtil.getCurrentTimeLong();
-			for(Integer i=0;i<account;i++){
-				Integer timeTemp = Integer.parseInt(timesArr[i]);
-				sumTime = sumTime+timeTemp;
-			}
 			if(currentTime.compareTo(sumTime)<0){
 				log.info("未达到时间发送间隔，不发送");
 				return send;

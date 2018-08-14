@@ -29,17 +29,11 @@
   select * from dl_sys_alarm_task where open_status=1
   </select>
   <update id="updateSmsCountPlusOne" parameterType="com.dl.task.model.DLSysAlarmTask">
-  update dl_sys_alarm_task set sms_alarm_count=sms_alarm_count+1 
-  <if test="smsFirstAlarmTime!=''">
-    ,sms_first_alarm_time=#{smsFirstAlarmTime}
-  </if>
+  update dl_sys_alarm_task set sms_alarm_count=sms_alarm_count+1,sms_first_alarm_time=#{smsFirstAlarmTime}
   where alarm_code=#{alarmCode}
   </update>
   <update id="updateDingDingCountPlusOne" parameterType="com.dl.task.model.DLSysAlarmTask">
-  update dl_sys_alarm_task set dingding_alarm_count=dingding_alarm_count+1 
-  <if test="dingdingFirstAlarmTime''">
-    ,dingding_first_alarm_time=#{dingdingFirstAlarmTime}
-  </if>
+  update dl_sys_alarm_task set dingding_alarm_count=dingding_alarm_count+1,dingding_first_alarm_time=#{dingdingFirstAlarmTime}
   where alarm_code=#{alarmCode}
   </update>
   <update id="reSetAlarmCode">
