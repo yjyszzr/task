@@ -98,7 +98,7 @@ public class DLSysAlarmTaskService {
 		if(balance.compareTo(limit)>0){
 //			未超过限制不报警
 			if(alarmTask.getSmsAlarmCount()>1||alarmTask.getDingdingAlarmCount()>1){
-				log.info("reset Alarm info AlarmCode={}",alarmTask.getAlarmCode());
+				log.info("reset Alarm info AlarmCode={},当前余额={}",alarmTask.getAlarmCode(),balance);
 				dLSysAlarmTaskMapper.reSetAlarmCode(alarmTask.getAlarmCode());
 			}
 			return;
@@ -141,7 +141,7 @@ public class DLSysAlarmTaskService {
 		if(balance.compareTo(limit)>0){
 //			未超过限制不报警
 			if(alarmTask.getSmsAlarmCount()>1||alarmTask.getDingdingAlarmCount()>1){
-				log.info("reset Alarm info AlarmCode={}",alarmTask.getAlarmCode());
+				log.info("reset Alarm info AlarmCode={},当前余额={}",alarmTask.getAlarmCode(),balance);
 				dLSysAlarmTaskMapper.reSetAlarmCode(alarmTask.getAlarmCode());
 			}
 			return;
