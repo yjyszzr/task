@@ -218,7 +218,7 @@ public class DLSysAlarmTaskService {
 			Integer currentTime = DateUtil.getCurrentTimeLong();
 			for(Integer i=0;i<account;i++){
 				Integer timeTemp = Integer.parseInt(timesArr[i]);
-				sumTime = timeTemp+timeTemp;
+				sumTime = sumTime+timeTemp;
 			}
 			if(currentTime.compareTo(sumTime)<0){
 				log.info("未达到时间发送间隔，不发送");
@@ -273,7 +273,7 @@ public class DLSysAlarmTaskService {
 			Integer currentTime = DateUtil.getCurrentTimeLong();
 			for(Integer i=0;i<account;i++){
 				Integer timeTemp = Integer.parseInt(timesArr[i]);
-				sumTime = timeTemp+timeTemp;
+				sumTime = sumTime+timeTemp;
 			}
 			if(currentTime.compareTo(sumTime)<0){
 				log.info("未达到时间发送间隔，不发送");
