@@ -29,7 +29,7 @@
   and channel.channel_status=0
   and channelClassify.status=0
   and channelClassify.lottery_classify_id=#{lotteryClassifyId} 
-  and cast(channelClassify.sale_end_time as SIGNED) &lt; (UNIX_TIMESTAMP(now()) - UNIX_TIMESTAMP(#{minMatchStartTime}))/60
+  and cast(channelClassify.sale_end_time as SIGNED) &lt; (UNIX_TIMESTAMP(#{minMatchStartTime}) - UNIX_TIMESTAMP(now()))/60
   and channelClassify.min_bet_amount &lt; #{ticketMoney}
   and channelClassify.matchine_open_time &lt; DATE_FORMAT(now(),'%H:%i:%S')
   and channelClassify.matchine_close_time &gt; DATE_FORMAT(now(),'%H:%i:%S')
