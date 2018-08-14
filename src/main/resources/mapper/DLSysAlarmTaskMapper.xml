@@ -7,6 +7,7 @@
     -->
     <id column="id" jdbcType="INTEGER" property="id" />
     <result column="alarm_code" jdbcType="VARCHAR" property="alarmCode" />
+    <result column="alarm_name" jdbcType="VARCHAR" property="alarmName" />
     <result column="open_status" jdbcType="INTEGER" property="openStatus" />
     <result column="alarm_limit" jdbcType="INTEGER" property="alarmLimit" />
     <result column="alarm_condition" jdbcType="VARCHAR" property="alarmCondition" />
