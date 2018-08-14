@@ -161,6 +161,7 @@ public class DLSysAlarmTaskService {
 				if(alarmTask.getSmsAlarmCount()==null||alarmTask.getSmsAlarmCount().equals(Integer.valueOf(0))){
 					update.setSmsFirstAlarmTime(DateUtil.getCurrentTimeLong());
 				}
+				log.info("update sms acunt+1 alarmCode={},nowAcccount={}",update.getAlarmCode(),alarmTask.getSmsAlarmCount());
 				dLSysAlarmTaskMapper.updateSmsCountPlusOne(update);
 			}
 		}
@@ -278,17 +279,17 @@ public class DLSysAlarmTaskService {
 			}
 		}
 		if(send){
-			for(String mobile:mobiles){
-				String paramsStr = alarmTask.getParamsName();
-				String tplValue="";
-				if(!StringUtils.isEmpty(paramsStr)){
-					String[] paramsConfig = paramsStr.split(";");
-					Map<String, String> smsParams = new HashMap<String, String>();
-					for(String param:paramsConfig){
-						smsParams.put(param, params.get(param));
-					}
-					tplValue=SmsUtil.getTplValue(smsParams);
+			String paramsStr = alarmTask.getParamsName();
+			String tplValue="";
+			if(!StringUtils.isEmpty(paramsStr)){
+				String[] paramsConfig = paramsStr.split(";");
+				Map<String, String> smsParams = new HashMap<String, String>();
+				for(String param:paramsConfig){
+					smsParams.put(param, params.get(param));
 				}
+				tplValue=SmsUtil.getTplValue(smsParams);
+			}
+			for(String mobile:mobiles){
 				SmsUtil.send(juHeConfig,mobile,smsContent,tplValue);
 			}
 		}
