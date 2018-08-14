@@ -95,6 +95,7 @@ public class DLSysAlarmTaskService {
 		Long balance = printBalanceDto.getBalance();
 		Long limit = Long.parseLong(alarmTask.getAlarmLimit());
 //		检测是否超限制
+		log.info("alarm to alarm alarmCode={},balacne={},limit={}",alarmTask.getAlarmCode(),balance,limit);
 		if(balance.compareTo(limit)>0){
 //			未超过限制不报警
 			if(alarmTask.getSmsAlarmCount()>1||alarmTask.getDingdingAlarmCount()>1){
@@ -137,6 +138,7 @@ public class DLSysAlarmTaskService {
 		}
 		Long balance = Long.parseLong(queryBalance.getBalance());
 		Long limit = Long.parseLong(alarmTask.getAlarmLimit());
+		log.info("alarm to alarm alarmCode={},balacne={},limit={}",alarmTask.getAlarmCode(),balance,limit);
 //		检测是否超限制
 		if(balance.compareTo(limit)>0){
 //			未超过限制不报警
