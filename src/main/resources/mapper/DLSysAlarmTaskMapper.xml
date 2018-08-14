@@ -36,7 +36,7 @@
   where alarm_code=#{alarmCode}
   </update>
   <update id="updateDingDingCountPlusOne" parameterType="com.dl.task.model.DLSysAlarmTask">
-  update dl_sys_alarm_task set sms_alarm_count=sms_alarm_count+1 
+  update dl_sys_alarm_task set dingding_alarm_count=dingding_alarm_count+1 
   <if test="dingdingFirstAlarmTime''">
     ,dingding_first_alarm_time=#{dingdingFirstAlarmTime}
   </if>
