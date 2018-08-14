@@ -77,13 +77,11 @@ public class DLSysAlarmTaskService {
 		if(alarmTask.getDingdingFirstAlarmTime()!=null&&alarmTask.getDingdingFirstAlarmTime()>0){
 			dingdingLastAlarmDay = DateUtil.getTimeString(alarmTask.getDingdingFirstAlarmTime(), DateUtil.yyyyMMdd);
 		}
-		if(!StringUtils.isEmpty(smsLastAlarmDay)||!StringUtils.isEmpty(dingdingLastAlarmDay)){			
-			String nowDay = DateUtil.getTimeString(DateUtil.getCurrentTimeLong(),DateUtil.yyyyMMdd);
-			if(!nowDay.equals(smsLastAlarmDay)||!nowDay.equals(dingdingLastAlarmDay)){
-				log.info("reset Alarm info AlarmCode={},smsLastDay={},dingdingLastDay={}",alarmTask.getAlarmCode(),smsLastAlarmDay,dingdingLastAlarmDay);
-				dLSysAlarmTaskMapper.reSetAlarmCode(alarmTask.getAlarmCode());
-				return ;
-			}
+		String nowDay = DateUtil.getTimeString(DateUtil.getCurrentTimeLong(),DateUtil.yyyyMMdd);
+		if((!StringUtils.isEmpty(smsLastAlarmDay)&&!nowDay.equals(smsLastAlarmDay))||(!StringUtils.isEmpty(dingdingLastAlarmDay)&&!nowDay.equals(dingdingLastAlarmDay))){
+			log.info("reset Alarm info AlarmCode={},smsLastDay={},dingdingLastDay={}",alarmTask.getAlarmCode(),smsLastAlarmDay,dingdingLastAlarmDay);
+			dLSysAlarmTaskMapper.reSetAlarmCode(alarmTask.getAlarmCode());
+			return ;
 		}
 //		获取余额
 		QueryPrintBalanceDTO printBalanceDto = printLotteryAdapter.getBalance(printComEnums);
@@ -122,13 +120,11 @@ public class DLSysAlarmTaskService {
 		if(alarmTask.getDingdingFirstAlarmTime()!=null&&alarmTask.getDingdingFirstAlarmTime()>0){
 			dingdingLastAlarmDay = DateUtil.getTimeString(alarmTask.getDingdingFirstAlarmTime(), DateUtil.yyyyMMdd);
 		}
-		if(!StringUtils.isEmpty(smsLastAlarmDay)||!StringUtils.isEmpty(dingdingLastAlarmDay)){			
-			String nowDay = DateUtil.getTimeString(DateUtil.getCurrentTimeLong(),DateUtil.yyyyMMdd);
-			if(!nowDay.equals(smsLastAlarmDay)||!nowDay.equals(dingdingLastAlarmDay)){
-				log.info("reset Alarm info AlarmCode={},smsLastDay={},dingdingLastDay={}",alarmTask.getAlarmCode(),smsLastAlarmDay,dingdingLastAlarmDay);
-				dLSysAlarmTaskMapper.reSetAlarmCode(alarmTask.getAlarmCode());
-				return ;
-			}
+		String nowDay = DateUtil.getTimeString(DateUtil.getCurrentTimeLong(),DateUtil.yyyyMMdd);
+		if((!StringUtils.isEmpty(smsLastAlarmDay)&&!nowDay.equals(smsLastAlarmDay))||(!StringUtils.isEmpty(dingdingLastAlarmDay)&&!nowDay.equals(dingdingLastAlarmDay))){
+			log.info("reset Alarm info AlarmCode={},smsLastDay={},dingdingLastDay={}",alarmTask.getAlarmCode(),smsLastAlarmDay,dingdingLastAlarmDay);
+			dLSysAlarmTaskMapper.reSetAlarmCode(alarmTask.getAlarmCode());
+			return ;
 		}
 //		获取余额
 		XianfengQueryBalanceDto queryBalance = xianFengPayService.queryBalance();
