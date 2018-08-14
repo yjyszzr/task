@@ -16,6 +16,11 @@ public class DLSysAlarmTask {
      */
     @Column(name = "alarm_code")
     private String alarmCode;
+    /**
+     * 值0 关闭 1打开
+     */
+    @Column(name = "alarm_name")
+    private String alarmName;
 
     /**
      * 值0 关闭 1打开
@@ -131,7 +136,7 @@ public class DLSysAlarmTask {
         this.id = id;
     }
 
-    /**
+	/**
      * 获取报警编号:10000：先锋支付余额报警，10001：河南出票余额报警，10002:西安票余额报警，10003:彩小秘出票余额报警，10004:微彩时代出票余额报警
      *
      * @return alarm_code - 报警编号:10000：先锋支付余额报警，10001：河南出票余额报警，10002:西安票余额报警，10003:彩小秘出票余额报警，10004:微彩时代出票余额报警
@@ -149,6 +154,13 @@ public class DLSysAlarmTask {
         this.alarmCode = alarmCode;
     }
 
+    public String getAlarmName() {
+		return alarmName;
+	}
+
+	public void setAlarmName(String alarmName) {
+		this.alarmName = alarmName;
+	}
     /**
      * 获取值0 关闭 1打开
      *

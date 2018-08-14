@@ -18,6 +18,7 @@ import org.springframework.web.client.RestTemplate;
 
 import com.dl.base.util.DateUtil;
 import com.dl.base.util.JSONHelper;
+import com.dl.task.configurer.JuHeConfig;
 import com.dl.task.dao.DLSysAlarmTaskMapper;
 import com.dl.task.dto.XianfengQueryBalanceDto;
 import com.dl.task.enums.AlarmTaskEnum;
@@ -40,6 +41,8 @@ public class DLSysAlarmTaskService {
 	private XianFengPayService xianFengPayService;
     @Resource
     private DLSysAlarmTaskMapper dLSysAlarmTaskMapper;
+    @Resource
+    private JuHeConfig juHeConfig;
 
 	public List<DLSysAlarmTask> selectOpenAlarmTask() {
 		return dLSysAlarmTaskMapper.selectSysAlarmOpenTask();
@@ -83,6 +86,7 @@ public class DLSysAlarmTaskService {
 		}
 		Map<String,String> params = new HashMap<String, String>();
 		params.put("balance", balance+"");
+		params.put("company", alarmTask.getAlarmName());
 		sendMsg(alarmTask,params);
 	}
 
@@ -105,6 +109,7 @@ public class DLSysAlarmTaskService {
 		}
 		Map<String,String> params = new HashMap<String, String>();
 		params.put("balance", queryBalance.getBalance());
+		params.put("company", alarmTask.getAlarmName());
 		sendMsg(alarmTask,params);
 	}
 
@@ -195,15 +200,10 @@ public class DLSysAlarmTaskService {
 	private Boolean sendAlarmSms(DLSysAlarmTask alarmTask,
 			Map<String, String> params) {
 		Boolean send=Boolean.FALSE;
-		String tplId="";
-		String tplValue="";
 		String smsContent = alarmTask.getSmsSendContent();
 		if(StringUtils.isEmpty(smsContent)){
 			log.info("短信报警，未设置报警短信内容,alarmCode={}",alarmTask.getAlarmCode());
 			return send;
-		}
-		for(String key:params.keySet()){
-			smsContent = smsContent.replaceAll("{"+key+"}", params.get(key));
 		}
 		String mobileStr = alarmTask.getSmsSendMobile();
 		if(StringUtils.isEmpty(mobileStr)){
@@ -243,7 +243,8 @@ public class DLSysAlarmTaskService {
 		}
 		if(send){
 			for(String mobile:mobiles){
-				SmsUtil.send(mobile,tplId,tplValue);
+				String tplValue=SmsUtil.getTplValue(params);
+				SmsUtil.send(juHeConfig,mobile,juHeConfig.getSmsBalanceAlarmTplid(),tplValue);
 			}
 		}
 		return send;
