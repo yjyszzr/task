@@ -186,7 +186,7 @@ public class DLSysAlarmTaskService {
 			return send;
 		}
 		for(String key:params.keySet()){
-			dingDingContent = dingDingContent.replaceAll("{"+key+"}", params.get(key));
+			dingDingContent = dingDingContent.replaceAll("#"+key+"#", params.get(key));
 		}
 		Integer firstSendTime = alarmTask.getDingdingFirstAlarmTime();
 		Integer account = alarmTask.getDingdingAlarmCount();
