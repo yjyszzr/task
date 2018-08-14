@@ -1308,7 +1308,7 @@ public class OrderService extends AbstractService<Order> {
 //			        }
 //					dlPrintLotteryService.saveLotteryPrintInfo(lotteryPrints, order.getOrderSn(),printLotteryCom);
 					Date minMatchStartTime = orderDetail.getOrderInfoDTO().getMinMatchStartTime();
-					PrintChannelInfo isOkChannels = printLotteryAdapter.getPrintChannelId(orderSn,minMatchStartTime,lotteryClassifyId,amount);
+					PrintChannelInfo isOkChannels = printLotteryAdapter.getPrintChannelId(lotteryClassifyId,orderSn,minMatchStartTime,amount);
 					if(isOkChannels!=null){
 						dlPrintLotteryService.saveLotteryPrintInfo(lotteryPrints, order.getOrderSn(),isOkChannels);
 					}else{
