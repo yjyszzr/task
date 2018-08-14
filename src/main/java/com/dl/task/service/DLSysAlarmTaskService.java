@@ -77,10 +77,13 @@ public class DLSysAlarmTaskService {
 		if(alarmTask.getDingdingFirstAlarmTime()!=null&&alarmTask.getDingdingFirstAlarmTime()>0){
 			dingdingLastAlarmDay = DateUtil.getTimeString(alarmTask.getDingdingFirstAlarmTime(), DateUtil.yyyyMMdd);
 		}
-		String nowDay = DateUtil.getTimeString(DateUtil.getCurrentTimeLong(),DateUtil.yyyyMMdd);
-		if(!nowDay.equals(smsLastAlarmDay)||!nowDay.equals(dingdingLastAlarmDay)){
-			dLSysAlarmTaskMapper.reSetAlarmCode(alarmTask.getAlarmCode());
-			return ;
+		if(!StringUtils.isEmpty(smsLastAlarmDay)||!StringUtils.isEmpty(dingdingLastAlarmDay)){			
+			String nowDay = DateUtil.getTimeString(DateUtil.getCurrentTimeLong(),DateUtil.yyyyMMdd);
+			if(!nowDay.equals(smsLastAlarmDay)||!nowDay.equals(dingdingLastAlarmDay)){
+				log.info("reset Alarm info AlarmCode={}",alarmTask.getAlarmCode());
+				dLSysAlarmTaskMapper.reSetAlarmCode(alarmTask.getAlarmCode());
+				return ;
+			}
 		}
 //		获取余额
 		QueryPrintBalanceDTO printBalanceDto = printLotteryAdapter.getBalance(printComEnums);
@@ -95,6 +98,7 @@ public class DLSysAlarmTaskService {
 		if(balance.compareTo(limit)>0){
 //			未超过限制不报警
 			if(alarmTask.getSmsAlarmCount()>1||alarmTask.getDingdingAlarmCount()>1){
+				log.info("reset Alarm info AlarmCode={}",alarmTask.getAlarmCode());
 				dLSysAlarmTaskMapper.reSetAlarmCode(alarmTask.getAlarmCode());
 			}
 			return;
@@ -117,10 +121,13 @@ public class DLSysAlarmTaskService {
 		if(alarmTask.getDingdingFirstAlarmTime()!=null&&alarmTask.getDingdingFirstAlarmTime()>0){
 			dingdingLastAlarmDay = DateUtil.getTimeString(alarmTask.getDingdingFirstAlarmTime(), DateUtil.yyyyMMdd);
 		}
-		String nowDay = DateUtil.getTimeString(DateUtil.getCurrentTimeLong(),DateUtil.yyyyMMdd);
-		if(!nowDay.equals(smsLastAlarmDay)||!nowDay.equals(dingdingLastAlarmDay)){
-			dLSysAlarmTaskMapper.reSetAlarmCode(alarmTask.getAlarmCode());
-			return ;
+		if(!StringUtils.isEmpty(smsLastAlarmDay)||!StringUtils.isEmpty(dingdingLastAlarmDay)){			
+			String nowDay = DateUtil.getTimeString(DateUtil.getCurrentTimeLong(),DateUtil.yyyyMMdd);
+			if(!nowDay.equals(smsLastAlarmDay)||!nowDay.equals(dingdingLastAlarmDay)){
+				log.info("reset Alarm info AlarmCode={}",alarmTask.getAlarmCode());
+				dLSysAlarmTaskMapper.reSetAlarmCode(alarmTask.getAlarmCode());
+				return ;
+			}
 		}
 //		获取余额
 		XianfengQueryBalanceDto queryBalance = xianFengPayService.queryBalance();
@@ -134,6 +141,7 @@ public class DLSysAlarmTaskService {
 		if(balance.compareTo(limit)>0){
 //			未超过限制不报警
 			if(alarmTask.getSmsAlarmCount()>1||alarmTask.getDingdingAlarmCount()>1){
+				log.info("reset Alarm info AlarmCode={}",alarmTask.getAlarmCode());
 				dLSysAlarmTaskMapper.reSetAlarmCode(alarmTask.getAlarmCode());
 			}
 			return;
