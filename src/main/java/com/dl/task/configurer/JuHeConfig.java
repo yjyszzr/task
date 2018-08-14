@@ -14,8 +14,4 @@ public class JuHeConfig {
 	
 	@Value("${juhe.sms.key}")
 	private String smsKey;
-	
-	@Value("${juhe.sms.balance.alarm.tplid}")
-	private String smsBalanceAlarmTplid;
-	
 }

@@ -243,8 +243,17 @@ public class DLSysAlarmTaskService {
 		}
 		if(send){
 			for(String mobile:mobiles){
-				String tplValue=SmsUtil.getTplValue(params);
-				SmsUtil.send(juHeConfig,mobile,juHeConfig.getSmsBalanceAlarmTplid(),tplValue);
+				String paramsStr = alarmTask.getParamsName();
+				String tplValue="";
+				if(!StringUtils.isEmpty(paramsStr)){
+					String[] paramsConfig = paramsStr.split(";");
+					Map<String, String> smsParams = new HashMap<String, String>();
+					for(String param:paramsConfig){
+						smsParams.put(param, params.get(param));
+					}
+					tplValue=SmsUtil.getTplValue(smsParams);
+				}
+				SmsUtil.send(juHeConfig,mobile,smsContent,tplValue);
 			}
 		}
 		return send;
