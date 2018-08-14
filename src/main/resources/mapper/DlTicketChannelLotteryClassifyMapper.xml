@@ -4,7 +4,7 @@
   <resultMap id="BaseResultMap" type="com.dl.task.model.DlTicketChannelLotteryClassify">
     <!--
       WARNING - @mbg.generated
-    -->selectOpenPrintChanel
+    -->
     <id column="id" jdbcType="INTEGER" property="id" />
     <result column="ticket_channel_id" jdbcType="INTEGER" property="ticketChannelId" />
     <result column="ticket_channel_name" jdbcType="VARCHAR" property="ticketChannelName" />
