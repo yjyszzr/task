@@ -256,7 +256,6 @@ public class DLSysAlarmTaskService {
 		Integer account = alarmTask.getSmsAlarmCount();
 		if(Integer.valueOf(0).equals(account)){//首次发送
 			send=Boolean.TRUE;
-			firstSendTime = DateUtil.getCurrentTimeLong();
 		}else{//非首次发送
 			String timesStr = alarmTask.getSmsAlarmTime();
 			if(StringUtils.isEmpty(timesStr)){
