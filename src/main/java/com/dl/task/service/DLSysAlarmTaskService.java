@@ -80,7 +80,7 @@ public class DLSysAlarmTaskService {
 		if(!StringUtils.isEmpty(smsLastAlarmDay)||!StringUtils.isEmpty(dingdingLastAlarmDay)){			
 			String nowDay = DateUtil.getTimeString(DateUtil.getCurrentTimeLong(),DateUtil.yyyyMMdd);
 			if(!nowDay.equals(smsLastAlarmDay)||!nowDay.equals(dingdingLastAlarmDay)){
-				log.info("reset Alarm info AlarmCode={}",alarmTask.getAlarmCode());
+				log.info("reset Alarm info AlarmCode={},smsLastDay={},dingdingLastDay={}",alarmTask.getAlarmCode(),smsLastAlarmDay,dingdingLastAlarmDay);
 				dLSysAlarmTaskMapper.reSetAlarmCode(alarmTask.getAlarmCode());
 				return ;
 			}
@@ -124,7 +124,7 @@ public class DLSysAlarmTaskService {
 		if(!StringUtils.isEmpty(smsLastAlarmDay)||!StringUtils.isEmpty(dingdingLastAlarmDay)){			
 			String nowDay = DateUtil.getTimeString(DateUtil.getCurrentTimeLong(),DateUtil.yyyyMMdd);
 			if(!nowDay.equals(smsLastAlarmDay)||!nowDay.equals(dingdingLastAlarmDay)){
-				log.info("reset Alarm info AlarmCode={}",alarmTask.getAlarmCode());
+				log.info("reset Alarm info AlarmCode={},smsLastDay={},dingdingLastDay={}",alarmTask.getAlarmCode(),smsLastAlarmDay,dingdingLastAlarmDay);
 				dLSysAlarmTaskMapper.reSetAlarmCode(alarmTask.getAlarmCode());
 				return ;
 			}
