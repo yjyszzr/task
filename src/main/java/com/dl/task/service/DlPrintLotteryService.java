@@ -1895,7 +1895,11 @@ public class DlPrintLotteryService {
 			DlPrintLottery lotteryPrint = new DlPrintLottery();
 			lotteryPrint.setGame(classify.getGame());
 			lotteryPrint.setMerchant(channel.getTicketMerchant());//当初为啥存储这个？？？用户名？有何意义？？
-			lotteryPrint.setTicketId(dto.getTicketId());
+			if(PrintComEnums.WEICAISHIDAI.getPrintChannelId().equals(channel.getId())){
+				lotteryPrint.setTicketId(channel.getTicketMerchant()+""+dto.getTicketId());	
+			}else{
+				lotteryPrint.setTicketId(dto.getTicketId());
+			}
 			lotteryPrint.setAcceptTime(DateUtil.getCurrentTimeLong());
 			lotteryPrint.setBetType(dto.getBetType());
 			lotteryPrint.setMoney(BigDecimal.valueOf(dto.getMoney()*100));
