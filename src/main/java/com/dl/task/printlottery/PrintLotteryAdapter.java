@@ -1,7 +1,6 @@
 package com.dl.task.printlottery;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -13,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import com.dl.base.util.DateUtil;
 import com.dl.task.dao.DlPrintLotteryMapper;
 import com.dl.task.dao.DlTicketChannelLotteryClassifyMapper;
 import com.dl.task.dao.DlTicketChannelMapper;
@@ -104,9 +104,10 @@ public class PrintLotteryAdapter {
 	}
 	
 	public PrintChannelInfo getPrintChannelId(Integer lotteryClassifyId,String orderSn,Date minMatchStartTime,BigDecimal ticketMoney){
-		log.info("进入出票路由设置 参数lotteryClassifyId={},orderSn={},minMatchStartTime={},ticketMoney={}",lotteryClassifyId,orderSn,minMatchStartTime,ticketMoney);
+		Integer minMatchStartTimeSeconds = DateUtil.getTimeSomeDate(minMatchStartTime);
+		log.info("进入出票路由设置 参数lotteryClassifyId={},orderSn={},minMatchStartTime={},ticketMoney={}",lotteryClassifyId,orderSn,minMatchStartTimeSeconds,ticketMoney);
 		PrintChannelInfo printChannelInfo = null;
-		List<DlTicketChannelLotteryClassify> isOkChannels = dlTicketChannelLotteryClassifyMapper.selectOpenPrintChanel(lotteryClassifyId,minMatchStartTime,ticketMoney);
+		List<DlTicketChannelLotteryClassify> isOkChannels = dlTicketChannelLotteryClassifyMapper.selectOpenPrintChanel(lotteryClassifyId,minMatchStartTimeSeconds,ticketMoney);
 		if(!CollectionUtils.isEmpty(isOkChannels)){
 			List<Integer> channelIds = isOkChannels.stream().map(channel-> channel.getId()).collect(Collectors.toList());
 			log.error("orderSn={},匹配到的所有出票路由集合={}",orderSn,channelIds);
