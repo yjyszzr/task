@@ -1790,7 +1790,7 @@ public class DlPrintLotteryService {
 						List<DlPrintLottery> subList = lotteryLists.subList(0, endIndex);
 						QueryRewardResponseDTO queryRewardResponseDTO = printLotteryAdapter.queryLotterysReward(printComEnums,subList,dlTicketChannel);
 						if(!queryRewardResponseDTO.getQuerySuccess()){
-							log.error("出票查询失败，channelId={},channelName={},errorCode={},errorMsg={}",printComEnums.getPrintChannelId(),printComEnums.getPrintChannelName(),
+							log.error("出票查询第三方奖金，channelId={},channelName={},errorCode={},errorMsg={}",printComEnums.getPrintChannelId(),printComEnums.getPrintChannelName(),
 									queryRewardResponseDTO.getRetCode(),queryRewardResponseDTO.getRetDesc());
 						}else if(queryRewardResponseDTO.getQuerySuccess()){
 							updateLotterysReward(queryRewardResponseDTO);
@@ -1801,7 +1801,7 @@ public class DlPrintLotteryService {
 					for(String issue:issueAndGameList){
 						QueryRewardResponseDTO queryRewardResponseDTO = printLotteryAdapter.queryLotterysRewardByIssue(printComEnums,issue,dlTicketChannel);
 						if(!queryRewardResponseDTO.getQuerySuccess()){
-							log.error("出票查询失败，channelId={},channelName={},errorCode={},errorMsg={}",printComEnums.getPrintChannelId(),printComEnums.getPrintChannelName(),
+							log.error("出票查询第三方奖金，channelId={},channelName={},errorCode={},errorMsg={}",printComEnums.getPrintChannelId(),printComEnums.getPrintChannelName(),
 									queryRewardResponseDTO.getRetCode(),queryRewardResponseDTO.getRetDesc());
 						}else if(queryRewardResponseDTO.getQuerySuccess()){
 							updateLotterysReward(queryRewardResponseDTO);
@@ -1809,10 +1809,10 @@ public class DlPrintLotteryService {
 					}
 				}
 			}catch(Exception e){
-				log.error("投注查询接口 printChannelId={},printChannelName={}投注查询异常",printComEnums.getPrintChannelId(),printComEnums.getPrintChannelName(),e);
+				log.error("出票查询第三方奖金接口 printChannelId={},printChannelName={}出票查询第三方奖金异常",printComEnums.getPrintChannelId(),printComEnums.getPrintChannelName(),e);
 				continue;
 			}
-			log.info("渠道channelId={},channelName={},查询出票状态结束",printComEnums.getPrintChannelId(),printComEnums.getPrintChannelName());
+			log.info("渠道channelId={},channelName={},出票查询第三方奖金结束",printComEnums.getPrintChannelId(),printComEnums.getPrintChannelName());
 		}
 	}
 	/**
