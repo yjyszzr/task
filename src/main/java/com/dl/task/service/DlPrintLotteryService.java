@@ -1241,6 +1241,7 @@ public class DlPrintLotteryService {
 			Date matchTime = detail.getMatchTime();
 			matchBetDto.setMatchTime((int)matchTime.toInstant().getEpochSecond());
 			if(Integer.valueOf(2).equals(detail.getLotteryClassifyId())){//竞彩足球逻辑保存
+				matchBetDto.setPlayCode(detail.getIssue());
 				 return matchBetDto;
 			}
 			String ticketData = detail.getTicketData();
