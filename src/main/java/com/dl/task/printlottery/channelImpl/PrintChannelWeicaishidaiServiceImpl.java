@@ -70,24 +70,44 @@ import com.dl.task.printlottery.responseDto.weicaishidai.WeiCaiShiDaiToStakeRetC
 @Slf4j
 public class PrintChannelWeicaishidaiServiceImpl  implements IPrintChannelService{
 	private static Map<String,String> playTypeRelationMap = new HashMap<String, String>();
+	private static Map<String,String> betTypeRelationMap = new HashMap<String, String>();
+	private static String CAIXIAOMI_GAME_JZ="T51";
+	private static String CAIXIAOMI_GAME_LETTO="T01";
 	private static String CMDSTAKE="CT01";
 	private static String CMDQUERYSTAKE="CT03";
 	private static String CMDQUERYBALANCE="CT04";
 	private static String playTypeCTW="CTOW";//彩小秘对微彩时代
 	private static String playTypeWTC="WTOC";//微彩时代对彩小秘
 	static{
-		playTypeRelationMap.put(playTypeCTW+"01", "02");//让球胜平负
-		playTypeRelationMap.put(playTypeCTW+"02", "01");//胜平负
-		playTypeRelationMap.put(playTypeCTW+"03", "04");//比分
-		playTypeRelationMap.put(playTypeCTW+"04", "03");//总进球
-		playTypeRelationMap.put(playTypeCTW+"05", "05");//半全场
-		playTypeRelationMap.put(playTypeCTW+"06", "10");//混合投注
-		playTypeRelationMap.put(playTypeWTC+"02", "01");//让球胜平负
-		playTypeRelationMap.put(playTypeWTC+"01", "02");//胜平负
-		playTypeRelationMap.put(playTypeWTC+"04", "03");//比分
-		playTypeRelationMap.put(playTypeWTC+"03", "04");//总进球
-		playTypeRelationMap.put(playTypeWTC+"05", "05");//半全场
-		playTypeRelationMap.put(playTypeWTC+"10", "06");//混合投注
+		betTypeRelationMap.put(playTypeCTW+CAIXIAOMI_GAME_JZ+"11", "01");
+		betTypeRelationMap.put(playTypeCTW+CAIXIAOMI_GAME_JZ+"21", "02");
+		betTypeRelationMap.put(playTypeCTW+CAIXIAOMI_GAME_JZ+"31", "02");
+		betTypeRelationMap.put(playTypeCTW+CAIXIAOMI_GAME_JZ+"41", "02");
+		betTypeRelationMap.put(playTypeCTW+CAIXIAOMI_GAME_JZ+"51", "02");
+		betTypeRelationMap.put(playTypeCTW+CAIXIAOMI_GAME_JZ+"61", "02");
+		betTypeRelationMap.put(playTypeCTW+CAIXIAOMI_GAME_JZ+"71", "02");
+		betTypeRelationMap.put(playTypeCTW+CAIXIAOMI_GAME_JZ+"81", "02");
+		betTypeRelationMap.put(playTypeCTW+CAIXIAOMI_GAME_LETTO+"00", "10");
+		betTypeRelationMap.put(playTypeCTW+CAIXIAOMI_GAME_LETTO+"01", "20");
+		betTypeRelationMap.put(playTypeCTW+CAIXIAOMI_GAME_LETTO+"02", "30");
+//		竞彩投注彩小秘对微彩对应关系
+		playTypeRelationMap.put(playTypeCTW+CAIXIAOMI_GAME_JZ+"01", "02");//让球胜平负
+		playTypeRelationMap.put(playTypeCTW+CAIXIAOMI_GAME_JZ+"02", "01");//胜平负
+		playTypeRelationMap.put(playTypeCTW+CAIXIAOMI_GAME_JZ+"03", "04");//比分
+		playTypeRelationMap.put(playTypeCTW+CAIXIAOMI_GAME_JZ+"04", "03");//总进球
+		playTypeRelationMap.put(playTypeCTW+CAIXIAOMI_GAME_JZ+"05", "05");//半全场
+		playTypeRelationMap.put(playTypeCTW+CAIXIAOMI_GAME_JZ+"06", "10");//混合投注
+//		微彩投注彩小秘对微彩对应关系
+		playTypeRelationMap.put(playTypeCTW+CAIXIAOMI_GAME_LETTO+"00", "10");//标准
+		playTypeRelationMap.put(playTypeCTW+CAIXIAOMI_GAME_LETTO+"05", "60");//追加投注
+//		竞彩投注微彩对彩小秘对应关系
+		playTypeRelationMap.put(playTypeWTC+CAIXIAOMI_GAME_JZ+"02", "01");//让球胜平负
+		playTypeRelationMap.put(playTypeWTC+CAIXIAOMI_GAME_JZ+"01", "02");//胜平负
+		playTypeRelationMap.put(playTypeWTC+CAIXIAOMI_GAME_JZ+"04", "03");//比分
+		playTypeRelationMap.put(playTypeWTC+CAIXIAOMI_GAME_JZ+"03", "04");//总进球
+		playTypeRelationMap.put(playTypeWTC+CAIXIAOMI_GAME_JZ+"05", "05");//半全场
+		playTypeRelationMap.put(playTypeWTC+CAIXIAOMI_GAME_JZ+"10", "06");//混合投注
+
 	}
 	@Override
 	public ToStakeResponseDTO toStake(List<DlPrintLottery> dlPrintLotterys, DlTicketChannel dlTicketChannel,DlPrintLotteryMapper dlPrintLotteryMapper) {
@@ -140,6 +160,10 @@ public class PrintChannelWeicaishidaiServiceImpl  implements IPrintChannelServic
 	@Override
 	public QueryStakeResponseDTO queryStake(List<DlPrintLottery> dlPrintLotterys,DlTicketChannel dlTicketChannel,
 			DlPrintLotteryMapper dlPrintLotteryMapper) {
+		Map<String,String> ticketsAndGameMap = new HashMap<String, String>();
+		dlPrintLotterys.forEach(print->{
+			ticketsAndGameMap.put(print.getTicketId(), print.getGame());
+		});
 		WeiCaiShiDaiQueryBodyRequesDto body = createQueryBody(CMDQUERYSTAKE, dlPrintLotterys);
 		String bodyStr= JSONHelper.bean2json(body);
 		WeiCaiShiDaiHearRequestDto header = createHeader(CMDQUERYSTAKE, dlTicketChannel, bodyStr);
@@ -192,12 +216,18 @@ public class PrintChannelWeicaishidaiServiceImpl  implements IPrintChannelServic
 				}
 				queryStakeOrderResponse.setQuerySuccess(querySuccess);
 				if(querySuccess){
+					String ticketId = weicaishidaiQueryResponse.getOrderId();
 					queryStakeOrderResponse.setStatusEnum(statusEnum);
 					queryStakeOrderResponse.setPrintStatus(Integer.parseInt(printStatus));
 					queryStakeOrderResponse.setPlatformId(weicaishidaiQueryResponse.getTicketId());
 					queryStakeOrderResponse.setPrintNo(weicaishidaiQueryResponse.getNumber());
-					queryStakeOrderResponse.setSp(getCaiXiaoMiSpFromTicketNumber(weicaishidaiQueryResponse.getNumber()));
-					queryStakeOrderResponse.setTicketId(weicaishidaiQueryResponse.getOrderId());
+					String game = ticketsAndGameMap.get(ticketId);
+					if(CAIXIAOMI_GAME_JZ.equals(game)){						
+						queryStakeOrderResponse.setSp(getCaiXiaoMiSpFromTicketNumber(weicaishidaiQueryResponse.getNumber()));
+					}else{//不需要赔率设置为""
+						queryStakeOrderResponse.setSp("");
+					}
+					queryStakeOrderResponse.setTicketId(ticketId);
 					queryStakeOrderResponse.setPrintTime(weicaishidaiQueryResponse.getPrintTime());
 					Date printTime = new Date();
 					try{
@@ -339,15 +369,16 @@ public class PrintChannelWeicaishidaiServiceImpl  implements IPrintChannelServic
 			String gameId = getGameId(lottery);
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 			String termCode = sdf.format(new Date());
+			String caiXiaoMiGame = lottery.getGame();
+			ticket.setOut_id(lottery.getTicketId());
 			ticket.setAmount(""+lottery.getMoney().intValue());
-			ticket.setBet_type(getBetType(lottery.getBetType()));
 			ticket.setGame_id(gameId);
 			ticket.setIcount(getIcount(lottery.getMoney().intValue(),lottery.getTimes()));
 			ticket.setMultiple(""+lottery.getTimes());
-			ticket.setNumber(getNumber(lottery.getGame(),lottery.getPlayType(),lottery.getBetType(),lottery.getStakes()));
-			ticket.setOut_id(lottery.getTicketId());
-			ticket.setPlay_type(getWeiCaiShiDaiPlayType(lottery.getTicketId(),lottery.getPlayType()));
 			ticket.setTerm_code(termCode);
+			ticket.setBet_type(getBetType(caiXiaoMiGame,lottery.getBetType()));
+			ticket.setNumber(getNumber(caiXiaoMiGame,lottery.getPlayType(),lottery.getBetType(),lottery.getStakes()));
+			ticket.setPlay_type(getWeiCaiShiDaiPlayType(caiXiaoMiGame,lottery.getTicketId(),lottery.getPlayType()));
 			tickets.add(ticket);
 		}
 		body.setTickets(tickets);
@@ -365,26 +396,30 @@ public class PrintChannelWeicaishidaiServiceImpl  implements IPrintChannelServic
 	 * @param caiXiaoMiBetType
 	 * @return
 	 */
-	private String getBetType(String caiXiaoMiBetType) {
-		if("11".equals(caiXiaoMiBetType)){//单串
-			return "01";
-		}else{
-			return "02";//串关
+	private String getBetType(String game,String caiXiaoMiBetType) {
+		String playTypeMapKey = playTypeCTW+game+caiXiaoMiBetType;
+		String weicaishidaiBetType = betTypeRelationMap.get(playTypeMapKey);
+		if(!StringUtils.isEmpty(weicaishidaiBetType)){
+			log.info("彩小秘投注方式转为微彩时代投注方式key={},value={}",playTypeMapKey,weicaishidaiBetType);
+			return weicaishidaiBetType;
 		}
+		log.error("彩小秘对微彩时代未知的玩法对应，game={},caiXiaoMiBetType={}",game,caiXiaoMiBetType);
+		return "";
 	}
 
 	/**
 	 * 根据彩小秘玩法获取微彩时代玩法
+	 * @param game 
 	 * @param lottery
 	 * @return
 	 */
-	private String getWeiCaiShiDaiPlayType(String ticketId,String caiXiaoMiPlayType) {
-		String weiCaiShiDaiPlayType = playTypeRelationMap.get(playTypeCTW+caiXiaoMiPlayType);
+	private String getWeiCaiShiDaiPlayType(String game,String ticketId,String caiXiaoMiPlayType) {
+		String weiCaiShiDaiPlayType = playTypeRelationMap.get(playTypeCTW+game+caiXiaoMiPlayType);
 		if(!StringUtils.isEmpty(weiCaiShiDaiPlayType)){
 			log.info("ticketId={},彩小秘对应的playType={},转化后微彩时代playType={}",ticketId,caiXiaoMiPlayType,weiCaiShiDaiPlayType);
 			return weiCaiShiDaiPlayType;
 		}
-		log.error("ticketId={},playType={},未能找到对应的微彩时代的palyType",ticketId,caiXiaoMiPlayType);
+		log.error("ticketId={},game={},playType={},未能找到对应的微彩时代的palyType",ticketId,game,caiXiaoMiPlayType);
 		return "";
 	}
 
@@ -397,7 +432,9 @@ public class PrintChannelWeicaishidaiServiceImpl  implements IPrintChannelServic
 	 * @return
 	 */
 	private static String getNumber(String game,String playType,String betType,String caixiaomiStatke) {
-		if("T51".equals(game)&&"06".equals(playType)){//混合投注
+		if(CAIXIAOMI_GAME_LETTO.equals(game)){
+			return caixiaomiStatke;
+		}else if(CAIXIAOMI_GAME_JZ.equals(game)&&"06".equals(playType)){//混合投注
 			StringBuffer weicaishidaiStake = new StringBuffer();
 			String[] issueStakes = caixiaomiStatke.split(";");
 			for(String issueStake:issueStakes){				
@@ -412,7 +449,7 @@ public class PrintChannelWeicaishidaiServiceImpl  implements IPrintChannelServic
 			weicaishidaiStake.replace(weicaishidaiStake.length()-1, weicaishidaiStake.length(), "|");
 			weicaishidaiStake.append(betType.substring(0, 1)+"*"+betType.substring(1, 2));
 			return weicaishidaiStake.toString();
-		}else if("T51".equals(game)){
+		}else if(CAIXIAOMI_GAME_JZ.equals(game)){
 			StringBuffer weicaishidaiStake = new StringBuffer();
 			String[] issueStakes = caixiaomiStatke.split(";");
 			log.info("issueStakes={}",Arrays.toString(issueStakes));
@@ -454,9 +491,11 @@ public class PrintChannelWeicaishidaiServiceImpl  implements IPrintChannelServic
 	private String getGameId(DlPrintLottery lottery) {
 		String game = lottery.getGame();
 		String betType=lottery.getBetType();
-		if("T51".equals(game)&&"11".equals(betType)){
+		if(CAIXIAOMI_GAME_LETTO.equals(game)){
+			return "200";
+		}else if(CAIXIAOMI_GAME_JZ.equals(game)&&"11".equals(betType)){
 			return "202";
-		}else if("T51".equals(lottery.getGame())){
+		}else if(CAIXIAOMI_GAME_JZ.equals(lottery.getGame())){
 			return "201";
 		}else{
 			log.error("微彩时代出票，暂未实现的出牌game lottery_game={},betType={}",game,betType);
@@ -486,6 +525,9 @@ public class PrintChannelWeicaishidaiServiceImpl  implements IPrintChannelServic
 	 * @return
 	 */
 	private static String getCaiXiaoMiSpFromTicketNumber(String ticketNumber) {
+		if(StringUtils.isEmpty(ticketNumber)){
+			return "";//没有赔率
+		}
 //		20180517001:3(2.39),0(2.39),1(2.39);20180517002:3(2.39)|2*1
 		StringBuffer caiXiaoMiSp = new StringBuffer(); 
 		String[] ticketNumArr= ticketNumber.split("\\|");
