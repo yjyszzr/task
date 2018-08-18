@@ -122,10 +122,10 @@ public class OrderDetail {
     @Column(name = "fix_odds")
     private String fixedodds;
     /**
-     * 让球数
+     * 投注方式
      */
-    @Column(name = "cathectic_type")
-    private String cathecticType;
+    @Column(name = "bet_type")
+    private String betType;
     
     public String getFixedodds() {
 		return fixedodds;
@@ -428,12 +428,12 @@ public class OrderDetail {
         this.addTime = addTime;
     }
 
-	public String getCathecticType() {
-		return cathecticType;
+	public String getBetType() {
+		return betType;
 	}
 
-	public void setCathecticType(String cathecticType) {
-		this.cathecticType = cathecticType;
+	public void setBetType(String betType) {
+		this.betType = betType;
 	}
     
 }

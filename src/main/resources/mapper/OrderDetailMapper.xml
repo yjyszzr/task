@@ -24,12 +24,12 @@
     <result column="match_time" jdbcType="TIMESTAMP" property="matchTime" />
     <result column="add_time" jdbcType="INTEGER" property="addTime" />
     <result column="fix_odds" jdbcType="VARCHAR" property="fixedodds" />
-    <result column="cathectic_type" jdbcType="VARCHAR" property="cathecticType" />
+    <result column="bet_type" jdbcType="VARCHAR" property="betType" />
   </resultMap>
   
   <sql id="detailFields">
   order_detail_id,user_id,order_id,order_sn,match_id,changci,issue,match_team,match_result,ticket_data,ticket_status,
-  give_integral,lottery_classify_id,lottery_play_classify_id,is_guess,is_dan,match_time,add_time,fix_odds,cathectic_type
+  give_integral,lottery_classify_id,lottery_play_classify_id,is_guess,is_dan,match_time,add_time,fix_odds,bet_type
   </sql>
   
   <select id = "unMatchResultOrderDetails" resultMap="BaseResultMap">
