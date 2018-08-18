@@ -37,4 +37,6 @@ public class OrderDetailDataDTO implements Serializable{
 	
 	@ApiModelProperty("期次")
 	private String issue;
+	@ApiModelProperty("投注方式")
+	private String betType;
 }

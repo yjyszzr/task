@@ -1401,6 +1401,7 @@ public class OrderService extends AbstractService<Order> {
 				}
 				orderDetailDataDTO.setTicketData(orderDetail.getTicketData());
 				orderDetailDataDTO.setIssue(orderDetail.getIssue());
+				orderDetailDataDTO.setBetType(orderDetail.getCathecticType());
 				orderDetailDataDTOs.add(orderDetailDataDTO);
 			}
 		}

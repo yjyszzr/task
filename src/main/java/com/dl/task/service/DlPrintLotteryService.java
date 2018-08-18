@@ -50,6 +50,7 @@ import com.dl.base.enums.SNBusinessCodeEnum;
 import com.dl.base.enums.ThirdApiEnum;
 import com.dl.base.result.BaseResult;
 import com.dl.base.result.ResultGenerator;
+import com.dl.base.util.BetUtils;
 import com.dl.base.util.DateUtil;
 import com.dl.base.util.JSONHelper;
 import com.dl.base.util.MD5Utils;
@@ -1228,6 +1229,20 @@ public class DlPrintLotteryService {
 		OrderInfoDTO order = orderInfo.getOrderInfoDTO();
 		List<OrderDetailDataDTO> selectByOrderId = orderInfo.getOrderDetailDataDTOs();
 		List<MatchBetPlayDTO> matchBetPlays = selectByOrderId.stream().map(detail->{
+			MatchBetPlayDTO matchBetDto = new MatchBetPlayDTO();
+			matchBetDto.setChangci(detail.getChangci());
+			matchBetDto.setIsDan(detail.getIsDan());
+			matchBetDto.setLotteryClassifyId(detail.getLotteryClassifyId());
+			matchBetDto.setLotteryPlayClassifyId(detail.getLotteryPlayClassifyId());
+			matchBetDto.setMatchId(detail.getMatchId());
+			matchBetDto.setMatchTeam(detail.getMatchTeam());
+			matchBetDto.setBetType(detail.getBetType());
+			matchBetDto.setTicketData(detail.getTicketData());
+			Date matchTime = detail.getMatchTime();
+			matchBetDto.setMatchTime((int)matchTime.toInstant().getEpochSecond());
+			if(Integer.valueOf(2).equals(detail.getLotteryClassifyId())){//竞彩足球逻辑保存
+				 return matchBetDto;
+			}
 			String ticketData = detail.getTicketData();
 			String[] tickets = ticketData.split(";");
 			String playCode = null;
@@ -1254,18 +1269,9 @@ public class DlPrintLotteryService {
 				matchBetCell.setBetCells(betCells);
 				matchBetCells.add(matchBetCell);
 			}
-			MatchBetPlayDTO dto = new MatchBetPlayDTO();
-			dto.setChangci(detail.getChangci());
-			dto.setIsDan(detail.getIsDan());
-			dto.setLotteryClassifyId(detail.getLotteryClassifyId());
-			dto.setLotteryPlayClassifyId(detail.getLotteryPlayClassifyId());
-			dto.setMatchId(detail.getMatchId());
-			dto.setMatchTeam(detail.getMatchTeam());
-			Date matchTime = detail.getMatchTime();
-			dto.setMatchTime((int)matchTime.toInstant().getEpochSecond());
-			dto.setPlayCode(playCode);
-			dto.setMatchBetCells(matchBetCells);
-			return dto;
+			matchBetDto.setPlayCode(playCode);
+			matchBetDto.setMatchBetCells(matchBetCells);
+			return matchBetDto;
 		}).collect(Collectors.toList());
 		Integer times = order.getCathectic();
 		String betType = order.getPassType();
@@ -1287,6 +1293,9 @@ public class DlPrintLotteryService {
 	 * @return
 	 */
 	public List<LotteryPrintDTO> getPrintLotteryList(DlJcZqMatchBetParam param) {
+		if(Integer.valueOf(2).equals(param.getLotteryClassifyId())){
+			return getDaLeTouLotteryPrintDTO(param);
+		}
 		long start = System.currentTimeMillis();
 		List<MatchBetPlayDTO> matchBellCellList = param.getMatchBetPlays();
 		String betTypes = param.getBetType();
@@ -1379,6 +1388,59 @@ public class DlPrintLotteryService {
 		return lotteryPrints;
 	}
 	
+	/**
+	 * 计算大乐透的拆票信息
+	 * @param param
+	 * @return
+	 */
+	private List<LotteryPrintDTO> getDaLeTouLotteryPrintDTO(
+			DlJcZqMatchBetParam param) {
+		List<LotteryPrintDTO> lotteryPrints = new ArrayList<LotteryPrintDTO>();
+		String playType = param.getPlayType();
+		int times = param.getTimes();
+		BigDecimal oneTicketMoney = new BigDecimal("2.0");
+		if("05".equals(playType)){
+			oneTicketMoney = new BigDecimal("3.0");
+		}
+		for(MatchBetPlayDTO matchBetPlayDto:param.getMatchBetPlays()){
+			String betType = matchBetPlayDto.getBetType();
+			String ticketData = matchBetPlayDto.getTicketData();	
+			int betNum = BetUtils.getLettoBetNum(ticketData);
+			int maxTime = BetUtils.maxTcBetTime(oneTicketMoney,betNum);
+			int n = times/maxTime;
+			int m = times%maxTime;
+			if(n > 0) {
+				for(int i=0; i< n; i++) {
+					BigDecimal money = oneTicketMoney.multiply(new BigDecimal(maxTime*betNum));
+					LotteryPrintDTO lotteryPrintDTO = new LotteryPrintDTO();
+					lotteryPrintDTO.setBetType(betType);
+					lotteryPrintDTO.setIssue(matchBetPlayDto.getPlayCode());
+					lotteryPrintDTO.setMoney(money.doubleValue());
+					lotteryPrintDTO.setPlayType(playType);
+					lotteryPrintDTO.setStakes(ticketData);
+					String ticketId = SNGenerator.nextSN(SNBusinessCodeEnum.TICKET_SN.getCode());
+					lotteryPrintDTO.setTicketId(ticketId);
+					lotteryPrintDTO.setTimes(maxTime);
+					lotteryPrints.add(lotteryPrintDTO);
+				}
+			}
+			if(m > 0) {
+				BigDecimal money = oneTicketMoney.multiply(new BigDecimal(m*betNum));
+				LotteryPrintDTO lotteryPrintDTO = new LotteryPrintDTO();
+				lotteryPrintDTO.setBetType(betType);
+				lotteryPrintDTO.setIssue(matchBetPlayDto.getPlayCode());
+				lotteryPrintDTO.setMoney(money.doubleValue());
+				lotteryPrintDTO.setPlayType(playType);
+				lotteryPrintDTO.setStakes(ticketData);
+				String ticketId = SNGenerator.nextSN(SNBusinessCodeEnum.TICKET_SN.getCode());
+				lotteryPrintDTO.setTicketId(ticketId);
+				lotteryPrintDTO.setTimes(m);
+				lotteryPrints.add(lotteryPrintDTO);
+			}
+		}
+		return lotteryPrints;
+	}
+
 	private Map<String, List<MatchBetPlayCellDTO>> getMatchBetPlayMap(List<MatchBetPlayDTO> matchBellCellList) {
 		//整理投注对象
 //		TMatchBetInfoWithMinOddsList tbml = new TMatchBetInfoWithMinOddsList();

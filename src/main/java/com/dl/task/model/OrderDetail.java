@@ -121,7 +121,12 @@ public class OrderDetail {
      */
     @Column(name = "fix_odds")
     private String fixedodds;
-
+    /**
+     * 让球数
+     */
+    @Column(name = "cathectic_type")
+    private String cathecticType;
+    
     public String getFixedodds() {
 		return fixedodds;
 	}
@@ -422,4 +427,13 @@ public class OrderDetail {
     public void setAddTime(Integer addTime) {
         this.addTime = addTime;
     }
+
+	public String getCathecticType() {
+		return cathecticType;
+	}
+
+	public void setCathecticType(String cathecticType) {
+		this.cathecticType = cathecticType;
+	}
+    
 }
