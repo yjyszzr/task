@@ -1827,7 +1827,7 @@ public class DlPrintLotteryService {
 		log.info("出奖奖金查询版本2.0奖金查询开始");
 		for(PrintComEnums printComEnums:PrintComEnums.values()){
 			try{
-				if(PrintComEnums.CAIXIAOMI==printComEnums||PrintComEnums.WEICAISHIDAI==printComEnums){
+				if(PrintComEnums.CAIXIAOMI==printComEnums){
 					continue;//暂未实现的公司不进行第三方开奖
 				}
 				DlTicketChannel dlTicketChannel = printLotteryAdapter.selectChannelByChannelId(printComEnums);
@@ -1853,7 +1853,7 @@ public class DlPrintLotteryService {
 						List<DlPrintLottery> subList = lotteryLists.subList(0, endIndex);
 						QueryRewardResponseDTO queryRewardResponseDTO = printLotteryAdapter.queryLotterysReward(printComEnums,subList,dlTicketChannel);
 						if(!queryRewardResponseDTO.getQuerySuccess()){
-							log.error("出票查询失败，channelId={},channelName={},errorCode={},errorMsg={}",printComEnums.getPrintChannelId(),printComEnums.getPrintChannelName(),
+							log.error("出票查询第三方奖金失败，channelId={},channelName={},errorCode={},errorMsg={}",printComEnums.getPrintChannelId(),printComEnums.getPrintChannelName(),
 									queryRewardResponseDTO.getRetCode(),queryRewardResponseDTO.getRetDesc());
 						}else if(queryRewardResponseDTO.getQuerySuccess()){
 							updateLotterysReward(queryRewardResponseDTO);

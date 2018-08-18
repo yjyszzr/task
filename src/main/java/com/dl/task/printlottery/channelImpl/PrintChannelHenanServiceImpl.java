@@ -154,9 +154,7 @@ public class PrintChannelHenanServiceImpl  implements IPrintChannelService{
 		return queryStakeResponseDto;
 	}
 	@Override
-	public QueryRewardResponseDTO queryRewardByLottery(
-			List<DlPrintLottery> dlPrintLotterys,
-			DlTicketChannel dlTicketChannel,
+	public QueryRewardResponseDTO queryRewardByLottery(List<DlPrintLottery> dlPrintLotterys,DlTicketChannel dlTicketChannel,
 			DlPrintLotteryMapper dlPrintLotteryMapper) {
 		QueryRewardResponseDTO notSupport = new QueryRewardResponseDTO();
 		notSupport.setQuerySuccess(Boolean.FALSE);

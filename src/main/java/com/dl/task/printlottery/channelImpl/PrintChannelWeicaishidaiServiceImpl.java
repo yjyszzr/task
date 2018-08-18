@@ -28,21 +28,15 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
-import org.springframework.web.client.RestTemplate;
 
 import com.dl.base.enums.ThirdApiEnum;
 import com.dl.base.util.JSONHelper;
 import com.dl.base.util.MD5Utils;
 import com.dl.task.dao.DlPrintLotteryMapper;
 import com.dl.task.enums.PrintLotteryStatusEnum;
+import com.dl.task.enums.ThirdRewardStatusEnum;
 import com.dl.task.model.DlPrintLottery;
 import com.dl.task.model.DlTicketChannel;
 import com.dl.task.model.LotteryThirdApiLog;
@@ -54,6 +48,7 @@ import com.dl.task.printlottery.requestDto.weicaishidai.WeiCaiShiDaiQueryBalance
 import com.dl.task.printlottery.requestDto.weicaishidai.WeiCaiShiDaiQueryBodyRequesDto;
 import com.dl.task.printlottery.responseDto.QueryPrintBalanceDTO;
 import com.dl.task.printlottery.responseDto.QueryRewardResponseDTO;
+import com.dl.task.printlottery.responseDto.QueryRewardResponseDTO.QueryRewardOrderResponse;
 import com.dl.task.printlottery.responseDto.QueryStakeResponseDTO;
 import com.dl.task.printlottery.responseDto.QueryStakeResponseDTO.QueryStakeOrderResponse;
 import com.dl.task.printlottery.responseDto.ToStakeResponseDTO;
@@ -245,31 +240,6 @@ public class PrintChannelWeicaishidaiServiceImpl  implements IPrintChannelServic
 		}
 		return queryStakeResponseDto;
 	}
-	private String sendHttpMessage(String requestUrl,String header, String body,DlPrintLotteryMapper dlPrintLotteryMapper) {
-		RestTemplate restTemplate = new RestTemplate();
-		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-		try{
-			header= java.net.URLEncoder.encode(header, "UTF-8");
-			body = java.net.URLEncoder.encode(body, "UTF-8");
-			}catch(Exception e){
-				log.error("微彩时代 地址转换异常",e);
-			}
-		MultiValueMap<String, String> map= new LinkedMultiValueMap<String, String>();
-//		map.add("head", header);
-//		map.add("body", body);
-		parentLog.info("通用的访问第三方请求reqTime={},url={},header={},requestParams={},",System.currentTimeMillis(),requestUrl,JSONHelper.bean2json(headers),JSONHelper.bean2json(map));
-		HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<MultiValueMap<String, String>>(map, headers);
-		String param="head="+header+"&body="+body;
-		requestUrl = requestUrl+"?"+param;
-		log.info("微彩时代requstUrl={}",requestUrl);
-		ResponseEntity<String> responseEntity = restTemplate.postForEntity(requestUrl, request , String.class );
-		String response = responseEntity.getBody();
-		parentLog.info("restreqTime={}, response={}",System.currentTimeMillis(),response);
-		LotteryThirdApiLog thirdApiLog = new LotteryThirdApiLog(requestUrl,ThirdApiEnum.WEI_CAI_LOTTERY.getCode(), JSONHelper.bean2json(map), response);
-		dlPrintLotteryMapper.saveLotteryThirdApiLog(thirdApiLog);
-		return response;
-	}
     private String httpPost(String url, Map<String, String> headerParams,
             Map<String, String> requestParams, String urlEncode) {
         String str = null;
@@ -342,17 +312,6 @@ public class PrintChannelWeicaishidaiServiceImpl  implements IPrintChannelServic
 		headDto.setUserId(dlTicketChannel.getTicketMerchant());
 		headDto.setUserType("company");
 		return headDto;
-//		headerMap.put("cmd", cmd);
-//		headerMap.put("digestType", "md5");
-//		headerMap.put("userId", dlTicketChannel.getTicketMerchant());
-//		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-//		String timeStamp = sdf.format(new Date());
-//		headerMap.put("timeStamp", timeStamp);
-//		headerMap.put("userType", "company");
-//		String md5DigestBerfore = dlTicketChannel.getTicketMerchantPassword()+body+timeStamp;
-//		String md5After = MD5Utils.MD5(md5DigestBerfore);
-//		headerMap.put("digest", MD5Utils.MD5(md5After));
-//		return JSONHelper.bean2json(headerMap);
 	}
 
 	private WeiCaiShiDaiQueryBodyRequesDto createQueryBody(String cmd,List<DlPrintLottery> dlPrintLotterys){
@@ -561,8 +520,64 @@ public class PrintChannelWeicaishidaiServiceImpl  implements IPrintChannelServic
 	@Override
 	public QueryRewardResponseDTO queryRewardByLottery(List<DlPrintLottery> dlPrintLotterys,DlTicketChannel dlTicketChannel,
 			DlPrintLotteryMapper dlPrintLotteryMapper) {
-		
-		return null;
+		WeiCaiShiDaiQueryBodyRequesDto body = createQueryBody(CMDQUERYSTAKE, dlPrintLotterys);
+		String bodyStr= JSONHelper.bean2json(body);
+		WeiCaiShiDaiHearRequestDto header = createHeader(CMDQUERYSTAKE, dlTicketChannel, bodyStr);
+		String headerStr=JSONHelper.bean2json(header);
+        String requestUrlReal = dlTicketChannel.getTicketUrl();
+        parentLog.info("微彩时代查询奖金reqTime={},url={}",System.currentTimeMillis(),requestUrlReal);
+        Map<String, String> headerParams =new HashMap<String, String>();
+        Map<String, String> requestParams =new HashMap<String, String>();
+        requestParams.put("head", headerStr);
+        requestParams.put("body", bodyStr);
+        headerParams.put("Content-Type", "application/x-www-form-urlencoded");
+        log.info("head={},body={}",headerStr,bodyStr);
+        String response = httpPost(requestUrlReal,headerParams,requestParams,"UTF-8");
+        log.info("response={}",response);
+        LotteryThirdApiLog thirdApiLog = new LotteryThirdApiLog(requestUrlReal,ThirdApiEnum.WEI_CAI_LOTTERY.getCode(), JSONHelper.bean2json(requestParams), response);
+        dlPrintLotteryMapper.saveLotteryThirdApiLog(thirdApiLog);
+		JSONObject backJo = JSONObject.fromObject(response);
+		@SuppressWarnings("rawtypes")
+		Map<String,Class> mapClass = new HashMap<String,Class>();
+		mapClass.put("err", WeiCaiShiDaiToStakeRetCode.class);
+		mapClass.put("tickets", WeiCaiShiDaiQueryStakeResponse.class);
+		WeiCaiShiDaiQueryStakeDTO dlQueryStakeDTO = (WeiCaiShiDaiQueryStakeDTO) JSONObject.toBean(backJo, WeiCaiShiDaiQueryStakeDTO.class, mapClass); 
+		QueryRewardResponseDTO queryRewardResponseDto = new QueryRewardResponseDTO();
+		queryRewardResponseDto.setQuerySuccess(Boolean.FALSE);
+		if(dlQueryStakeDTO==null){
+			return queryRewardResponseDto;
+		}
+		queryRewardResponseDto.setRetCode(dlQueryStakeDTO.getErr().getCode());
+		queryRewardResponseDto.setRetDesc(dlQueryStakeDTO.getErr().getDes());
+		if(!CollectionUtils.isEmpty(dlQueryStakeDTO.getTickets())){
+			queryRewardResponseDto.setQuerySuccess(Boolean.TRUE);
+			List<QueryRewardOrderResponse> orders = new ArrayList<QueryRewardOrderResponse>();
+			for(WeiCaiShiDaiQueryStakeResponse weicaishidaiQueryResponse:dlQueryStakeDTO.getTickets()){
+				QueryRewardOrderResponse queryRewardOrderResponse = new QueryRewardOrderResponse();
+//				#中奖状态, 0未开奖 1未中奖 2已算奖
+				String winStatus=weicaishidaiQueryResponse.getWinStatus();
+				String ticketId = weicaishidaiQueryResponse.getOrderId();
+				Boolean querySuccess = Boolean.FALSE;
+				if("1".equals(winStatus)||"2".equals(winStatus)){
+					querySuccess = Boolean.TRUE;
+				}else if("0".equals(winStatus)){
+					querySuccess = Boolean.FALSE;
+				}else{
+					log.error("微彩时代出票查询出现非预定状态printStatus={}",winStatus);
+					querySuccess = Boolean.FALSE;	
+				}
+				queryRewardOrderResponse.setQuerySuccess(querySuccess);
+				if(querySuccess){
+					queryRewardOrderResponse.setTicketId(ticketId);
+					queryRewardOrderResponse.setThirdRewardStatusEnum(ThirdRewardStatusEnum.REWARD_OVER);
+					BigDecimal prizeMoney  = new BigDecimal(weicaishidaiQueryResponse.getActualPrize()).multiply(new BigDecimal("100"));
+					queryRewardOrderResponse.setPrizeMoney(prizeMoney.intValue());
+				}
+				orders.add(queryRewardOrderResponse);
+			}
+			queryRewardResponseDto.setOrders(orders);
+		}
+		return queryRewardResponseDto;
 	}
 
 	@Override
