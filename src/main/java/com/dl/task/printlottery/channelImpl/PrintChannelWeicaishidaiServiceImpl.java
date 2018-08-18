@@ -222,7 +222,7 @@ public class PrintChannelWeicaishidaiServiceImpl  implements IPrintChannelServic
 					queryStakeOrderResponse.setPlatformId(weicaishidaiQueryResponse.getTicketId());
 					queryStakeOrderResponse.setPrintNo(weicaishidaiQueryResponse.getNumber());
 					String game = ticketsAndGameMap.get(ticketId);
-					if(CAIXIAOMI_GAME_JZ.equals(game)){						
+					if(CAIXIAOMI_GAME_JZ.equals(game)){
 						queryStakeOrderResponse.setSp(getCaiXiaoMiSpFromTicketNumber(weicaishidaiQueryResponse.getNumber()));
 					}else{//不需要赔率设置为""
 						queryStakeOrderResponse.setSp("");
