@@ -1,4 +1,5 @@
 package com.dl.task.service;
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -103,10 +104,13 @@ public class DLSysAlarmTaskService {
 			return;
 		}
 		Map<String,String> params = new HashMap<String, String>();
-		params.put("balance", (balance/100)+"");
-		params.put("balanceFen", balance+"");
-		params.put("limit", (limit/100)+"");
-		params.put("limitFen", limit+"");
+		BigDecimal big100 = new BigDecimal("100");
+		BigDecimal bigBalance = new BigDecimal(queryBalance.getBalance());
+		BigDecimal bigLimit = new BigDecimal(alarmTask.getAlarmLimit());
+		params.put("balance", bigBalance.divide(big100).setScale(2).toString());
+		params.put("balanceFen", bigBalance.setScale(2).toString());
+		params.put("limit", bigLimit.divide(big100).setScale(2).toString());
+		params.put("limitFen", bigLimit.setScale(2).toString());
 		params.put("company", alarmTask.getAlarmName());
 		sendMsg(alarmTask,params);
 	}
@@ -148,10 +152,13 @@ public class DLSysAlarmTaskService {
 			return;
 		}
 		Map<String,String> params = new HashMap<String, String>();
-		params.put("balance", (balance/100)+"");
-		params.put("balanceFen", balance+"");
-		params.put("limit", (limit/100)+"");
-		params.put("limitFen", limit+"");
+		BigDecimal big100 = new BigDecimal("100");
+		BigDecimal bigBalance = new BigDecimal(queryBalance.getBalance());
+		BigDecimal bigLimit = new BigDecimal(alarmTask.getAlarmLimit());
+		params.put("balance", bigBalance.divide(big100).setScale(2).toString());
+		params.put("balanceFen", bigBalance.setScale(2).toString());
+		params.put("limit", bigLimit.divide(big100).setScale(2).toString());
+		params.put("limitFen", bigLimit.setScale(2).toString());
 		params.put("company", alarmTask.getAlarmName());
 		sendMsg(alarmTask,params);
 	}
