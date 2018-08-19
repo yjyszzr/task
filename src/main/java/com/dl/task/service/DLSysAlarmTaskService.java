@@ -218,7 +218,7 @@ public class DLSysAlarmTaskService {
 		if(send){
 			String mobileStr = alarmTask.getDingdingMobile();
 			String[] mobiles = null;
-			if(StringUtils.isEmpty(mobileStr)){
+			if(!StringUtils.isEmpty(mobileStr)){
 				mobiles = mobileStr.split(";");	
 			}
 			DingDingUtil.sendDingDingMsg(dingDingUrl, dingDingContent, mobiles);
