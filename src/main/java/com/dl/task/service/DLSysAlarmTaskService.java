@@ -108,9 +108,9 @@ public class DLSysAlarmTaskService {
 		BigDecimal bigBalance = new BigDecimal(printBalanceDto.getBalance());
 		BigDecimal bigLimit = new BigDecimal(alarmTask.getAlarmLimit());
 		params.put("balance", bigBalance.divide(big100).setScale(2).toString());
-		params.put("balanceFen", bigBalance.setScale(2).toString());
+		params.put("balanceFen", bigBalance.setScale(0).toString());
 		params.put("limit", bigLimit.divide(big100).setScale(2).toString());
-		params.put("limitFen", bigLimit.setScale(2).toString());
+		params.put("limitFen", bigLimit.setScale(0).toString());
 		params.put("company", alarmTask.getAlarmName());
 		sendMsg(alarmTask,params);
 	}
@@ -156,9 +156,9 @@ public class DLSysAlarmTaskService {
 		BigDecimal bigBalance = new BigDecimal(queryBalance.getBalance());
 		BigDecimal bigLimit = new BigDecimal(alarmTask.getAlarmLimit());
 		params.put("balance", bigBalance.divide(big100).setScale(2).toString());
-		params.put("balanceFen", bigBalance.setScale(2).toString());
+		params.put("balanceFen", bigBalance.setScale(0).toString());
 		params.put("limit", bigLimit.divide(big100).setScale(2).toString());
-		params.put("limitFen", bigLimit.setScale(2).toString());
+		params.put("limitFen", bigLimit.setScale(0).toString());
 		params.put("company", alarmTask.getAlarmName());
 		sendMsg(alarmTask,params);
 	}
