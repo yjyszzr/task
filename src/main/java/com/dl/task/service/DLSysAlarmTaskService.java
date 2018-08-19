@@ -192,11 +192,11 @@ public class DLSysAlarmTaskService {
 		String dingDingContent = alarmTask.getDingdingSendContent();
 		String dingDingUrl=alarmTask.getDingdingUrl();
 		if(StringUtils.isEmpty(dingDingUrl)){
-			log.info("短信报警，未设置报警钉钉地址,alarmCode={}",alarmTask.getAlarmCode());
+			log.info("钉钉报警，未设置报警钉钉地址,alarmCode={}",alarmTask.getAlarmCode());
 			return send;
 		}
 		if(StringUtils.isEmpty(dingDingContent)){
-			log.info("短信报警，未设置报警钉钉内容,alarmCode={}",alarmTask.getAlarmCode());
+			log.info("钉钉报警，未设置报警钉钉内容,alarmCode={}",alarmTask.getAlarmCode());
 			return send;
 		}
 		for(String key:params.keySet()){
@@ -207,7 +207,7 @@ public class DLSysAlarmTaskService {
 		if(Integer.valueOf(0).equals(account)){//首次发送
 			send=Boolean.TRUE;
 		}else{//非首次发送
-			String timesStr = alarmTask.getSmsAlarmTime();
+			String timesStr = alarmTask.getDingdingAlarmTime();
 			if(StringUtils.isEmpty(timesStr)){
 				log.info("未配置时间间隔，只发送一次");
 				return send;
@@ -231,7 +231,7 @@ public class DLSysAlarmTaskService {
 		if(send){
 			String mobileStr = alarmTask.getDingdingMobile();
 			String[] mobiles = null;
-			if(StringUtils.isEmpty(mobileStr)){
+			if(!StringUtils.isEmpty(mobileStr)){
 				mobiles = mobileStr.split(";");	
 			}
 			DingDingUtil.sendDingDingMsg(dingDingUrl, dingDingContent, mobiles);
