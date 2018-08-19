@@ -105,7 +105,7 @@ public class DLSysAlarmTaskService {
 		}
 		Map<String,String> params = new HashMap<String, String>();
 		BigDecimal big100 = new BigDecimal("100");
-		BigDecimal bigBalance = new BigDecimal(queryBalance.getBalance());
+		BigDecimal bigBalance = new BigDecimal(printBalanceDto.getBalance());
 		BigDecimal bigLimit = new BigDecimal(alarmTask.getAlarmLimit());
 		params.put("balance", bigBalance.divide(big100).setScale(2).toString());
 		params.put("balanceFen", bigBalance.setScale(2).toString());
