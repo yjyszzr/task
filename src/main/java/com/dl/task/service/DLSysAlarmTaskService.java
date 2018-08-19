@@ -103,7 +103,10 @@ public class DLSysAlarmTaskService {
 			return;
 		}
 		Map<String,String> params = new HashMap<String, String>();
-		params.put("balance", balance+"");
+		params.put("balance", (balance/100)+"");
+		params.put("balanceFen", balance+"");
+		params.put("limit", (limit/100)+"");
+		params.put("limitFen", limit+"");
 		params.put("company", alarmTask.getAlarmName());
 		sendMsg(alarmTask,params);
 	}
@@ -145,7 +148,10 @@ public class DLSysAlarmTaskService {
 			return;
 		}
 		Map<String,String> params = new HashMap<String, String>();
-		params.put("balance", queryBalance.getBalance());
+		params.put("balance", (balance/100)+"");
+		params.put("balanceFen", balance+"");
+		params.put("limit", (limit/100)+"");
+		params.put("limitFen", limit+"");
 		params.put("company", alarmTask.getAlarmName());
 		sendMsg(alarmTask,params);
 	}
