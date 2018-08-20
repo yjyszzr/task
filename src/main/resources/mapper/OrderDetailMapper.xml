@@ -49,6 +49,12 @@
   	set match_result = #{matchResult} 
   	where order_detail_id = #{orderDetailId}
   </update>
+  
+  <update id="beatchUpdateMatchResult">
+  	update dl_order_detail 
+  	set match_result = #{matchResult} 
+  	where issue = #{issue}
+  </update>
   <select id="selectByOrderId" resultType="com.dl.task.model.OrderDetail">
         select
             dod.match_id matchId,

@@ -144,11 +144,19 @@
         #{dlPrintLottery.status},#{dlPrintLottery.printLotteryCom})
   </foreach>
   </insert>
-   <select id="lotteryPrintsByUnCompare" resultMap="BaseResultMap">
+   <select id="lotteryPrintsByUnCompareJz" resultMap="BaseResultMap">
   	select 
   	<include refid="allFields"></include>
   	from dl_print_lottery 
   	where game='T51' and status=1 
+  	and (compare_status = 0 or compare_status is null or compare_status = '')
+  	and stakes is not null and stakes != ''
+  </select>
+  <select id="lotteryPrintsByUnCompare" resultMap="BaseResultMap">
+  	select 
+  	<include refid="allFields"></include>
+  	from dl_print_lottery 
+  	where game!='T51' and status=1 
   	and (compare_status = 0 or compare_status is null or compare_status = '')
   	and stakes is not null and stakes != ''
   </select>
@@ -216,5 +224,23 @@
 	     ,print_time = #{printTime}
 	</if>
   	where ticket_id=#{ticketId}
+  </update>
+  
+  <update id="beatchUpdateComparedStakes">
+  update dl_print_lottery set compare_status=1,compared_stakes=#{isSsue} where issue=#{isSsue}
+  </update>
+  <update id="updatePrintThirdRewardRewardStatus1To3AndPrintLottery" parameterType="com.dl.task.model.DlPrintLottery">
+  update dl_print_lottery set third_part_reward_money=#{thirdPartRewardMoney},
+  compare_status=#{compareStatus},
+  third_reward_status=3,
+  real_reward_money=#{realRewardMoney} 
+  where ticket_id=#{ticketId} and third_reward_status=1
+  </update>
+  <update id="updatePrintThirdRewardRewardStatus2To3AndPrintLottery" parameterType="com.dl.task.model.DlPrintLottery">
+  update dl_print_lottery set third_part_reward_money=#{thirdPartRewardMoney},
+  compare_status=#{compareStatus},
+  third_reward_status=3,
+  real_reward_money=#{realRewardMoney} 
+  where ticket_id=#{ticketId} and third_reward_status=2 
   </update>
 </mapper>

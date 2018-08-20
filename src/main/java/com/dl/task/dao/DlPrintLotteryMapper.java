@@ -23,6 +23,8 @@ public interface DlPrintLotteryMapper extends Mapper<DlPrintLottery> {
 	//更新出票信息
 	public int updateLotteryPrintByCallBack(DlPrintLottery print);
 	//获取已出票还没有兑奖比对的记录
+	public List<DlPrintLottery> lotteryPrintsByUnCompareJz();
+	//获取已出票还没有兑奖比对的记录
 	public List<DlPrintLottery> lotteryPrintsByUnCompare();
 	//更新彩票兑奖结果
 	public int updatePrintLotteryCompareInfo(DlPrintLottery lotteryPrint);
@@ -52,4 +54,7 @@ public interface DlPrintLotteryMapper extends Mapper<DlPrintLottery> {
 	public List<DlPrintLottery> selectFinishPrintLotteryButNotRewardHeNan();
 	public List<DlPrintLottery> lotteryPrintsByUnPrintByChannelId(@Param("printChannelId") Integer printChannelId,@Param("status") Integer status);
 	public List<DlPrintLottery> selectRewardLotterys(@Param("printChannelId") Integer printChannelId,@Param("thirdRewardStatus") Integer thirdRewardStatus);
+	public int beatchUpdateComparedStakes(@Param("isSsue") String isSsue);
+	public int updatePrintThirdRewardRewardStatus1To3AndPrintLottery(DlPrintLottery updateDlPrint);
+	public int updatePrintThirdRewardRewardStatus2To3AndPrintLottery(DlPrintLottery updateDlPrint);
 }

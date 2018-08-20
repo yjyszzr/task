@@ -68,10 +68,10 @@ public class LotteryRewardService {
 				for(DlPrintLottery dto: dlOrderDataDTOs) {
 					String orderSn = dto.getOrderSn();
 					String compareStatus = dto.getCompareStatus();
-//					Integer thirdRewardStatus = dto.getThirdRewardStatus();
-//					if(StringUtils.isBlank(compareStatus) || !"1".equals(compareStatus)
-//							||!Integer.valueOf(3).equals(thirdRewardStatus)) {
-					if(StringUtils.isBlank(compareStatus) || !"1".equals(compareStatus)){
+					Integer thirdRewardStatus = dto.getThirdRewardStatus();
+					if(StringUtils.isBlank(compareStatus) || !"1".equals(compareStatus)
+							||!Integer.valueOf(3).equals(thirdRewardStatus)) {
+//					if(StringUtils.isBlank(compareStatus) || !"1".equals(compareStatus)){
 						unOrderSns.add(orderSn);
 					}
 					if(unOrderSns.contains(orderSn)) {

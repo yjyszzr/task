@@ -20,4 +20,5 @@ public interface OrderDetailMapper extends Mapper<OrderDetail> {
 	public List<OrderDetail> queryListByOrderSn(@Param("orderSn")String orderSn);
 	//更新赔率信息
 	public int updateTicketData(OrderDetail orderDetail);
+	public int beatchUpdateMatchResult(@Param("issue") String t01Issue, @Param("matchResult") String matchResult);
 }
