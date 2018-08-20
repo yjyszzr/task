@@ -366,7 +366,9 @@ public class OrderService extends AbstractService<Order> {
 		}
 		order.setAcceptTime(acceptTime);
 		order.setTicketTime(ticketTime);
-		
+		if(Integer.valueOf(2).equals(order.getLotteryClassifyId())){
+			return;
+		}
 		// 更新订单详情表
 		List<OrderDetail> orderDetailList = orderDetailMapper.queryListByOrderSn(order.getOrderSn());
 		if (CollectionUtils.isEmpty(orderDetailList)) {
