@@ -353,13 +353,12 @@ public class OrderService extends AbstractService<Order> {
 		Integer acceptTime = 0;
 		Integer ticketTime = 0;
 		for(DlPrintLottery printLottery: succPrintLotterys) {
-			if(!"T51".equals(printLottery.getGame())){
-//				其他玩法直接退出
-				return ;
+			if("T51".equals(printLottery.getGame())){
+				
+				String stakes = printLottery.getStakes();
+				String printSp = printLottery.getPrintSp();
+				this.getPrintOdds(map, stakes, printSp);
 			}
-			String stakes = printLottery.getStakes();
-			String printSp = printLottery.getPrintSp();
-			this.getPrintOdds(map, stakes, printSp);
 			Integer acceptTime1 = printLottery.getAcceptTime();
 			acceptTime = acceptTime<acceptTime1?acceptTime1:acceptTime;
 			Integer ticketTime1 = DateUtil.getCurrentTimeLong(printLottery.getPrintTime().getTime()/1000);
@@ -367,6 +366,7 @@ public class OrderService extends AbstractService<Order> {
 		}
 		order.setAcceptTime(acceptTime);
 		order.setTicketTime(ticketTime);
+		
 		// 更新订单详情表
 		List<OrderDetail> orderDetailList = orderDetailMapper.queryListByOrderSn(order.getOrderSn());
 		if (CollectionUtils.isEmpty(orderDetailList)) {
