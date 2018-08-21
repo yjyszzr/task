@@ -916,7 +916,7 @@ public class DlPrintLotteryService {
 	private void updateT01GameDetailAndLottery(List<String> t01Game) {
 		for(String t01Issue:t01Game){
 			DlSuperLotto dlSuperLotto = dlSuperLottoMapper.selectPrizeResultByTermNum(t01Issue);
-			if(dlSuperLotto==null||StringUtils.isEmpty(dlSuperLotto.getPrizeNum())){				
+			if(dlSuperLotto!=null&&!StringUtils.isEmpty(dlSuperLotto.getPrizeNum())){				
 				orderDetailMapper.beatchUpdateMatchResult(t01Issue,dlSuperLotto.getPrizeNum());
 				dlPrintLotteryMapper.beatchUpdateComparedStakes(t01Issue);
 			}
