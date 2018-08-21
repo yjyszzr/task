@@ -201,6 +201,7 @@ public class PrintChannelHenanServiceImpl  implements IPrintChannelService{
 				}
 				orders.add(queryRewardOrderResponse);
 			}
+			queryRewardResponseDto.setOrders(orders);
 		}
 		return queryRewardResponseDto;
 	}
