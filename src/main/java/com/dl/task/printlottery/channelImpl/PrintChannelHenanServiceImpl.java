@@ -163,8 +163,8 @@ public class PrintChannelHenanServiceImpl  implements IPrintChannelService{
 			DlPrintLotteryMapper dlPrintLotteryMapper) {
 		CommonQueryStakeParam commonQueryStakeParam = defaultCommonQueryStakeParam(dlPrintLotterys, dlTicketChannel.getTicketMerchant(), version);
 		List<String> collect = dlPrintLotterys.stream().map(print-> print.getPlatformId()).collect(Collectors.toList());
-		String[] orders = collect.toArray(new String[collect.size()]);
-		commonQueryStakeParam.setOrders(orders);
+		String[] platformIds = collect.toArray(new String[collect.size()]);
+		commonQueryStakeParam.setOrders(platformIds);
 		JSONObject jo = JSONObject.fromObject(commonQueryStakeParam);
 		String backStr = defaultCommonRestRequest(dlTicketChannel, dlPrintLotteryMapper, jo, "/ticket_prize", ThirdApiEnum.HE_NAN_LOTTERY);
 		JSONObject backJo = JSONObject.fromObject(backStr);
