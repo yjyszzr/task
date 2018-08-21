@@ -3,6 +3,7 @@ package com.dl.task.printlottery.channelImpl;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.math.BigDecimal;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -22,6 +23,7 @@ import com.dl.base.enums.ThirdApiEnum;
 import com.dl.base.util.DateUtil;
 import com.dl.task.dao.DlPrintLotteryMapper;
 import com.dl.task.enums.PrintLotteryStatusEnum;
+import com.dl.task.enums.ThirdRewardStatusEnum;
 import com.dl.task.model.DlPrintLottery;
 import com.dl.task.model.DlTicketChannel;
 import com.dl.task.printlottery.IPrintChannelService;
@@ -39,6 +41,8 @@ import com.dl.task.printlottery.responseDto.ToStakeResponseDTO.ToStakeBackOrderD
 import com.dl.task.printlottery.responseDto.henan.HeNanDlToStakeDTO;
 import com.dl.task.printlottery.responseDto.henan.HeNanDlToStakeDTO.HeNanBackOrderDetail;
 import com.dl.task.printlottery.responseDto.henan.HeNanQueryPrizeFileDTO;
+import com.dl.task.printlottery.responseDto.henan.HenanQueryRewardDTO;
+import com.dl.task.printlottery.responseDto.henan.HenanQueryRewardDTO.HenanQueryRewardOrderResponse;
 import com.dl.task.printlottery.responseDto.henan.HenanQueryStakeResponseDTO;
 import com.dl.task.printlottery.responseDto.henan.HenanQueryStakeResponseDTO.HenanQueryStakeOrderResponse;
 
@@ -156,11 +160,45 @@ public class PrintChannelHenanServiceImpl  implements IPrintChannelService{
 	@Override
 	public QueryRewardResponseDTO queryRewardByLottery(List<DlPrintLottery> dlPrintLotterys,DlTicketChannel dlTicketChannel,
 			DlPrintLotteryMapper dlPrintLotteryMapper) {
-		QueryRewardResponseDTO notSupport = new QueryRewardResponseDTO();
-		notSupport.setQuerySuccess(Boolean.FALSE);
-		notSupport.setRetCode("-1");
-		notSupport.setRetDesc("notSupprt");
-		return notSupport;
+		CommonQueryStakeParam commonQueryStakeParam = defaultCommonQueryStakeParam(dlPrintLotterys, dlTicketChannel.getTicketMerchant(), version);
+		JSONObject jo = JSONObject.fromObject(commonQueryStakeParam);
+		String backStr = defaultCommonRestRequest(dlTicketChannel, dlPrintLotteryMapper, jo, "/ticket_prize", ThirdApiEnum.HE_NAN_LOTTERY);
+		JSONObject backJo = JSONObject.fromObject(backStr);
+		@SuppressWarnings("rawtypes")
+		Map<String,Class> mapClass = new HashMap<String,Class>();
+		mapClass.put("orders", HenanQueryRewardOrderResponse.class);
+		HenanQueryRewardDTO dlQueryRewardDTO = (HenanQueryRewardDTO) JSONObject.toBean(backJo, HenanQueryRewardDTO.class, mapClass); 
+		QueryRewardResponseDTO queryRewardResponseDto = new QueryRewardResponseDTO();
+		queryRewardResponseDto.setQuerySuccess(Boolean.FALSE);
+		if(dlQueryRewardDTO==null){
+			return queryRewardResponseDto;
+		}
+		queryRewardResponseDto.setRetCode(dlQueryRewardDTO.getRetCode());
+		queryRewardResponseDto.setRetDesc(dlQueryRewardDTO.getRetDesc());
+		if(!CollectionUtils.isEmpty(dlQueryRewardDTO.getOrders())){
+			queryRewardResponseDto.setQuerySuccess(Boolean.TRUE);
+			List<QueryRewardOrderResponse> orders = new ArrayList<QueryRewardResponseDTO.QueryRewardOrderResponse>();
+			for(HenanQueryRewardOrderResponse rewardOrder:dlQueryRewardDTO.getOrders()){
+				QueryRewardOrderResponse queryRewardOrderResponse = new QueryRewardOrderResponse();
+				Integer status = rewardOrder.getStatus();
+				String ticketId = rewardOrder.getTicketId();
+				Boolean querySuccess = Boolean.FALSE;
+				if(Integer.valueOf(8).equals(status)||Integer.valueOf(9).equals(status)||Integer.valueOf(10).equals(status)){
+					querySuccess = Boolean.TRUE;
+				}
+				queryRewardOrderResponse.setQuerySuccess(querySuccess);
+				if(querySuccess){
+					queryRewardOrderResponse.setTicketId(ticketId);
+					queryRewardOrderResponse.setThirdRewardStatusEnum(ThirdRewardStatusEnum.REWARD_OVER);
+					Integer preTax = rewardOrder.getPreTax();
+					Integer tax = rewardOrder.getTax();
+					Integer prizeMoneyInteger = preTax-tax;
+					queryRewardOrderResponse.setPrizeMoney(prizeMoneyInteger);
+				}
+				orders.add(queryRewardOrderResponse);
+			}
+		}
+		return queryRewardResponseDto;
 	}
 	@Override
 	public QueryRewardResponseDTO queryRewardByIssue(String issueAndGame,DlTicketChannel dlTicketChannel,DlPrintLotteryMapper dlPrintLotteryMapper) {
