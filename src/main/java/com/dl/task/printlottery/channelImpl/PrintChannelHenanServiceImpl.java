@@ -11,6 +11,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 import net.sf.json.JSONObject;
@@ -161,6 +162,9 @@ public class PrintChannelHenanServiceImpl  implements IPrintChannelService{
 	public QueryRewardResponseDTO queryRewardByLottery(List<DlPrintLottery> dlPrintLotterys,DlTicketChannel dlTicketChannel,
 			DlPrintLotteryMapper dlPrintLotteryMapper) {
 		CommonQueryStakeParam commonQueryStakeParam = defaultCommonQueryStakeParam(dlPrintLotterys, dlTicketChannel.getTicketMerchant(), version);
+		List<String> collect = dlPrintLotterys.stream().map(print-> print.getPlatformId()).collect(Collectors.toList());
+		String[] orders = collect.toArray(new String[collect.size()]);
+		commonQueryStakeParam.setOrders(orders);
 		JSONObject jo = JSONObject.fromObject(commonQueryStakeParam);
 		String backStr = defaultCommonRestRequest(dlTicketChannel, dlPrintLotteryMapper, jo, "/ticket_prize", ThirdApiEnum.HE_NAN_LOTTERY);
 		JSONObject backJo = JSONObject.fromObject(backStr);
