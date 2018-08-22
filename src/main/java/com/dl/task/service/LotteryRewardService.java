@@ -69,8 +69,12 @@ public class LotteryRewardService {
 					String orderSn = dto.getOrderSn();
 					String compareStatus = dto.getCompareStatus();
 					Integer thirdRewardStatus = dto.getThirdRewardStatus();
-					if(StringUtils.isBlank(compareStatus) || !"1".equals(compareStatus)
-							||!Integer.valueOf(3).equals(thirdRewardStatus)) {
+					Boolean caiXiaoMiIsNotRewardEnd = StringUtils.isBlank(compareStatus) || !"1".equals(compareStatus);
+					String game = dto.getGame();
+					if("T01".equals(game)){
+						caiXiaoMiIsNotRewardEnd = caiXiaoMiIsNotRewardEnd||!Integer.valueOf(3).equals(thirdRewardStatus);
+					}
+					if(caiXiaoMiIsNotRewardEnd) {
 //					if(StringUtils.isBlank(compareStatus) || !"1".equals(compareStatus)){
 						unOrderSns.add(orderSn);
 					}
