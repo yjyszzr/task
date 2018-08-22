@@ -23,6 +23,8 @@ public class RewardComputeUtil {
 		tickesList.add("1=03|201808212017|11@7.200;05|201808212010|11@4.400;02|201808212007|3@2.300;04|201808212001|2@3.050");
 		tickesList.add("1=04|201808212017|2@3.200;02|201808212010|1@3.120;02|201808212007|3@2.300;04|201808212001|2@3.050");
 		tickesList.add("1=04|201808212017|2@3.200;05|201808212010|11@4.400;02|201808212007|3@2.300;04|201808212001|2@3.050");
+		StringBuffer orderRewardStr = new StringBuffer();
+		BigDecimal orderReward = new BigDecimal("0.0");
 		BigDecimal two = new BigDecimal(2.0);
 		for(String temp:tickesList){
 			String[] timeArr = temp.split("=");
@@ -44,8 +46,14 @@ public class RewardComputeUtil {
 			oneReward.append(two);
 			oneReward.append("=");
 			oneReward.append(reward.setScale(2,RoundingMode.HALF_EVEN));
+			orderRewardStr.append(reward.setScale(2,RoundingMode.HALF_EVEN));
+			orderRewardStr.append("+");
+			orderReward=orderReward.add(reward.setScale(2,RoundingMode.HALF_EVEN));
 			System.out.println(oneReward.toString());
 		}
-		
+		orderRewardStr.deleteCharAt(orderRewardStr.length()-1);
+		orderRewardStr.append("=");
+		orderRewardStr.append(orderReward);
+		System.out.println("订单总金额:"+orderRewardStr.toString());
 	}
 }
