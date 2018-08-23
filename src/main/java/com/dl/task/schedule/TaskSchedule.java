@@ -75,7 +75,7 @@ public class TaskSchedule {
 	/**
 	 * 第一步： 出票任务 （每5分钟执行一次） 调用第三方接口出票定时任务 定时的对出票中的进行查询结果
 	 */
-	// @Scheduled(cron = "${task.schedule.match.score.refreshMatchResult}")
+	@Scheduled(cron = "${task.schedule.match.score.refreshMatchResult}")
 	public void refreshMatchResult() {
 		log.info("比分计算赛果定时任务启动");
 		dlMatchResultService.refreshMatchResult();
@@ -181,7 +181,7 @@ public class TaskSchedule {
 	/**
 	 * 更新中奖用户的账户
 	 */
-	// @Scheduled(cron = "${task.schedule.member.reward.money}")
+	@Scheduled(cron = "${task.schedule.member.reward.money}")
 	public void addRewardMoneyToUsers() {
 		log.info("更新中奖用户的账户，派奖开始");
 		orderService.addRewardMoneyToUsers();
