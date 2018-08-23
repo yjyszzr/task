@@ -210,6 +210,7 @@
      	add_time betTime,
         order_sn orderSn,
         user_id userId,
+        lottery_classify_id lotteryClassifyId,
         winning_money realRewardMoney
      from 
         dl_order

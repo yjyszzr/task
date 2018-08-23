@@ -86,6 +86,8 @@ import com.dl.task.param.MessageAddParam;
 import com.dl.task.param.OrderSnParam;
 import com.dl.task.param.UpdateOrderInfoParam;
 import com.dl.task.printlottery.PrintLotteryAdapter;
+import com.dl.task.util.GeTuiMessage;
+import com.dl.task.util.GeTuiUtil;
 
 @Slf4j
 @Service
@@ -131,6 +133,9 @@ public class OrderService extends AbstractService<Order> {
     private UserMatchCollectMapper userMatchCollectMapper;
     @Resource
     private PrintLotteryAdapter printLotteryAdapter;
+    
+    @Resource
+    private GeTuiUtil geTuiUtil;
     
 	/**
 	 * 更新订单状态
@@ -457,6 +462,7 @@ public class OrderService extends AbstractService<Order> {
 	private void goLotteryMessage(List<Order> orders) {
 		AddMessageParam addParam = new AddMessageParam();
 		List<MessageAddParam> params = new ArrayList<MessageAddParam>(orders.size());
+		List<Integer> lotteryFailUserIds = new ArrayList<Integer>(orders.size());
 		for (Order order : orders) {
 			// 消息
 			MessageAddParam messageAddParam = new MessageAddParam();
@@ -474,7 +480,17 @@ public class OrderService extends AbstractService<Order> {
 			Integer addTime = order.getAddTime();
 			LocalDateTime loclaTime = LocalDateTime.ofEpochSecond(addTime, 0, ZoneOffset.of("+08:00"));
 			String format = loclaTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:dd"));
-			messageAddParam.setMsgDesc(MessageFormat.format(CommonConstants.FORMAT_PRINTLOTTERY_MSG_DESC, ticketAmount, format));
+			String gameDesc="竞彩足球";
+			if(Integer.valueOf(2).equals(order.getLotteryClassifyId())){
+				gameDesc="大乐透";
+			}
+			lotteryFailUserIds.add(order.getUserId());
+			User user = userMapper.queryUserByUserId(order.getUserId());
+			String pushKey= user.getPushKey();
+			String content = MessageFormat.format(CommonConstants.FORMAT_PRINTLOTTERY_PUSH_DESC,pushKey);
+			GeTuiMessage getuiMessage = new GeTuiMessage(CommonConstants.FORMAT_PRINTLOTTERY_PUSH_TITLE, content, DateUtil.getCurrentTimeLong());
+			geTuiUtil.pushMessage(pushKey, getuiMessage);
+			messageAddParam.setMsgDesc(MessageFormat.format(CommonConstants.FORMAT_PRINTLOTTERY_MSG_DESC,gameDesc,ticketAmount, format));
 			params.add(messageAddParam);
 		}
 		addParam.setParams(params);
@@ -637,6 +653,7 @@ public class OrderService extends AbstractService<Order> {
 				userIdAndRewardDTO.setBetMoney(orderWithUserDTO.getBetMoney());
 				userIdAndRewardDTO.setBetTime(DateUtil.getTimeString(betTime, DateUtil.datetimeFormat));
 				userIdAndRewardDTOs.add(userIdAndRewardDTO);
+				userIdAndRewardDTO.setLotteryClassifyId(orderWithUserDTO.getLotteryClassifyId());
 			}
 			userAccountService.batchUpdateUserAccount(userIdAndRewardDTOs,ProjectConstant.REWARD_AUTO);
 		}

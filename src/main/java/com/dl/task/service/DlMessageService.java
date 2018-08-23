@@ -34,7 +34,6 @@ public class DlMessageService extends AbstractService<DlMessage> {
     
     public BaseResult<String> add(@RequestBody AddMessageParam addParam) {
     	List<MessageAddParam> params = addParam.getParams();
-    	List<Integer> lotteryFailUserIds = new ArrayList<Integer>(params.size());
     	for(MessageAddParam param: params) {
     		DlMessage dlMessage = new DlMessage();
     		dlMessage.setContent(param.getContent());
@@ -50,18 +49,8 @@ public class DlMessageService extends AbstractService<DlMessage> {
     		dlMessage.setMsgUrl(param.getMsgUrl());
     		dlMessage.setContentUrl(param.getContentUrl());
     		dlMessageMapper.insertInDbSelective(dlMessage);
-    		if(3 == param.getObjectType()) {
-    			lotteryFailUserIds.add(param.getReceiver());
-    		}
     	}
     	//出票失败提示
-    	if(CollectionUtils.isNotEmpty(lotteryFailUserIds)) {
-    		List<String> clientIds = userMapper.getClientIds(lotteryFailUserIds);
-    		for(String clientId : clientIds) {
-    			GeTuiMessage getuiMessage = new GeTuiMessage(CommonConstants.FORMAT_PRINTLOTTERY_PUSH_TITLE, CommonConstants.FORMAT_PRINTLOTTERY_PUSH_DESC, DateUtil.getCurrentTimeLong());
-    			geTuiUtil.pushMessage(clientId, getuiMessage);
-    		}
-    	}
         return ResultGenerator.genSuccessResult();
     }
     

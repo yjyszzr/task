@@ -24,4 +24,6 @@ public class UserIdAndRewardDTO {
     
     @ApiModelProperty(value = "投注时间")
     private String betTime;
+    @ApiModelProperty(value = "彩种类型")
+	private Integer lotteryClassifyId;
 }
