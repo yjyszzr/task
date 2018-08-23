@@ -336,7 +336,7 @@ public class PrintChannelWeicaishidaiServiceImpl  implements IPrintChannelServic
 			ticket.setOut_id(lottery.getTicketId());
 			ticket.setAmount(""+lottery.getMoney().intValue());
 			ticket.setGame_id(gameId);
-			ticket.setIcount(getIcount(lottery.getMoney().intValue(),lottery.getTimes()));
+			ticket.setIcount(getBetNum(lottery.getMoney(),lottery.getTimes()));
 			ticket.setMultiple(""+lottery.getTimes());
 			ticket.setTerm_code(termCode);
 			ticket.setBet_type(getBetType(caiXiaoMiGame,lottery.getBetType()));
@@ -347,11 +347,6 @@ public class PrintChannelWeicaishidaiServiceImpl  implements IPrintChannelServic
 		body.setTickets(tickets);
 		body.setUuid(UUID.randomUUID().toString());
 		return body;
-	}
-
-	private static String getIcount(Integer money,Integer times) {
-		Integer icount = money/(100*times*2);
-		return icount.toString();
 	}
 
 	/**
@@ -394,7 +389,7 @@ public class PrintChannelWeicaishidaiServiceImpl  implements IPrintChannelServic
 	 * @param caixiaomiStatke
 	 * @return
 	 */
-	private static String getNumber(String game,String playType,String betType,String caixiaomiStatke) {
+	private String getNumber(String game,String playType,String betType,String caixiaomiStatke) {
 		if(CAIXIAOMI_GAME_LETTO.equals(game)){
 			return caixiaomiStatke;
 		}else if(CAIXIAOMI_GAME_JZ.equals(game)&&"06".equals(playType)){//混合投注
@@ -431,29 +426,7 @@ public class PrintChannelWeicaishidaiServiceImpl  implements IPrintChannelServic
 		}
 		return null;
 	}
-	public static String removeIssueWeekDay(String isssue){
-		String sumIsssue = isssue.substring(0, 8)+isssue.substring(9, isssue.length()); 
-		return sumIsssue;
-	}
-	public static String addIssueWeekDay(String isssue){
-		String yyyymmdd = isssue.substring(0, 8);
-		String theEnd = isssue.substring(8, isssue.length());
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-		Date issueDay=null;
-		try {
-			issueDay = sdf.parse(yyyymmdd);
-		} catch (ParseException e) {
-			log.error("日期格式转化异常 日期串={}",yyyymmdd);
-		}
-		 Calendar cal = Calendar.getInstance();
-		cal.setTime(issueDay);
-		int week = cal.get(Calendar.DAY_OF_WEEK)-1;
-		if(week==0){
-			week=7;
-		}
-		String sumIsssue = yyyymmdd+week+theEnd;
-		return sumIsssue;
-	}
+	
 	private String getGameId(DlPrintLottery lottery) {
 		String game = lottery.getGame();
 		String betType=lottery.getBetType();
@@ -490,7 +463,7 @@ public class PrintChannelWeicaishidaiServiceImpl  implements IPrintChannelServic
 	 * @param ticketNumber
 	 * @return
 	 */
-	private static String getCaiXiaoMiSpFromTicketNumber(String ticketNumber) {
+	private String getCaiXiaoMiSpFromTicketNumber(String ticketNumber) {
 		if(StringUtils.isEmpty(ticketNumber)){
 			return "";//没有赔率
 		}

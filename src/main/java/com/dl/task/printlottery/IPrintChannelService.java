@@ -1,7 +1,10 @@
 package com.dl.task.printlottery;
 
+import java.math.BigDecimal;
 import java.nio.charset.Charset;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -51,6 +54,61 @@ public interface IPrintChannelService {
 		String[] orders = collect.toArray(new String[collect.size()]);
 		queryStakeParam.setOrders(orders);
 		return queryStakeParam;
+	}
+	/**
+	 * 计算投注注数(默认2.0元一张票时)
+	 * @param money 票总价 单位分
+	 * @param times 倍数
+	 * @return
+	 */
+	default String getBetNum(BigDecimal money,Integer times) {
+		Integer icount = money.intValue()/(100*times*2);
+		return icount.toString();
+	}
+	
+	/**
+	 * 计算投注注数(指定投注金额，暂不支持单张票为小数的计算)
+	 * @param money 票总价 单位分
+	 * @param times 倍数
+	 * @param oneTicketMoney 一张票钱非2.0时，例如大乐透追加投注3.0
+	 * @return
+	 */
+	default String getBetNum(BigDecimal money,Integer times,BigDecimal oneTicketMoney) {
+		Integer icount = money.intValue()/(100*times*oneTicketMoney.intValue());
+		return icount.toString();
+	}
+	/**
+	 * 移除竞彩足球第九位数据（星期几）
+	 * @param isssue 例如201808234001 返回20180823001
+	 * @return
+	 */
+	default String removeIssueWeekDay(String isssue){
+		String sumIsssue = isssue.substring(0, 8)+isssue.substring(9, isssue.length()); 
+		return sumIsssue;
+	}
+	/**
+	 * 在期次中第九位增加星期几
+	 * @param isssue 例如20180823001 返回201808234001
+	 * @return
+	 */
+	default String addIssueWeekDay(String isssue){
+		String yyyymmdd = isssue.substring(0, 8);
+		String theEnd = isssue.substring(8, isssue.length());
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+		Date issueDay=null;
+		try {
+			issueDay = sdf.parse(yyyymmdd);
+		} catch (ParseException e) {
+			parentLog.error("日期格式转化异常 日期串={}",yyyymmdd);
+		}
+		 Calendar cal = Calendar.getInstance();
+		cal.setTime(issueDay);
+		int week = cal.get(Calendar.DAY_OF_WEEK)-1;
+		if(week==0){
+			week=7;
+		}
+		String sumIsssue = yyyymmdd+week+theEnd;
+		return sumIsssue;
 	}
 	/**
 	 * 
