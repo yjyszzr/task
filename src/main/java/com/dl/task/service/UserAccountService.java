@@ -29,6 +29,7 @@ import com.dl.base.util.DateUtil;
 import com.dl.base.util.JSONHelper;
 import com.dl.base.util.SNGenerator;
 import com.dl.task.core.ProjectConstant;
+import com.dl.task.dao.DlLotteryClassifyMapper;
 import com.dl.task.dao.DlMessageMapper;
 import com.dl.task.dao.LotteryWinningLogTempMapper;
 import com.dl.task.dao.OrderMapper;
@@ -37,6 +38,7 @@ import com.dl.task.dao.UserMapper;
 import com.dl.task.dto.SurplusPaymentCallbackDTO;
 import com.dl.task.dto.SysConfigDTO;
 import com.dl.task.dto.UserIdAndRewardDTO;
+import com.dl.task.model.DlLotteryClassify;
 import com.dl.task.model.DlMessage;
 import com.dl.task.model.LotteryWinningLogTemp;
 import com.dl.task.model.Order;
@@ -65,10 +67,13 @@ public class UserAccountService extends AbstractService<UserAccount> {
 	@Resource
 	private DlMessageMapper dlMessageMapper;
 	@Resource
+	private DlLotteryClassifyMapper dlLotteryClassifyMapper;
+	@Resource
 	private GeTuiUtil geTuiUtil;
 	
 	@Resource
 	private	LotteryWinningLogTempMapper lotteryWinningLogTempMapper;
+	
 
 	/**
 	 * 更新用户账户信息
@@ -186,9 +191,11 @@ public class UserAccountService extends AbstractService<UserAccount> {
 		}
 
 		for (UserIdAndRewardDTO u : list) {
-			String gameDesc="竞彩足球";
-			if(Integer.valueOf(2).equals(u.getLotteryClassifyId())){
-				gameDesc="大乐透";
+			DlLotteryClassify lottery= dlLotteryClassifyMapper.selectOneByLotteryClassifyId(u.getLotteryClassifyId());
+			String gameDesc=lottery.getLotteryName();
+			if(StringUtils.isEmpty(gameDesc)){
+				log.error("orderSn={},lotteryId={},lotteryName is null",u.getOrderSn(),u.getLotteryClassifyId());
+				gameDesc="竞彩足球";
 			}
 			DlMessage messageAddParam = new DlMessage();
 			messageAddParam.setTitle(CommonConstants.FORMAT_REWARD_TITLE);
