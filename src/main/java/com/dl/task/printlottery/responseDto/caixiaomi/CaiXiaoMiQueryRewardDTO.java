@@ -8,7 +8,7 @@ import java.util.List;
 import lombok.Data;
 
 @Data
-public class CaixiaomiQueryRewardDTO implements Serializable {
+public class CaiXiaoMiQueryRewardDTO implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -28,10 +28,10 @@ public class CaixiaomiQueryRewardDTO implements Serializable {
 	private String retDesc;
 
 	@ApiModelProperty(value = "返回订单详情", required = true)
-	private List<HenanQueryRewardOrderResponse> orders;
+	private List<CaixiaoMiQueryRewardOrderResponse> orders;
 
 	@Data
-	public static class HenanQueryRewardOrderResponse {
+	public static class CaixiaoMiQueryRewardOrderResponse {
 		@ApiModelProperty(value = "中心平台订单编号", required = true)
 		private String platformId;
 

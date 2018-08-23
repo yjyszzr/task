@@ -32,10 +32,10 @@ import com.dl.task.printlottery.responseDto.ToStakeResponseDTO;
 import com.dl.task.printlottery.responseDto.ToStakeResponseDTO.ToStakeBackOrderDetail;
 import com.dl.task.printlottery.responseDto.caixiaomi.CaiXiaoMiDlToStakeDTO;
 import com.dl.task.printlottery.responseDto.caixiaomi.CaiXiaoMiDlToStakeDTO.CaiXiaoBackOrderDetail;
+import com.dl.task.printlottery.responseDto.caixiaomi.CaiXiaoMiQueryRewardDTO;
+import com.dl.task.printlottery.responseDto.caixiaomi.CaiXiaoMiQueryRewardDTO.CaixiaoMiQueryRewardOrderResponse;
 import com.dl.task.printlottery.responseDto.caixiaomi.CaiXiaoMiQueryStakeResponseDTO;
 import com.dl.task.printlottery.responseDto.caixiaomi.CaiXiaoMiQueryStakeResponseDTO.CaiXiaoMiQueryStakeOrderResponse;
-import com.dl.task.printlottery.responseDto.henan.HenanQueryRewardDTO;
-import com.dl.task.printlottery.responseDto.henan.HenanQueryRewardDTO.HenanQueryRewardOrderResponse;
 
 @Service
 @Slf4j
@@ -62,12 +62,12 @@ public class PrintChannelCaixiaomiServiceImpl implements IPrintChannelService {
 		if (!CollectionUtils.isEmpty(dlToStakeDTO.getOrders())) {
 			toStakeResponseDTO.setRetSucc(Boolean.TRUE);
 			List<ToStakeBackOrderDetail> orders = new ArrayList<>();
-			for (CaiXiaoBackOrderDetail heNanDetail : dlToStakeDTO.getOrders()) {
+			for (CaiXiaoBackOrderDetail caiXiaoMiDetail : dlToStakeDTO.getOrders()) {
 				ToStakeBackOrderDetail orderDetail = new ToStakeBackOrderDetail();
-				orderDetail.setErrorCode(heNanDetail.getErrorCode());
-				orderDetail.setPlatformId(heNanDetail.getPlatformId());
-				orderDetail.setTicketId(heNanDetail.getTicketId());
-				Boolean printLotteryDoing = heNanDetail.getErrorCode() == 0 || heNanDetail.getErrorCode() == 8;
+				orderDetail.setErrorCode(caiXiaoMiDetail.getErrorCode());
+				orderDetail.setPlatformId(caiXiaoMiDetail.getPlatformId());
+				orderDetail.setTicketId(caiXiaoMiDetail.getTicketId());
+				Boolean printLotteryDoing = caiXiaoMiDetail.getErrorCode() == 0 || caiXiaoMiDetail.getErrorCode() == 8;
 				orderDetail.setPrintLotteryDoing(printLotteryDoing);
 				orders.add(orderDetail);
 			}
@@ -163,8 +163,8 @@ public class PrintChannelCaixiaomiServiceImpl implements IPrintChannelService {
 		JSONObject backJo = JSONObject.fromObject(backStr);
 		@SuppressWarnings("rawtypes")
 		Map<String, Class> mapClass = new HashMap<String, Class>();
-		mapClass.put("orders", HenanQueryRewardOrderResponse.class);
-		HenanQueryRewardDTO dlQueryRewardDTO = (HenanQueryRewardDTO) JSONObject.toBean(backJo, HenanQueryRewardDTO.class, mapClass);
+		mapClass.put("orders", CaixiaoMiQueryRewardOrderResponse.class);
+		CaiXiaoMiQueryRewardDTO dlQueryRewardDTO = (CaiXiaoMiQueryRewardDTO) JSONObject.toBean(backJo, CaiXiaoMiQueryRewardDTO.class, mapClass);
 		QueryRewardResponseDTO queryRewardResponseDto = new QueryRewardResponseDTO();
 		queryRewardResponseDto.setQuerySuccess(Boolean.FALSE);
 		if (dlQueryRewardDTO == null) {
@@ -175,21 +175,22 @@ public class PrintChannelCaixiaomiServiceImpl implements IPrintChannelService {
 		if (!CollectionUtils.isEmpty(dlQueryRewardDTO.getOrders())) {
 			queryRewardResponseDto.setQuerySuccess(Boolean.TRUE);
 			List<QueryRewardOrderResponse> orders = new ArrayList<QueryRewardResponseDTO.QueryRewardOrderResponse>();
-			for (HenanQueryRewardOrderResponse rewardOrder : dlQueryRewardDTO.getOrders()) {
+			for (CaixiaoMiQueryRewardOrderResponse rewardOrder : dlQueryRewardDTO.getOrders()) {
 				QueryRewardOrderResponse queryRewardOrderResponse = new QueryRewardOrderResponse();
-				Integer status = rewardOrder.getStatus();
+				Integer status = rewardOrder.getAwardCode();
 				String ticketId = rewardOrder.getTicketId();
 				Boolean querySuccess = Boolean.FALSE;
-				if (Integer.valueOf(8).equals(status) || Integer.valueOf(9).equals(status) || Integer.valueOf(10).equals(status)) {
+				if (Integer.valueOf(0).equals(status) || Integer.valueOf(8).equals(status) || Integer.valueOf(9).equals(status) || Integer.valueOf(10).equals(status)) {
 					querySuccess = Boolean.TRUE;
 				}
 				queryRewardOrderResponse.setQuerySuccess(querySuccess);
 				if (querySuccess) {
 					queryRewardOrderResponse.setTicketId(ticketId);
 					queryRewardOrderResponse.setThirdRewardStatusEnum(ThirdRewardStatusEnum.REWARD_OVER);
-					Integer preTax = rewardOrder.getPreTax();
-					Integer tax = rewardOrder.getTax();
-					Integer prizeMoneyInteger = preTax - tax;
+					// Integer preTax = rewardOrder.getPreTax();
+					// Integer tax = rewardOrder.getTax();
+					// 奖金字段缺失需要跟第三方对接
+					Integer prizeMoneyInteger = 0;
 					queryRewardOrderResponse.setPrizeMoney(prizeMoneyInteger);
 				}
 				orders.add(queryRewardOrderResponse);
