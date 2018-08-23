@@ -75,7 +75,7 @@ public class TaskSchedule {
 	/**
 	 * 第一步： 出票任务 （每5分钟执行一次） 调用第三方接口出票定时任务 定时的对出票中的进行查询结果
 	 */
-	@Scheduled(cron = "${task.schedule.match.score.refreshMatchResult}")
+	// @Scheduled(cron = "${task.schedule.match.score.refreshMatchResult}")
 	public void refreshMatchResult() {
 		log.info("比分计算赛果定时任务启动");
 		dlMatchResultService.refreshMatchResult();
@@ -87,21 +87,22 @@ public class TaskSchedule {
 	 */
 	@Scheduled(cron = "${task.schedule.lottery.print.lottery}")
 	public void printLottery() {
-//		log.info("出票定时任务启动");
-//		dlPrintLotteryService.goPrintLottery();
-//		log.info("出票定时任务结束");
-//		// 每天9点前不作查询处理，只作出票处理
-//		LocalTime localTime = LocalTime.now(ZoneId.systemDefault());
-//		int hour = localTime.getHour();
-//		if (hour < 1 || hour >= 9) {
-//			log.info("彩票出票状态查询定时任务启动");
-//			dlPrintLotteryService.goQueryStake();
-//			log.info("彩票出票状态查询定时任务结束");
-//		}
+		// log.info("出票定时任务启动");
+		// dlPrintLotteryService.goPrintLottery();
+		// log.info("出票定时任务结束");
+		// // 每天9点前不作查询处理，只作出票处理
+		// LocalTime localTime = LocalTime.now(ZoneId.systemDefault());
+		// int hour = localTime.getHour();
+		// if (hour < 1 || hour >= 9) {
+		// log.info("彩票出票状态查询定时任务启动");
+		// dlPrintLotteryService.goQueryStake();
+		// log.info("彩票出票状态查询定时任务结束");
+		// }
 		dlPrintLotteryService.goPrintLotteryVersion2();
 	}
+
 	/**
-	 *查询出票信息任务 （每12分钟执行一次） 调用第三方接口出票定时任务 定时的对出票中的进行查询结果
+	 * 查询出票信息任务 （每12分钟执行一次） 调用第三方接口出票定时任务 定时的对出票中的进行查询结果
 	 */
 	@Scheduled(cron = "${task.schedule.lottery.print.querylottery}")
 	public void quereyPrintLottery() {
@@ -113,22 +114,23 @@ public class TaskSchedule {
 			log.info("彩票出票状态查询定时任务结束");
 		}
 	}
+
 	/**
 	 * 更新出票的中奖信息
 	 */
 	@Scheduled(cron = "${task.schedule.lottery.print.third.reward}")
 	public void updatePrintLotteryThirdRewardInfo() {
 		dlPrintLotteryService.rewardPrintLotteryVersion2();
-//		try {
-//			dlPrintLotteryService.updatePrintLotterysThirdRewardXian();
-//		} catch (Exception e) {
-//			log.error("定时更新西安获奖信息失败", e);
-//		}
-//		try {
-//			dlPrintLotteryService.updatePrintLotteryThirdRewardHeNan();
-//		} catch (Exception e) {
-//			log.error("定时更新河南获奖信息失败", e);
-//		}
+		// try {
+		// dlPrintLotteryService.updatePrintLotterysThirdRewardXian();
+		// } catch (Exception e) {
+		// log.error("定时更新西安获奖信息失败", e);
+		// }
+		// try {
+		// dlPrintLotteryService.updatePrintLotteryThirdRewardHeNan();
+		// } catch (Exception e) {
+		// log.error("定时更新河南获奖信息失败", e);
+		// }
 	}
 
 	/**
@@ -179,7 +181,7 @@ public class TaskSchedule {
 	/**
 	 * 更新中奖用户的账户
 	 */
-	@Scheduled(cron = "${task.schedule.member.reward.money}")
+	// @Scheduled(cron = "${task.schedule.member.reward.money}")
 	public void addRewardMoneyToUsers() {
 		log.info("更新中奖用户的账户，派奖开始");
 		orderService.addRewardMoneyToUsers();
