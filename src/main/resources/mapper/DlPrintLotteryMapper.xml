@@ -65,7 +65,7 @@
   where printLottery.status=1 and printLottery.compare_status=1
   and printLottery.third_reward_status=#{thirdRewardStatus} 
   and printLottery.print_lottery_com=#{printChannelId}
-  order by order_sn limit 1000
+  order by order_sn limit 2000
   </select>
   
    <select id="getPrintIngLotterys" resultMap="BaseResultMap">
@@ -210,7 +210,7 @@
   <select id="lotteryPrintsByUnPrintByChannelId" resultMap="BaseResultMap">
   	select * from dl_print_lottery 
   	where status=#{status} and print_lottery_com = #{printChannelId}
-     order by order_sn limit 1000
+     order by order_sn limit 2000
   </select>
   <update id="updatePrintLotteryFailStatus">
     update dl_print_lottery set 
