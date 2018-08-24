@@ -1813,9 +1813,9 @@ public class DlPrintLotteryService {
 				DlTicketChannel dlTicketChannel = printLotteryAdapter.selectChannelByChannelId(printComEnums);
 				List<DlPrintLottery> lotteryLists = printLotteryAdapter.getLotteryList(printComEnums,PrintLotteryStatusEnum.DOING);
 				log.info("渠道channelId={},channelName={},查询出票状态个数={}",printComEnums.getPrintChannelId(),printComEnums.getPrintChannelName(),lotteryLists.size());
-				while(true){
-//					int endIndex = lotteryLists.size()>50?50:lotteryLists.size();
-					List<DlPrintLottery> subList = new ArrayList<DlPrintLottery>();//lotteryLists.subList(0, endIndex);
+				while(!CollectionUtils.isEmpty(lotteryLists)){
+					int endIndex = lotteryLists.size()>50?50:lotteryLists.size();
+					List<DlPrintLottery> subList = lotteryLists.subList(0, endIndex);
 					QueryStakeResponseDTO queryStakeResponseDTO = printLotteryAdapter.queryStake(printComEnums,subList,dlTicketChannel);
 					if(queryStakeResponseDTO==null){
 						log.error("出票查询返回空，channelId={},channelName={}",printComEnums.getPrintChannelId(),printComEnums.getPrintChannelName());
