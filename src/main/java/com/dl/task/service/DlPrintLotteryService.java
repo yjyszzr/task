@@ -1808,9 +1808,7 @@ public class DlPrintLotteryService {
 			log.info("渠道channelId={},channelName={}出票结束",printComEnums.getPrintChannelId(),printComEnums.getPrintChannelName());
 		}
 	}
-	public void queryPrintLotteryVersion2() {
-		log.info("出票查询版本2.0出票查询开始");
-		for(PrintComEnums printComEnums:PrintComEnums.values()){
+	public void queryPrintLotteryVersion2(PrintComEnums printComEnums) {
 			try{
 				DlTicketChannel dlTicketChannel = printLotteryAdapter.selectChannelByChannelId(printComEnums);
 				List<DlPrintLottery> lotteryLists = printLotteryAdapter.getLotteryList(printComEnums,PrintLotteryStatusEnum.DOING);
@@ -1853,10 +1851,8 @@ public class DlPrintLotteryService {
 				}
 			}catch(Exception e){
 				log.error("投注查询接口 printChannelId={},printChannelName={}投注查询异常",printComEnums.getPrintChannelId(),printComEnums.getPrintChannelName(),e);
-				continue;
 			}
 			log.info("渠道channelId={},channelName={},查询出票状态结束",printComEnums.getPrintChannelId(),printComEnums.getPrintChannelName());
-		}
 	}
 	public void rewardPrintLotteryVersion2() {
 		log.info("出奖奖金查询版本2.0奖金查询开始");

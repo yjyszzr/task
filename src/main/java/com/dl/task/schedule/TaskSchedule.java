@@ -28,6 +28,7 @@ import com.dl.task.model.Order;
 import com.dl.task.model.ReqOrdeEntity;
 import com.dl.task.model.ReqOrdeEntityForUserAccount;
 import com.dl.task.model.UserWithdraw;
+import com.dl.task.printlottery.PrintComEnums;
 import com.dl.task.service.DlMatchResultService;
 import com.dl.task.service.DlOldBeltNewService;
 import com.dl.task.service.DlPrintLotteryService;
@@ -100,6 +101,7 @@ public class TaskSchedule {
 //		}
 		dlPrintLotteryService.goPrintLotteryVersion2();
 	}
+	
 	/**
 	 *查询出票信息任务 （每12分钟执行一次） 调用第三方接口出票定时任务 定时的对出票中的进行查询结果
 	 */
@@ -109,8 +111,26 @@ public class TaskSchedule {
 		int hour = localTime.getHour();
 		if (hour < 1 || hour >= 9) {
 			log.info("彩票出票状态查询定时任务启动");
-			dlPrintLotteryService.queryPrintLotteryVersion2();
+			for(PrintComEnums printComEnums:PrintComEnums.values()){
+				if(PrintComEnums.WEICAISHIDAI==printComEnums){
+					continue;
+				}
+				dlPrintLotteryService.queryPrintLotteryVersion2(printComEnums);
+			}
 			log.info("彩票出票状态查询定时任务结束");
+		}
+	}
+	/**
+	 *查询出票信息任务 （每12分钟执行一次） 调用第三方接口出票定时任务 定时的对出票中的进行查询结果
+	 */
+	@Scheduled(cron = "${task.schedule.lottery.print.querylottery.weicai}")
+	public void quereyPrintLotteryWeiCai() {
+		LocalTime localTime = LocalTime.now(ZoneId.systemDefault());
+		int hour = localTime.getHour();
+		if (hour < 1 || hour >= 9) {
+			log.info("彩票出票状态微彩时代查询定时任务启动");
+			dlPrintLotteryService.queryPrintLotteryVersion2(PrintComEnums.WEICAISHIDAI);
+			log.info("彩票出票状态微彩时代查询定时任务结束");
 		}
 	}
 	/**
