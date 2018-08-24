@@ -47,5 +47,8 @@ public class CaiXiaoMiQueryRewardDTO implements Serializable {
 		@ApiModelProperty(value = "中奖时间", required = true)
 		private String awardTime;
 
+		@ApiModelProperty(value = "中奖奖金(按照分来计算)", required = true)
+		private Integer awardMoney;
+
 	}
 }

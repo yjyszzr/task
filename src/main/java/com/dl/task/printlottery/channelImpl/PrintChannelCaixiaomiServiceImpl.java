@@ -6,7 +6,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 import net.sf.json.JSONObject;
@@ -26,6 +25,8 @@ import com.dl.task.printlottery.requestDto.CommonToStakeParam;
 import com.dl.task.printlottery.responseDto.QueryPrintBalanceDTO;
 import com.dl.task.printlottery.responseDto.QueryRewardResponseDTO;
 import com.dl.task.printlottery.responseDto.QueryRewardResponseDTO.QueryRewardOrderResponse;
+import com.dl.task.printlottery.responseDto.QueryRewardStatusResponseDTO;
+import com.dl.task.printlottery.responseDto.QueryRewardStatusResponseDTO.QueryRewardStatusOrderResponse;
 import com.dl.task.printlottery.responseDto.QueryStakeResponseDTO;
 import com.dl.task.printlottery.responseDto.QueryStakeResponseDTO.QueryStakeOrderResponse;
 import com.dl.task.printlottery.responseDto.ToStakeResponseDTO;
@@ -148,17 +149,18 @@ public class PrintChannelCaixiaomiServiceImpl implements IPrintChannelService {
 
 	@Override
 	public QueryRewardResponseDTO queryRewardByLottery(List<DlPrintLottery> dlPrintLotterys, DlTicketChannel dlTicketChannel, DlPrintLotteryMapper dlPrintLotteryMapper) {
-		// TODO 胡贺东 暂时不实现
-		// QueryRewardResponseDTO notSupport = new QueryRewardResponseDTO();
-		// notSupport.setQuerySuccess(Boolean.FALSE);
-		// notSupport.setRetCode("-1");
-		// notSupport.setRetDesc("notSupprt");
-
 		CommonQueryStakeParam commonQueryStakeParam = defaultCommonQueryStakeParam(dlPrintLotterys, dlTicketChannel.getTicketMerchant(), version);
-		List<String> collect = dlPrintLotterys.stream().map(print -> print.getPlatformId()).collect(Collectors.toList());
+		// List<String> collect = dlPrintLotterys.stream().map(print ->
+		// print.getPlatformId()).collect(Collectors.toList());
+		List<String> collect = new ArrayList<String>(dlPrintLotterys.size());
+		for (int i = 0; i < dlPrintLotterys.size(); i++) {
+			String str = "{'ticketId':'" + dlPrintLotterys.get(i).getTicketId() + "'}";
+			collect.add(str);
+		}
 		String[] platformIds = collect.toArray(new String[collect.size()]);
 		commonQueryStakeParam.setOrders(platformIds);
 		JSONObject jo = JSONObject.fromObject(commonQueryStakeParam);
+		log.error("==========================================投注查询请求接口参数 jo={}", jo);
 		String backStr = defaultCommonRestRequest(dlTicketChannel, dlPrintLotteryMapper, jo, "/award_query", ThirdApiEnum.CAI_XIAO_MI_LOTTERY);
 		JSONObject backJo = JSONObject.fromObject(backStr);
 		@SuppressWarnings("rawtypes")
@@ -187,19 +189,52 @@ public class PrintChannelCaixiaomiServiceImpl implements IPrintChannelService {
 				if (querySuccess) {
 					queryRewardOrderResponse.setTicketId(ticketId);
 					queryRewardOrderResponse.setThirdRewardStatusEnum(ThirdRewardStatusEnum.REWARD_OVER);
-					// Integer preTax = rewardOrder.getPreTax();
-					// Integer tax = rewardOrder.getTax();
-					// 奖金字段缺失需要跟第三方对接
-					Integer prizeMoneyInteger = 0;
-					queryRewardOrderResponse.setPrizeMoney(prizeMoneyInteger);
+					// 中奖奖金
+					queryRewardOrderResponse.setPrizeMoney(rewardOrder.getAwardMoney());
 				}
 				orders.add(queryRewardOrderResponse);
 			}
 			queryRewardResponseDto.setOrders(orders);
 		}
 		return queryRewardResponseDto;
+	}
 
-		// return notSupport;
+	@Override
+	public QueryRewardStatusResponseDTO queryRewardStatusByLottery(List<DlPrintLottery> dlPrintLotterys, DlTicketChannel dlTicketChannel, DlPrintLotteryMapper dlPrintLotteryMapper) {
+		CommonQueryStakeParam commonQueryStakeParam = defaultCommonQueryStakeParam(dlPrintLotterys, dlTicketChannel.getTicketMerchant(), version);
+		List<String> collect = new ArrayList<String>(dlPrintLotterys.size());
+		for (int i = 0; i < dlPrintLotterys.size(); i++) {
+			String str = "{'ticketId':'" + dlPrintLotterys.get(i).getTicketId() + "'}";
+			collect.add(str);
+		}
+		String[] platformIds = collect.toArray(new String[collect.size()]);
+		commonQueryStakeParam.setOrders(platformIds);
+		JSONObject jo = JSONObject.fromObject(commonQueryStakeParam);
+		log.error("==========================================兑奖接口参数 jo={}", jo);
+		String backStr = defaultCommonRestRequest(dlTicketChannel, dlPrintLotteryMapper, jo, "/award", ThirdApiEnum.CAI_XIAO_MI_LOTTERY);
+		JSONObject backJo = JSONObject.fromObject(backStr);
+		@SuppressWarnings("rawtypes")
+		Map<String, Class> mapClass = new HashMap<String, Class>();
+		mapClass.put("orders", QueryRewardStatusOrderResponse.class);
+		QueryRewardStatusResponseDTO dlQueryRewardDTO = (QueryRewardStatusResponseDTO) JSONObject.toBean(backJo, QueryRewardStatusResponseDTO.class, mapClass);
+		if (dlQueryRewardDTO != null) {
+			dlQueryRewardDTO.setQuerySuccess(Boolean.TRUE);
+			if (!CollectionUtils.isEmpty(dlQueryRewardDTO.getOrders())) {
+				for (int i = 0; i < dlQueryRewardDTO.getOrders().size(); i++) {
+					QueryRewardStatusOrderResponse rewardOrder = new QueryRewardStatusOrderResponse();
+					Integer status = rewardOrder.getErrorCode();
+					Boolean querySuccess = Boolean.FALSE;
+					if (Integer.valueOf(0).equals(status) || Integer.valueOf(8).equals(status) || Integer.valueOf(9).equals(status) || Integer.valueOf(10).equals(status)) {
+						querySuccess = Boolean.TRUE;
+						rewardOrder.setQuerySuccess(querySuccess);
+						dlQueryRewardDTO.getOrders().set(i, rewardOrder);
+					}
+				}
+			}
+		} else {
+			return dlQueryRewardDTO;
+		}
+		return dlQueryRewardDTO;
 	}
 
 	@Override
