@@ -115,6 +115,19 @@
     where status=3 and ticket_id = #{ticketId}
   </update>
   
+  <update id="beatchUpdateLotteryPrintByCallBack">
+    <foreach collection="lotteryPrints" separator=";" item="lottery">
+    update dl_print_lottery set
+           status = #{lottery.status},
+           platform_id = #{lottery.platformId},
+           print_status = #{lottery.printStatus},
+           print_sp = #{lottery.printSp},
+           print_no = #{lottery.printNo},
+           print_time = #{lottery.printTime}
+    where status=3 and ticket_id = #{lottery.ticketId}
+    </foreach>
+  </update>
+  
   <insert id="saveLotteryThirdApiLog">
   	insert into dl_third_api_log(api_name,api_type,api_param,api_result,api_desc)
   	values(#{apiName},#{apiType},#{apiParam},#{apiResult},#{apiDesc})
@@ -226,6 +239,17 @@
 	     ,print_time = #{printTime}
 	</if>
   	where ticket_id=#{ticketId}
+  </update>
+   <update id="beatchUpdatePrintStatusByTicketId">
+   <foreach collection="lotteryPrints" separator=";" item="lottery">
+  	update dl_print_lottery set 
+  	error_code=#{lottery.errorCode}, 
+  	status=#{lottery.status} 
+  	<if test="lottery.printTime != null ">
+	     ,print_time = #{lottery.printTime}
+	</if>
+  	where ticket_id=#{lottery.ticketId}
+  	</foreach>
   </update>
   
   <update id="beatchUpdateComparedStakes">

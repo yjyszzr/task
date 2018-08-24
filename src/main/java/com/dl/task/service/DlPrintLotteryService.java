@@ -1813,9 +1813,9 @@ public class DlPrintLotteryService {
 				DlTicketChannel dlTicketChannel = printLotteryAdapter.selectChannelByChannelId(printComEnums);
 				List<DlPrintLottery> lotteryLists = printLotteryAdapter.getLotteryList(printComEnums,PrintLotteryStatusEnum.DOING);
 				log.info("渠道channelId={},channelName={},查询出票状态个数={}",printComEnums.getPrintChannelId(),printComEnums.getPrintChannelName(),lotteryLists.size());
-				while(!CollectionUtils.isEmpty(lotteryLists)){
-					int endIndex = lotteryLists.size()>50?50:lotteryLists.size();
-					List<DlPrintLottery> subList = lotteryLists.subList(0, endIndex);
+				while(true){
+//					int endIndex = lotteryLists.size()>50?50:lotteryLists.size();
+					List<DlPrintLottery> subList = new ArrayList<DlPrintLottery>();//lotteryLists.subList(0, endIndex);
 					QueryStakeResponseDTO queryStakeResponseDTO = printLotteryAdapter.queryStake(printComEnums,subList,dlTicketChannel);
 					if(queryStakeResponseDTO==null){
 						log.error("出票查询返回空，channelId={},channelName={}",printComEnums.getPrintChannelId(),printComEnums.getPrintChannelName());
@@ -1843,8 +1843,15 @@ public class DlPrintLotteryService {
 							lotteryPrint.setPrintTime(stake.getPrintTimeDate());
 							lotteryPrints.add(lotteryPrint);
 						}
-						for (DlPrintLottery print : lotteryPrints) {
-							dlPrintLotteryMapper.updateLotteryPrintByCallBack(print);
+						if(!CollectionUtils.isEmpty(lotteryPrints)){							
+							long start = System.currentTimeMillis();
+							log.info("query stake betch Update dl_print_lottery start ={}ms,listSize={}",start,lotteryPrints.size());
+							int updateRow= dlPrintLotteryMapper.beatchUpdateLotteryPrintByCallBack(lotteryPrints);
+							long end = System.currentTimeMillis();
+							log.info("query stake betch Update dl_print_lottery useTime ={}ms,updateRow={}",(end-start),updateRow);
+//						for (DlPrintLottery print : lotteryPrints) {
+//							dlPrintLotteryMapper.updateLotteryPrintByCallBack(print);
+//						}
 						}
 					}
 					lotteryLists.removeAll(subList);
@@ -1990,12 +1997,19 @@ public class DlPrintLotteryService {
 				lotteryPrints.add(lotteryPrint);
 			}
 		}
-		for(DlPrintLottery lotteryPrint:lotteryPrints) {
-			log.info("更新出票信息tikectInfo={}",JSONHelper.bean2json(lotteryPrint));
-			int rst = this.updatePrintStatusByTicketId(lotteryPrint);
-			if(rst<1){
-				log.error("更新出票信息tikectInfo={},更新失败，updateRow={}",JSONHelper.bean2json(lotteryPrint),rst);
-			}
+		if(!CollectionUtils.isEmpty(lotteryPrints)){							
+			long start = System.currentTimeMillis();
+			log.info("toStake betch Update dl_print_lottery start ={}ms,listSize={}",start,lotteryPrints.size());
+			int updateRow= dlPrintLotteryMapper.beatchUpdatePrintStatusByTicketId(lotteryPrints);
+			long end = System.currentTimeMillis();
+			log.info("toStake betch Update dl_print_lottery useTime ={}ms,updateRow={}",(end-start),updateRow);
+//			for(DlPrintLottery lotteryPrint:lotteryPrints) {
+//			log.info("更新出票信息tikectInfo={}",JSONHelper.bean2json(lotteryPrint));
+//			int rst = this.updatePrintStatusByTicketId(lotteryPrint);
+//			if(rst<1){
+//				log.error("更新出票信息tikectInfo={},更新失败，updateRow={}",JSONHelper.bean2json(lotteryPrint),rst);
+//			}
+//		}
 		}
 	}
 
