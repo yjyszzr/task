@@ -99,9 +99,9 @@ public interface IPrintChannelService {
 	default RestTemplate getRestTemplate(){
 		 SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
         //ms
-        factory.setReadTimeout(5000);
+        factory.setReadTimeout(50000);
         //ms
-        factory.setConnectTimeout(15000);
+        factory.setConnectTimeout(60000);
         RestTemplate restTemplate = new RestTemplate(factory);
         List<HttpMessageConverter<?>> messageConverters = Lists.newArrayList();
         for (HttpMessageConverter httpMessageConverter : restTemplate.getMessageConverters()) {
