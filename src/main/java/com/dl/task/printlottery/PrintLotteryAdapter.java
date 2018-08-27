@@ -24,6 +24,7 @@ import com.dl.task.model.DlTicketChannel;
 import com.dl.task.model.DlTicketChannelLotteryClassify;
 import com.dl.task.printlottery.channelImpl.PrintChannelCaixiaomiServiceImpl;
 import com.dl.task.printlottery.channelImpl.PrintChannelHenanServiceImpl;
+import com.dl.task.printlottery.channelImpl.PrintChannelSendeServiceImp;
 import com.dl.task.printlottery.channelImpl.PrintChannelWeicaishidaiServiceImpl;
 import com.dl.task.printlottery.channelImpl.PrintChannelXianServiceImpl;
 import com.dl.task.printlottery.responseDto.QueryPrintBalanceDTO;
@@ -43,6 +44,8 @@ public class PrintLotteryAdapter {
 	private PrintChannelCaixiaomiServiceImpl printChannelCaixiaomiServiceImpl;
 	@Resource
 	private PrintChannelWeicaishidaiServiceImpl printChannelWeicaishidaiServiceImpl;
+	@Resource
+	private PrintChannelSendeServiceImp printChannelSendeServiceImpl;
 	@Resource
 	private DlPrintLotteryMapper dlPrintLotteryMapper;
 	@Resource
@@ -141,6 +144,7 @@ public class PrintLotteryAdapter {
 			case XIAN : iPrintChannelService = printChannelXianServiceImpl ; break;
 			case CAIXIAOMI : iPrintChannelService = printChannelCaixiaomiServiceImpl; break;
 			case WEICAISHIDAI : iPrintChannelService = printChannelWeicaishidaiServiceImpl; break;
+			case SENDE : iPrintChannelService = printChannelSendeServiceImpl; break;
 			default :;
 		}
 		return iPrintChannelService;
