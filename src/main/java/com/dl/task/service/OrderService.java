@@ -553,6 +553,7 @@ public class OrderService extends AbstractService<Order> {
 				OrderDetail od = new OrderDetail();
 				od.setOrderDetailId(orderDetail.getOrderDetailId());
 				StringBuffer sbuf = new StringBuffer();
+				int hasResultCount=0;
 				for (String ticketData : split) {
 					if (StringUtils.isBlank(ticketData) || !ticketData.contains("|")) {
 						continue;
@@ -589,17 +590,19 @@ public class OrderService extends AbstractService<Order> {
 							}
 						}
 						if (cellCode != null) {
+							hasResultCount++;
 							sbuf.append("07|").append(playCode).append("|").append(cellCode).append(";");
 						}
 					} else {
 						for (DlLeagueMatchResult dto : resultDTOs) {
 							if (playType.equals(dto.getPlayType())) {
+								hasResultCount++;
 								sbuf.append("0").append(dto.getPlayType()).append("|").append(playCode).append("|").append(dto.getCellCode()).append(";");
 							}
 						}
 					}
 				}
-				if (sbuf.length() > 0) {
+				if (sbuf.length() > 0&& hasResultCount==split.length) {
 					od.setMatchResult(sbuf.substring(0, sbuf.length() - 1));
 					orderDetailList.add(od);
 				}

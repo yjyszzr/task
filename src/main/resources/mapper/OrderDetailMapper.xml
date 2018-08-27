@@ -35,7 +35,7 @@
   <select id = "unMatchResultOrderDetails" resultMap="BaseResultMap">
   	select  <include refid="detailFields"></include>
   	from dl_order_detail 
-  	where ticket_data is not null and match_result is null and ticket_data !=''
+  	where ticket_data is not null and match_result is null and ticket_data !='' and lottery_classify_id=1
   </select>
   
   <select id = "queryListByOrderSn" resultMap="BaseResultMap">
