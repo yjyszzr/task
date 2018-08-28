@@ -135,7 +135,7 @@ public class PrintChannelSendeServiceImp implements IPrintChannelService {
 			String resultCode = dlQueryStakeDTO.getResultCode();
 			Boolean querySuccess = Boolean.FALSE;
 			if(resultCode.equals("SUCCESS") || resultCode.equals("ORDER_EXIT_ERROR")) {
-				querySuccess = Boolean.TRUE;;
+				querySuccess = Boolean.TRUE;
 			}
 			for(SendeResultMessageDTO queryMessage:dlQueryStakeDTO.getMessage()){
 				QueryStakeOrderResponse queryStakeOrderResponse = new QueryStakeOrderResponse();
@@ -175,7 +175,7 @@ public class PrintChannelSendeServiceImp implements IPrintChannelService {
 					List<MatchNumber> marchNumbers = queryMessage.getOdds().getSpMap().getMatchNumber();
 					StringBuffer numBuff = new StringBuffer();
 					marchNumbers.forEach(item->{
-						numBuff.append(";"+item.getMatchNumber()+"|");
+						numBuff.append(";"+addIssueWeekDay(item.getMatchNumber())+"|");//添加第九位
 						Map<String,String> val = item.getValue();
 						String str ="";
 						for(String key:val.keySet()) {
@@ -245,8 +245,8 @@ public class PrintChannelSendeServiceImp implements IPrintChannelService {
 		String backStr = this.httpPost(channel.getTicketUrl()+"/queryBalance",map,"UTF-8");
 		log.info("森德查询余额返回信息={}",backStr);
 		JSONObject backJo = JSONObject.fromObject(backStr);
-		JSONObject backJo2 = JSONObject.fromObject(backJo.get("message"));
-		backJo.put("message", backJo2);
+		JSONObject backJo2 = JSONObject.fromObject(backJo.get("message"));//!!
+		backJo.put("message", backJo2);//!!返回参数message的值最外层中有“”，直接转json无法封装对象
 		Map<String,Class> mapClass = new HashMap<String,Class>();
 		mapClass.put("message", SendeBalanceMessageDTO.class);
 		SendeQueryBalanceDTO dlToStakeDTO = (SendeQueryBalanceDTO) JSONObject.toBean(backJo, SendeQueryBalanceDTO.class, mapClass); 
@@ -278,7 +278,7 @@ public class PrintChannelSendeServiceImp implements IPrintChannelService {
 			param.setSchemeCost((double)item.getMoney().doubleValue()/100);
 			param.setOrderStatus("ING_ENTRUST");//固定值
 			param.setPassItem("");
-			param.setUnits(item.getMoney().intValue()/item.getTimes()/2/100);
+			param.setUnits(Integer.parseInt(getBetNum(item.getMoney(),item.getTimes())));//计算注数
 			param.setTicketId(item.getTicketId());
 			param.setOrderTime(DateUtilNew.getCurrentDateTime());
 			String stakes = item.getStakes();
@@ -288,7 +288,7 @@ public class PrintChannelSendeServiceImp implements IPrintChannelService {
 				MatchContentSDParam content = new MatchContentSDParam();
 				content.setMatchKey("");
 				content.setValue(RelationSDUtil.getValueMap(sk[0], sk[2]));
-				content.setMatchNumber(this.getMatchNumber(item.getIssue())); 
+				content.setMatchNumber(removeIssueWeekDay(item.getIssue())); //去除第九位
 				matchContents.add(content);
 			});
 			param.setMatchContent(matchContents);
@@ -338,14 +338,6 @@ public class PrintChannelSendeServiceImp implements IPrintChannelService {
 		map.put("key", MD5Utils.MD5(buff.toString()));
 		return map;
 	}
- 
-	//去除第9位
-	private String getMatchNumber(String issue) {
-		StringBuilder str = new StringBuilder(issue);
-		str.replace(8, 9, "");
-		return str.toString();
-	}
-	
 	/**
 	 * 发送请求
 	 * @param url 地址
