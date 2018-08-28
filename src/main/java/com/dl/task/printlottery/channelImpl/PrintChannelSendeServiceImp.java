@@ -21,6 +21,7 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.springframework.stereotype.Service;
 
+import com.dl.base.enums.ThirdApiEnum;
 import com.dl.base.util.DateUtilNew;
 import com.dl.base.util.MD5Utils;
 import com.dl.task.dao.DlPrintLotteryMapper;
@@ -28,6 +29,7 @@ import com.dl.task.enums.PrintLotteryStatusEnum;
 import com.dl.task.enums.ThirdRewardStatusEnum;
 import com.dl.task.model.DlPrintLottery;
 import com.dl.task.model.DlTicketChannel;
+import com.dl.task.model.LotteryThirdApiLog;
 import com.dl.task.printlottery.IPrintChannelService;
 import com.dl.task.printlottery.requestDto.sende.BetContentSDParam;
 import com.dl.task.printlottery.requestDto.sende.RelationSDUtil;
@@ -72,7 +74,7 @@ public class PrintChannelSendeServiceImp implements IPrintChannelService {
 		StakeSDParam stakeSDParam = this.getStakeSDParam(dlPrintLotterys,dlTicketChannel);
 		String content = com.alibaba.fastjson.JSONObject.toJSONString(stakeSDParam.getBetContent());
 		Map<String,Object> map = this.creatPostMap(dlTicketChannel, TO_MASSAGE_TYPE,content);
-		String backStr = this.httpPost(dlTicketChannel.getTicketUrl()+"/pushTicketList",map,"UTF-8");
+		String backStr = this.httpPost(dlTicketChannel.getTicketUrl()+TO_MASSAGE_TYPE,map,"UTF-8",dlPrintLotteryMapper);
 		JSONObject backJo = JSONObject.fromObject(backStr);
 		Map<String,Class> mapClass = new HashMap<String,Class>();
 		mapClass.put("message", SendeResultMessageDTO.class);
@@ -89,14 +91,14 @@ public class PrintChannelSendeServiceImp implements IPrintChannelService {
 			List<ToStakeBackOrderDetail> orders = new ArrayList<ToStakeResponseDTO.ToStakeBackOrderDetail>();
 			 for(SendeResultMessageDTO sendeDetail : dlToStakeDTO.getMessage()){
 				 ToStakeBackOrderDetail orderDetail = new ToStakeBackOrderDetail();
-				 Boolean printLotteryDoing =  sendeDetail.getResult().equals("SUCCESS");
+				 Boolean printLotteryDoing =  sendeDetail.getResult().equals("SUCCESS")||sendeDetail.getResult().equals("ORDER_EXIT_ERROR");
 				 if(printLotteryDoing) {
 					 orderDetail.setErrorDesc(sendeDetail.getResult());
 					 orderDetail.setTicketId(sendeDetail.getTicketId());
 					 orderDetail.setPrintLotteryDoing(printLotteryDoing);
 				 }else {
 					 orderDetail.setErrorCode(5006);//!!!!
-					 log.info("森德投注失败：",sendeDetail.getResult());
+					 log.info("森德投注失败result={}",sendeDetail.getResult());
 				 }
 				 orders.add(orderDetail);
 			 }
@@ -114,7 +116,7 @@ public class PrintChannelSendeServiceImp implements IPrintChannelService {
 		});
 		param.setMessage(message.substring(1));
 		Map<String,Object> map = this.creatPostMap(dlTicketChannel, QUERY_MASSAGE_TYPE, param.getMessage());
-		String backStr = this.httpPost(dlTicketChannel.getTicketUrl()+"/queryTicketsOrderStatusList",map,"UTF-8");
+		String backStr = this.httpPost(dlTicketChannel.getTicketUrl()+QUERY_MASSAGE_TYPE,map,"UTF-8",dlPrintLotteryMapper);
 		JSONObject backJo = JSONObject.fromObject(backStr);
 		Map<String,Class> mapClass = new HashMap<String,Class>();
 		mapClass.put("message", SendeResultMessageDTO.class);
@@ -152,7 +154,7 @@ public class PrintChannelSendeServiceImp implements IPrintChannelService {
 					statusEnum = PrintLotteryStatusEnum.FAIL;
 					querySuccess = Boolean.TRUE;
 					printStatus = 17;
-					log.error("森德出票查询出票失败result=",result);
+					log.error("森德出票查询出票失败result={}",result);
 				}
 				queryStakeOrderResponse.setQuerySuccess(querySuccess);
 				if(querySuccess) {
@@ -169,7 +171,7 @@ public class PrintChannelSendeServiceImp implements IPrintChannelService {
 						printTimeStr = printTimeStr.replaceAll("/", "-");
 						printTime = sdf.parse(printTimeStr);
 					}catch(Exception e){
-						log.error("河南出票时间转化出错 ticketId={},printTimeStr={}",queryMessage.getTicketId(),queryMessage.getSuccessTime());
+						log.error("森德出票时间转化出错 ticketId={},printTimeStr={}",queryMessage.getTicketId(),queryMessage.getSuccessTime());
 					}
 					queryStakeOrderResponse.setPrintTimeDate(printTime);	
 					List<MatchNumber> marchNumbers = queryMessage.getOdds().getSpMap().getMatchNumber();
@@ -189,7 +191,7 @@ public class PrintChannelSendeServiceImp implements IPrintChannelService {
 			}
 			queryStakeResponseDto.setOrders(orders);
 		}
-		return null;
+		return queryStakeResponseDto;
 	}
 
 	@Override
@@ -201,7 +203,7 @@ public class PrintChannelSendeServiceImp implements IPrintChannelService {
 		});
 		param.setMessage(message.substring(1));
 		Map<String,Object> map = this.creatPostMap(dlTicketChannel, BONUS_MASSAGE_TYPE, param.getMessage());
-		String backStr = this.httpPost(dlTicketChannel.getTicketUrl()+"/queryTicketsOrderBonusList",map,"UTF-8");
+		String backStr = this.httpPost(dlTicketChannel.getTicketUrl()+BONUS_MASSAGE_TYPE,map,"UTF-8",dlPrintLotteryMapper);
 		JSONObject backJo = JSONObject.fromObject(backStr);
 		Map<String,Class> mapClass = new HashMap<String,Class>();
 		mapClass.put("message", SendeBonusMessageDTO.class);
@@ -236,13 +238,13 @@ public class PrintChannelSendeServiceImp implements IPrintChannelService {
 			}
 			queryRewardResponseDto.setOrders(orders);
 		}
-		return null;
+		return queryRewardResponseDto;
 	}
 
 	@Override
 	public QueryPrintBalanceDTO queryBalance(DlTicketChannel channel, DlPrintLotteryMapper dlPrintLotteryMapper) {
 		Map<String,Object> map = creatPostMap(channel,BALANCE_MASSAGE_TYPE,"");
-		String backStr = this.httpPost(channel.getTicketUrl()+"/queryBalance",map,"UTF-8");
+		String backStr = this.httpPost(channel.getTicketUrl()+BALANCE_MASSAGE_TYPE,map,"UTF-8",dlPrintLotteryMapper);
 		log.info("森德查询余额返回信息={}",backStr);
 		JSONObject backJo = JSONObject.fromObject(backStr);
 		JSONObject backJo2 = JSONObject.fromObject(backJo.get("message"));//!!
@@ -345,7 +347,7 @@ public class PrintChannelSendeServiceImp implements IPrintChannelService {
 	 * @param urlEncode 编码
 	 * @return
 	 */
-	 private String httpPost(String url,Map<String, Object> requestParams, String urlEncode) {
+	 private String httpPost(String url,Map<String, Object> requestParams, String urlEncode,DlPrintLotteryMapper dlPrintLotteryMapper) {
 		 String respContent = null;
 		 HttpPost httpPost = null;
 	        HttpClient httpClient =  HttpClientBuilder.create().build();// new DefaultHttpClient();
@@ -355,11 +357,11 @@ public class PrintChannelSendeServiceImp implements IPrintChannelService {
 	            for (Map.Entry<String, Object> entry : requestParams.entrySet()) {
 	                params.add(new BasicNameValuePair((String) entry.getKey(), entry.getValue().toString()));
 	            }
-	            log.info("httpPostUrl={}",url);
+	            log.info("森德httpPostUrl={}",url);
 	            httpPost = new HttpPost(url);
 	            httpPost.setEntity(new UrlEncodedFormEntity(params, urlEncode));
 	            HttpResponse response = httpClient.execute(httpPost);
-	            log.info("statusCode={}",response.getStatusLine().getStatusCode());
+	            log.info("森德statusCode={}",response.getStatusLine().getStatusCode());
 	            org.apache.http.Header[] headers = response.getAllHeaders();
 	            for (org.apache.http.Header header : headers) {
 	                log.info(header.getName() + ": " + header.getValue());
@@ -367,7 +369,7 @@ public class PrintChannelSendeServiceImp implements IPrintChannelService {
 	            // 网页内容
 	            org.apache.http.HttpEntity httpEntity = response.getEntity();
 	            respContent = EntityUtils.toString(httpEntity);
-	            log.info("response={}",respContent);
+	            log.info("森德response={}",respContent);
 	        } catch (UnsupportedEncodingException e) {
 	            log.error("",e);
 	        } catch (ClientProtocolException e) {
@@ -379,6 +381,8 @@ public class PrintChannelSendeServiceImp implements IPrintChannelService {
 	                httpPost.abort();
 	            }
 	        }
+	        LotteryThirdApiLog thirdApiLog = new LotteryThirdApiLog(url, ThirdApiEnum.SENDE_LOTTERY, JSONObject.fromObject(requestParams), respContent);
+			dlPrintLotteryMapper.saveLotteryThirdApiLog(thirdApiLog);
 			return respContent;
 	    }
 
