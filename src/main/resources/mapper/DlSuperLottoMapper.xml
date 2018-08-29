@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dl.task.dao2.DlSuperLottoMapper">
+  <resultMap id="BaseResultMap" type="com.dl.task.model.DlSuperLotto">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="term_num" jdbcType="INTEGER" property="termNum" />
+    <result column="prize_date" jdbcType="VARCHAR" property="prizeDate" />
+    <result column="prize_num" jdbcType="VARCHAR" property="prizeNum" />
+    <result column="prizes" jdbcType="VARCHAR" property="prizes" />
+    <result column="create_time" jdbcType="VARCHAR" property="createTime" />
+  </resultMap>
+  <select id="selectPrizeResultByTermNum" resultMap="BaseResultMap">
+  select * from dl_super_lotto where term_num=#{termNum} limit 1;
+  </select>
+</mapper>

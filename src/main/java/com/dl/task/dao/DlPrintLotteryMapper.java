@@ -22,6 +22,9 @@ public interface DlPrintLotteryMapper extends Mapper<DlPrintLottery> {
 	public List<DlPrintLottery> getPrintIngLotterys();
 	//更新出票信息
 	public int updateLotteryPrintByCallBack(DlPrintLottery print);
+	public int beatchUpdateLotteryPrintByCallBack(@Param("lotteryPrints")List<DlPrintLottery> lotteryPrints);
+	//获取已出票还没有兑奖比对的记录
+	public List<DlPrintLottery> lotteryPrintsByUnCompareJz();
 	//获取已出票还没有兑奖比对的记录
 	public List<DlPrintLottery> lotteryPrintsByUnCompare();
 	//更新彩票兑奖结果
@@ -34,7 +37,7 @@ public interface DlPrintLotteryMapper extends Mapper<DlPrintLottery> {
 	public List<DlPrintLottery> printLotterysByOrderSn(@Param("orderSn")String orderSn);
 	public DlPrintLottery selectDlPrintLotteryByTicketId(String ticketId);
 	public int updatePrintStatusByTicketId(DlPrintLottery lotteryPrint);
-	
+	public int beatchUpdatePrintStatusByTicketId(@Param("lotteryPrints")List<DlPrintLottery> lotteryPrints);
 	public List<DlPrintLottery> lotteryPrintsHenanByUnPrint();
 	
 	public List<DlPrintLottery> lotteryPrintsXianByUnPrint();
@@ -52,4 +55,7 @@ public interface DlPrintLotteryMapper extends Mapper<DlPrintLottery> {
 	public List<DlPrintLottery> selectFinishPrintLotteryButNotRewardHeNan();
 	public List<DlPrintLottery> lotteryPrintsByUnPrintByChannelId(@Param("printChannelId") Integer printChannelId,@Param("status") Integer status);
 	public List<DlPrintLottery> selectRewardLotterys(@Param("printChannelId") Integer printChannelId,@Param("thirdRewardStatus") Integer thirdRewardStatus);
+	public int beatchUpdateComparedStakes(@Param("isSsue") String isSsue);
+	public int updatePrintThirdRewardRewardStatus1To3AndPrintLottery(DlPrintLottery updateDlPrint);
+	public int updatePrintThirdRewardRewardStatus2To3AndPrintLottery(DlPrintLottery updateDlPrint);
 }

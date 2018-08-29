@@ -29,6 +29,7 @@ import com.dl.base.util.DateUtil;
 import com.dl.base.util.JSONHelper;
 import com.dl.base.util.SNGenerator;
 import com.dl.task.core.ProjectConstant;
+import com.dl.task.dao.DlLotteryClassifyMapper;
 import com.dl.task.dao.DlMessageMapper;
 import com.dl.task.dao.LotteryWinningLogTempMapper;
 import com.dl.task.dao.OrderMapper;
@@ -37,6 +38,7 @@ import com.dl.task.dao.UserMapper;
 import com.dl.task.dto.SurplusPaymentCallbackDTO;
 import com.dl.task.dto.SysConfigDTO;
 import com.dl.task.dto.UserIdAndRewardDTO;
+import com.dl.task.model.DlLotteryClassify;
 import com.dl.task.model.DlMessage;
 import com.dl.task.model.LotteryWinningLogTemp;
 import com.dl.task.model.Order;
@@ -65,10 +67,13 @@ public class UserAccountService extends AbstractService<UserAccount> {
 	@Resource
 	private DlMessageMapper dlMessageMapper;
 	@Resource
+	private DlLotteryClassifyMapper dlLotteryClassifyMapper;
+	@Resource
 	private GeTuiUtil geTuiUtil;
 	
 	@Resource
 	private	LotteryWinningLogTempMapper lotteryWinningLogTempMapper;
+	
 
 	/**
 	 * 更新用户账户信息
@@ -186,6 +191,12 @@ public class UserAccountService extends AbstractService<UserAccount> {
 		}
 
 		for (UserIdAndRewardDTO u : list) {
+			DlLotteryClassify lottery= dlLotteryClassifyMapper.selectOneByLotteryClassifyId(u.getLotteryClassifyId());
+			String gameDesc=lottery.getLotteryName();
+			if(StringUtils.isEmpty(gameDesc)){
+				log.error("orderSn={},lotteryId={},lotteryName is null",u.getOrderSn(),u.getLotteryClassifyId());
+				gameDesc="竞彩足球";
+			}
 			DlMessage messageAddParam = new DlMessage();
 			messageAddParam.setTitle(CommonConstants.FORMAT_REWARD_TITLE);
 			messageAddParam.setContent(MessageFormat.format(CommonConstants.FORMAT_REWARD_CONTENT, u.getReward()));
@@ -205,11 +216,11 @@ public class UserAccountService extends AbstractService<UserAccount> {
 			messageAddParam.setObjectType(1);
 			messageAddParam.setMsgUrl("");// 通知暂时不需要
 			messageAddParam.setSendTime(accountTime);
-			messageAddParam.setMsgDesc(MessageFormat.format(CommonConstants.FORMAT_REWARD_MSG_DESC, u.getBetMoney(), u.getBetTime()));
+			messageAddParam.setMsgDesc(MessageFormat.format(CommonConstants.FORMAT_REWARD_MSG_DESC, gameDesc,u.getBetMoney(), u.getBetTime()));
 			dlMessageMapper.insertInDbSelective(messageAddParam);
 			//push
 			if(StringUtils.isNotBlank(clientId)) {
-				String content = MessageFormat.format(CommonConstants.FORMAT_REWARD_PUSH_DESC, u.getReward());
+				String content = MessageFormat.format(CommonConstants.FORMAT_REWARD_PUSH_DESC,gameDesc, u.getReward());
 				GeTuiMessage getuiMessage = new GeTuiMessage(CommonConstants.FORMAT_REWARD_PUSH_TITLE, content, DateUtil.getCurrentTimeLong());
 				geTuiUtil.pushMessage(clientId, getuiMessage);
 			}

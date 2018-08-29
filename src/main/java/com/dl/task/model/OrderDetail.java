@@ -121,7 +121,12 @@ public class OrderDetail {
      */
     @Column(name = "fix_odds")
     private String fixedodds;
-
+    /**
+     * 投注方式
+     */
+    @Column(name = "bet_type")
+    private String betType;
+    
     public String getFixedodds() {
 		return fixedodds;
 	}
@@ -422,4 +427,13 @@ public class OrderDetail {
     public void setAddTime(Integer addTime) {
         this.addTime = addTime;
     }
+
+	public String getBetType() {
+		return betType;
+	}
+
+	public void setBetType(String betType) {
+		this.betType = betType;
+	}
+    
 }

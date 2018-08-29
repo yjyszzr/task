@@ -1,6 +1,7 @@
 package com.dl.task.model;
 
 import java.math.BigDecimal;
+
 import javax.persistence.*;
 
 @Table(name = "dl_ticket_channel_lottery_classify")
@@ -84,7 +85,6 @@ public class DlTicketChannelLotteryClassify {
      */
     @Column(name = "update_time")
     private Integer updateTime;
-
     /**
      * @return id
      */

@@ -6,7 +6,7 @@ package com.dl.task.printlottery;
  */
 public enum PrintComEnums {
 	
-	HENAN(1,"河南",2),
+	HENAN(1,"河南"),
 	XIAN(2,"西安"),
 	CAIXIAOMI(3,"彩小秘"),
 	WEICAISHIDAI(4,"微彩时代");

@@ -21,6 +21,7 @@ import com.dl.task.model.DlTicketChannel;
 import com.dl.task.printlottery.IPrintChannelService;
 import com.dl.task.printlottery.requestDto.CommonQueryStakeParam;
 import com.dl.task.printlottery.requestDto.CommonToStakeParam;
+import com.dl.task.printlottery.responseDto.QueryPrintBalanceDTO;
 import com.dl.task.printlottery.responseDto.QueryRewardResponseDTO;
 import com.dl.task.printlottery.responseDto.QueryStakeResponseDTO;
 import com.dl.task.printlottery.responseDto.QueryStakeResponseDTO.QueryStakeOrderResponse;
@@ -154,6 +155,16 @@ public class PrintChannelCaixiaomiServiceImpl implements IPrintChannelService{
 			DlPrintLotteryMapper dlPrintLotteryMapper) {
 		// TODO 胡贺东 暂时不实现
 		QueryRewardResponseDTO notSupport = new QueryRewardResponseDTO();
+		notSupport.setQuerySuccess(Boolean.FALSE);
+		notSupport.setRetCode("-1");
+		notSupport.setRetDesc("notSupprt");
+		return notSupport;
+	}
+
+	@Override
+	public QueryPrintBalanceDTO queryBalance(DlTicketChannel channel,
+			DlPrintLotteryMapper dlPrintLotteryMapper) {
+		QueryPrintBalanceDTO notSupport = new QueryPrintBalanceDTO();
 		notSupport.setQuerySuccess(Boolean.FALSE);
 		notSupport.setRetCode("-1");
 		notSupport.setRetDesc("notSupprt");

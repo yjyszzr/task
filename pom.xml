@@ -22,6 +22,11 @@
     </parent>
 
     <dependencies>
+       <dependency>
+            <groupId>com.ucf</groupId>
+             <artifactId>ucf-java-sdk</artifactId>
+    		 <version>1.0.6</version>
+        </dependency>
     	<dependency>
 	        <groupId>com.dl</groupId>
 		    <artifactId>payment-api</artifactId>

@@ -50,14 +50,17 @@ import com.dl.base.enums.SNBusinessCodeEnum;
 import com.dl.base.enums.ThirdApiEnum;
 import com.dl.base.result.BaseResult;
 import com.dl.base.result.ResultGenerator;
+import com.dl.base.util.BetUtils;
 import com.dl.base.util.DateUtil;
 import com.dl.base.util.JSONHelper;
 import com.dl.base.util.MD5Utils;
 import com.dl.base.util.SNGenerator;
 import com.dl.task.core.ProjectConstant;
 import com.dl.task.dao.DlPrintLotteryMapper;
+import com.dl.task.dao.OrderDetailMapper;
 import com.dl.task.dao.PeriodRewardDetailMapper;
 import com.dl.task.dao2.DlLeagueMatchResultMapper;
+import com.dl.task.dao2.DlSuperLottoMapper;
 import com.dl.task.dao2.LotteryMatchMapper;
 import com.dl.task.dto.DlJcZqMatchCellDTO;
 import com.dl.task.dto.DlQueryPrizeFileDTO;
@@ -72,6 +75,7 @@ import com.dl.task.dto.MatchBetPlayDTO;
 import com.dl.task.dto.OrderDetailDataDTO;
 import com.dl.task.dto.OrderInfoAndDetailDTO;
 import com.dl.task.dto.OrderInfoDTO;
+import com.dl.task.dto.PrintChannelInfo;
 import com.dl.task.dto.XianDlQueryStakeDTO;
 import com.dl.task.dto.XianDlQueryStakeDTO.XianBackQueryStake;
 import com.dl.task.dto.XianDlToStakeDTO;
@@ -81,6 +85,7 @@ import com.dl.task.enums.ThirdRewardStatusEnum;
 import com.dl.task.model.BetResultInfo;
 import com.dl.task.model.DlLeagueMatchResult;
 import com.dl.task.model.DlPrintLottery;
+import com.dl.task.model.DlSuperLotto;
 import com.dl.task.model.DlTicketChannel;
 import com.dl.task.model.DlTicketChannelLotteryClassify;
 import com.dl.task.model.LotteryThirdApiLog;
@@ -102,7 +107,6 @@ import com.google.common.collect.Lists;
 @Service
 @Slf4j
 public class DlPrintLotteryService {
-
 	@Resource
 	private DlPrintLotteryMapper dlPrintLotteryMapper;
 
@@ -117,6 +121,10 @@ public class DlPrintLotteryService {
 
 	@Resource
 	private LotteryMatchMapper lotteryMatchMapper;
+	@Resource
+	private DlSuperLottoMapper dlSuperLottoMapper;
+	@Resource
+	private OrderDetailMapper orderDetailMapper;
 	@Resource
 	private RestTemplateConfig restTemplateConfig;
 
@@ -888,12 +896,41 @@ public class DlPrintLotteryService {
 		dlPrintLotteryMapper.saveLotteryThirdApiLog(thirdApiLog);
 		return response;
 	}
+	/**
+	 * 更新赛果信息
+	 */
+	public void updatePrintLotteryCompareStatus() {
+		List<DlPrintLottery> lotteryPrints = dlPrintLotteryMapper.lotteryPrintsByUnCompare();
+		if (lotteryPrints == null) {
+			log.info("updatePrintLotteryCompareStatus 没有获取到需要更新状态的彩票数据");
+			return;
+		}
+		List<String> T01Game = new ArrayList<String>();
+		lotteryPrints.forEach(print->{
+			if("T01".equals(print.getGame())){
+				T01Game.add(print.getIssue()); 
+			}
+		});
+		updateT01GameDetailAndLottery(T01Game);
+	}
+	private void updateT01GameDetailAndLottery(List<String> t01Game) {
+		for(String t01Issue:t01Game){
+			DlSuperLotto dlSuperLotto = dlSuperLottoMapper.selectPrizeResultByTermNum(t01Issue);
+			if(dlSuperLotto!=null&&!StringUtils.isEmpty(dlSuperLotto.getPrizeNum())){				
+				orderDetailMapper.beatchUpdateMatchResult(t01Issue,dlSuperLotto.getPrizeNum());
+				dlPrintLotteryMapper.beatchUpdateComparedStakes(t01Issue);
+			}
+		}
+	}
 
+	/**
+	 * 仅适用于竞彩足球
+	 */
 	// ※※※※※※※※※※※※※※※※※
 	// ※※※※※※※※※※※※※※※※※
 	// 定时任务：更新彩票信息
-	public void updatePrintLotteryCompareStatus() {
-		List<DlPrintLottery> lotteryPrints = dlPrintLotteryMapper.lotteryPrintsByUnCompare();
+	public void updatePrintLotteryCompareStatusJz() {
+		List<DlPrintLottery> lotteryPrints = dlPrintLotteryMapper.lotteryPrintsByUnCompareJz();
 		if (lotteryPrints == null) {
 			log.info("updatePrintLotteryCompareStatus 没有获取到需要更新状态的彩票数据");
 			return;
@@ -920,6 +957,7 @@ public class DlPrintLotteryService {
 			}
 		}
 		log.info("updatePrintLotteryCompareStatus 未更新状态彩票对应其次数，size=" + unPlayCodes.size());
+		log.info("updatePrintLotteryCompareStatus 未更新状态彩票对应期次={}",unPlayCodes);
 		if (CollectionUtils.isEmpty(unPlayCodes)) {
 			return;
 		}
@@ -1226,6 +1264,21 @@ public class DlPrintLotteryService {
 		OrderInfoDTO order = orderInfo.getOrderInfoDTO();
 		List<OrderDetailDataDTO> selectByOrderId = orderInfo.getOrderDetailDataDTOs();
 		List<MatchBetPlayDTO> matchBetPlays = selectByOrderId.stream().map(detail->{
+			MatchBetPlayDTO matchBetDto = new MatchBetPlayDTO();
+			matchBetDto.setChangci(detail.getChangci());
+			matchBetDto.setIsDan(detail.getIsDan());
+			matchBetDto.setLotteryClassifyId(detail.getLotteryClassifyId());
+			matchBetDto.setLotteryPlayClassifyId(detail.getLotteryPlayClassifyId());
+			matchBetDto.setMatchId(detail.getMatchId());
+			matchBetDto.setMatchTeam(detail.getMatchTeam());
+			matchBetDto.setBetType(detail.getBetType());
+			matchBetDto.setTicketData(detail.getTicketData());
+			Date matchTime = detail.getMatchTime();
+			matchBetDto.setMatchTime((int)matchTime.toInstant().getEpochSecond());
+			if(Integer.valueOf(2).equals(detail.getLotteryClassifyId())){//竞彩足球逻辑保存
+				matchBetDto.setPlayCode(detail.getIssue());
+				 return matchBetDto;
+			}
 			String ticketData = detail.getTicketData();
 			String[] tickets = ticketData.split(";");
 			String playCode = null;
@@ -1252,18 +1305,9 @@ public class DlPrintLotteryService {
 				matchBetCell.setBetCells(betCells);
 				matchBetCells.add(matchBetCell);
 			}
-			MatchBetPlayDTO dto = new MatchBetPlayDTO();
-			dto.setChangci(detail.getChangci());
-			dto.setIsDan(detail.getIsDan());
-			dto.setLotteryClassifyId(detail.getLotteryClassifyId());
-			dto.setLotteryPlayClassifyId(detail.getLotteryPlayClassifyId());
-			dto.setMatchId(detail.getMatchId());
-			dto.setMatchTeam(detail.getMatchTeam());
-			Date matchTime = detail.getMatchTime();
-			dto.setMatchTime((int)matchTime.toInstant().getEpochSecond());
-			dto.setPlayCode(playCode);
-			dto.setMatchBetCells(matchBetCells);
-			return dto;
+			matchBetDto.setPlayCode(playCode);
+			matchBetDto.setMatchBetCells(matchBetCells);
+			return matchBetDto;
 		}).collect(Collectors.toList());
 		Integer times = order.getCathectic();
 		String betType = order.getPassType();
@@ -1285,6 +1329,9 @@ public class DlPrintLotteryService {
 	 * @return
 	 */
 	public List<LotteryPrintDTO> getPrintLotteryList(DlJcZqMatchBetParam param) {
+		if(Integer.valueOf(2).equals(param.getLotteryClassifyId())){
+			return getDaLeTouLotteryPrintDTO(param);
+		}
 		long start = System.currentTimeMillis();
 		List<MatchBetPlayDTO> matchBellCellList = param.getMatchBetPlays();
 		String betTypes = param.getBetType();
@@ -1377,6 +1424,59 @@ public class DlPrintLotteryService {
 		return lotteryPrints;
 	}
 	
+	/**
+	 * 计算大乐透的拆票信息
+	 * @param param
+	 * @return
+	 */
+	private List<LotteryPrintDTO> getDaLeTouLotteryPrintDTO(
+			DlJcZqMatchBetParam param) {
+		List<LotteryPrintDTO> lotteryPrints = new ArrayList<LotteryPrintDTO>();
+		String playType = param.getPlayType();
+		int times = param.getTimes();
+		BigDecimal oneTicketMoney = new BigDecimal("2.0");
+		if("05".equals(playType)){
+			oneTicketMoney = new BigDecimal("3.0");
+		}
+		for(MatchBetPlayDTO matchBetPlayDto:param.getMatchBetPlays()){
+			String betType = matchBetPlayDto.getBetType();
+			String ticketData = matchBetPlayDto.getTicketData();	
+			int betNum = BetUtils.getLettoBetNum(ticketData);
+			int maxTime = BetUtils.maxTcBetTime(oneTicketMoney,betNum);
+			int n = times/maxTime;
+			int m = times%maxTime;
+			if(n > 0) {
+				for(int i=0; i< n; i++) {
+					BigDecimal money = oneTicketMoney.multiply(new BigDecimal(maxTime*betNum));
+					LotteryPrintDTO lotteryPrintDTO = new LotteryPrintDTO();
+					lotteryPrintDTO.setBetType(betType);
+					lotteryPrintDTO.setIssue(matchBetPlayDto.getPlayCode());
+					lotteryPrintDTO.setMoney(money.doubleValue());
+					lotteryPrintDTO.setPlayType(playType);
+					lotteryPrintDTO.setStakes(ticketData);
+					String ticketId = SNGenerator.nextSN(SNBusinessCodeEnum.TICKET_SN.getCode());
+					lotteryPrintDTO.setTicketId(ticketId);
+					lotteryPrintDTO.setTimes(maxTime);
+					lotteryPrints.add(lotteryPrintDTO);
+				}
+			}
+			if(m > 0) {
+				BigDecimal money = oneTicketMoney.multiply(new BigDecimal(m*betNum));
+				LotteryPrintDTO lotteryPrintDTO = new LotteryPrintDTO();
+				lotteryPrintDTO.setBetType(betType);
+				lotteryPrintDTO.setIssue(matchBetPlayDto.getPlayCode());
+				lotteryPrintDTO.setMoney(money.doubleValue());
+				lotteryPrintDTO.setPlayType(playType);
+				lotteryPrintDTO.setStakes(ticketData);
+				String ticketId = SNGenerator.nextSN(SNBusinessCodeEnum.TICKET_SN.getCode());
+				lotteryPrintDTO.setTicketId(ticketId);
+				lotteryPrintDTO.setTimes(m);
+				lotteryPrints.add(lotteryPrintDTO);
+			}
+		}
+		return lotteryPrints;
+	}
+
 	private Map<String, List<MatchBetPlayCellDTO>> getMatchBetPlayMap(List<MatchBetPlayDTO> matchBellCellList) {
 		//整理投注对象
 //		TMatchBetInfoWithMinOddsList tbml = new TMatchBetInfoWithMinOddsList();
@@ -1708,9 +1808,7 @@ public class DlPrintLotteryService {
 			log.info("渠道channelId={},channelName={}出票结束",printComEnums.getPrintChannelId(),printComEnums.getPrintChannelName());
 		}
 	}
-	public void queryPrintLotteryVersion2() {
-		log.info("出票查询版本2.0出票查询开始");
-		for(PrintComEnums printComEnums:PrintComEnums.values()){
+	public void queryPrintLotteryVersion2(PrintComEnums printComEnums) {
 			try{
 				DlTicketChannel dlTicketChannel = printLotteryAdapter.selectChannelByChannelId(printComEnums);
 				List<DlPrintLottery> lotteryLists = printLotteryAdapter.getLotteryList(printComEnums,PrintLotteryStatusEnum.DOING);
@@ -1745,23 +1843,31 @@ public class DlPrintLotteryService {
 							lotteryPrint.setPrintTime(stake.getPrintTimeDate());
 							lotteryPrints.add(lotteryPrint);
 						}
-						for (DlPrintLottery print : lotteryPrints) {
-							dlPrintLotteryMapper.updateLotteryPrintByCallBack(print);
+						if(!CollectionUtils.isEmpty(lotteryPrints)){							
+							long start = System.currentTimeMillis();
+							log.info("query stake betch Update dl_print_lottery start ={}ms,listSize={}",start,lotteryPrints.size());
+							int updateRow= dlPrintLotteryMapper.beatchUpdateLotteryPrintByCallBack(lotteryPrints);
+							long end = System.currentTimeMillis();
+							log.info("query stake betch Update dl_print_lottery useTime ={}ms,updateRow={}",(end-start),updateRow);
+//						for (DlPrintLottery print : lotteryPrints) {
+//							dlPrintLotteryMapper.updateLotteryPrintByCallBack(print);
+//						}
 						}
 					}
 					lotteryLists.removeAll(subList);
 				}
 			}catch(Exception e){
 				log.error("投注查询接口 printChannelId={},printChannelName={}投注查询异常",printComEnums.getPrintChannelId(),printComEnums.getPrintChannelName(),e);
-				continue;
 			}
 			log.info("渠道channelId={},channelName={},查询出票状态结束",printComEnums.getPrintChannelId(),printComEnums.getPrintChannelName());
-		}
 	}
 	public void rewardPrintLotteryVersion2() {
 		log.info("出奖奖金查询版本2.0奖金查询开始");
 		for(PrintComEnums printComEnums:PrintComEnums.values()){
 			try{
+				if(PrintComEnums.CAIXIAOMI==printComEnums){
+					continue;//暂未实现的公司不进行第三方开奖
+				}
 				DlTicketChannel dlTicketChannel = printLotteryAdapter.selectChannelByChannelId(printComEnums);
 				ThirdRewardStatusEnum thirdRewardStatusEnum = ThirdRewardStatusEnum.REWARD_INIT;
 				if(PrintComEnums.CAIXIAOMI==printComEnums){
@@ -1772,8 +1878,10 @@ public class DlPrintLotteryService {
 				if(CollectionUtils.isEmpty(lotteryLists)){
 					continue ;
 				}
+				Map<String,DlPrintLottery> ticketIdPrintLottery= new HashMap<String, DlPrintLottery>();
 				List<String> issueAndGameList = new ArrayList<String>();
 				lotteryLists.forEach(print->{
+					ticketIdPrintLottery.put(print.getTicketId(), print);
 					String issueAndGame = print.getGame()+";"+print.getIssue();
 					if(!issueAndGameList.contains(issueAndGame)){
 						issueAndGameList.add(issueAndGame);
@@ -1785,10 +1893,10 @@ public class DlPrintLotteryService {
 						List<DlPrintLottery> subList = lotteryLists.subList(0, endIndex);
 						QueryRewardResponseDTO queryRewardResponseDTO = printLotteryAdapter.queryLotterysReward(printComEnums,subList,dlTicketChannel);
 						if(!queryRewardResponseDTO.getQuerySuccess()){
-							log.error("出票查询失败，channelId={},channelName={},errorCode={},errorMsg={}",printComEnums.getPrintChannelId(),printComEnums.getPrintChannelName(),
+							log.error("出票查询第三方奖金失败，channelId={},channelName={},errorCode={},errorMsg={}",printComEnums.getPrintChannelId(),printComEnums.getPrintChannelName(),
 									queryRewardResponseDTO.getRetCode(),queryRewardResponseDTO.getRetDesc());
 						}else if(queryRewardResponseDTO.getQuerySuccess()){
-							updateLotterysReward(queryRewardResponseDTO);
+							updateLotterysReward(queryRewardResponseDTO,ticketIdPrintLottery);
 						}
 						lotteryLists.removeAll(subList);
 					}
@@ -1799,7 +1907,7 @@ public class DlPrintLotteryService {
 							log.error("出票查询失败，channelId={},channelName={},errorCode={},errorMsg={}",printComEnums.getPrintChannelId(),printComEnums.getPrintChannelName(),
 									queryRewardResponseDTO.getRetCode(),queryRewardResponseDTO.getRetDesc());
 						}else if(queryRewardResponseDTO.getQuerySuccess()){
-							updateLotterysReward(queryRewardResponseDTO);
+							updateLotterysReward(queryRewardResponseDTO,ticketIdPrintLottery);
 						}
 					}
 				}
@@ -1813,8 +1921,9 @@ public class DlPrintLotteryService {
 	/**
 	 * 查询出奖信息，更新第三方出奖信息
 	 * @param queryRewardResponseDTO
+	 * @param ticketIdPrintLottery 
 	 */
-	private void updateLotterysReward(QueryRewardResponseDTO queryRewardResponseDTO) {
+	private void updateLotterysReward(QueryRewardResponseDTO queryRewardResponseDTO, Map<String, DlPrintLottery> ticketIdPrintLottery) {
 			List<QueryRewardOrderResponse> queryRewardOrders = queryRewardResponseDTO.getOrders();
 			if(CollectionUtils.isEmpty(queryRewardOrders)){
 				log.error("查询第三方出奖信息，查询成功但是orders is null");
@@ -1825,13 +1934,39 @@ public class DlPrintLotteryService {
 					continue;
 				}
 				ThirdRewardStatusEnum thirdRewardStatusEnum = reward.getThirdRewardStatusEnum();
-				if(ThirdRewardStatusEnum.REWARD_OVER==thirdRewardStatusEnum){					
+				if(ThirdRewardStatusEnum.REWARD_OVER==thirdRewardStatusEnum){
+					String ticektId = reward.getTicketId();
+					DlPrintLottery dlPrintLottery = ticketIdPrintLottery.get(ticektId);
+					if(dlPrintLottery==null){
+						log.error("ticketId={},更新出奖信息，对应的票不存在",ticektId);
+						continue;
+					}
+					String game = dlPrintLottery.getGame();
+					Integer printLotteryCom = dlPrintLottery.getPrintLotteryCom();
 					BigDecimal thirdRewardMoney = BigDecimal.valueOf(reward.getPrizeMoney());
-					DlPrintLottery updateDlPrint = new DlPrintLottery();
-					updateDlPrint.setThirdPartRewardMoney(thirdRewardMoney);
-					updateDlPrint.setTicketId(reward.getTicketId());
-					log.info("更新第三方奖金信息 ticketId={},thirdRewardMoney={}",updateDlPrint.getTicketId(),updateDlPrint.getThirdPartRewardMoney());
-					dlPrintLotteryMapper.updatePrintThirdRewardRewardStatus1To3(updateDlPrint);
+					if("T01".equals(game)){//大乐透更新订单开奖信息
+						DlPrintLottery updateDlPrint = new DlPrintLottery();
+						updateDlPrint.setThirdPartRewardMoney(thirdRewardMoney);
+						updateDlPrint.setCompareStatus(ProjectConstant.FINISH_COMPARE);
+						updateDlPrint.setRealRewardMoney(thirdRewardMoney.divide(new BigDecimal("100")).setScale(2));
+						updateDlPrint.setTicketId(reward.getTicketId());
+						log.info("更新第三方奖金信息 ticketId={},thirdRewardMoney={}",updateDlPrint.getTicketId(),updateDlPrint.getThirdPartRewardMoney());
+						if(PrintComEnums.CAIXIAOMI.getPrintChannelId().equals(printLotteryCom)){							
+							dlPrintLotteryMapper.updatePrintThirdRewardRewardStatus2To3AndPrintLottery(updateDlPrint);
+						}else{
+							dlPrintLotteryMapper.updatePrintThirdRewardRewardStatus1To3AndPrintLottery(updateDlPrint);
+						}
+					}else{
+						DlPrintLottery updateDlPrint = new DlPrintLottery();
+						updateDlPrint.setThirdPartRewardMoney(thirdRewardMoney);
+						updateDlPrint.setTicketId(reward.getTicketId());
+						log.info("更新第三方奖金信息 ticketId={},thirdRewardMoney={}",updateDlPrint.getTicketId(),updateDlPrint.getThirdPartRewardMoney());
+						if(PrintComEnums.CAIXIAOMI.getPrintChannelId().equals(printLotteryCom)){
+						    dlPrintLotteryMapper.updatePrintThirdRewardRewardStatus2To3(updateDlPrint);
+						}else{
+							dlPrintLotteryMapper.updatePrintThirdRewardRewardStatus1To3(updateDlPrint);
+						}
+					}
 				}
 			}
 	}
@@ -1862,17 +1997,65 @@ public class DlPrintLotteryService {
 				lotteryPrints.add(lotteryPrint);
 			}
 		}
-		for(DlPrintLottery lotteryPrint:lotteryPrints) {
-			log.info("更新出票信息tikectInfo={}",JSONHelper.bean2json(lotteryPrint));
-			int rst = this.updatePrintStatusByTicketId(lotteryPrint);
-			if(rst<1){
-				log.error("更新出票信息tikectInfo={},更新失败，updateRow={}",JSONHelper.bean2json(lotteryPrint),rst);
-			}
+		if(!CollectionUtils.isEmpty(lotteryPrints)){							
+			long start = System.currentTimeMillis();
+			log.info("toStake betch Update dl_print_lottery start ={}ms,listSize={}",start,lotteryPrints.size());
+			int updateRow= dlPrintLotteryMapper.beatchUpdatePrintStatusByTicketId(lotteryPrints);
+			long end = System.currentTimeMillis();
+			log.info("toStake betch Update dl_print_lottery useTime ={}ms,updateRow={}",(end-start),updateRow);
+//			for(DlPrintLottery lotteryPrint:lotteryPrints) {
+//			log.info("更新出票信息tikectInfo={}",JSONHelper.bean2json(lotteryPrint));
+//			int rst = this.updatePrintStatusByTicketId(lotteryPrint);
+//			if(rst<1){
+//				log.error("更新出票信息tikectInfo={},更新失败，updateRow={}",JSONHelper.bean2json(lotteryPrint),rst);
+//			}
+//		}
 		}
 	}
 
-	public void saveLotteryPrintInfo(List<LotteryPrintDTO> lotteryPrints,String orderSn, DlTicketChannelLotteryClassify classify) {
-		
+	/**
+	 * 新的根据出票路由选择后出票信息
+	 * @param lotteryPrints
+	 * @param orderSn
+	 * @param printChannelInfo
+	 */
+	public void saveLotteryPrintInfo(List<LotteryPrintDTO> lotteryPrints,String orderSn, PrintChannelInfo printChannelInfo) {
+
+		List<DlPrintLottery> printLotterysByOrderSn = dlPrintLotteryMapper.printLotterysByOrderSn(orderSn);
+		if(CollectionUtils.isNotEmpty(printLotterysByOrderSn)) {
+			log.info("订单orderSn={},已经出票",orderSn);
+			return ;
+		}
+		DlTicketChannelLotteryClassify classify = printChannelInfo.getClassify();
+		DlTicketChannel channel = printChannelInfo.getChannel();
+		List<DlPrintLottery> models = lotteryPrints.stream().map(dto->{
+			DlPrintLottery lotteryPrint = new DlPrintLottery();
+			lotteryPrint.setGame(classify.getGame());
+			lotteryPrint.setMerchant(channel.getTicketMerchant());//当初为啥存储这个？？？用户名？有何意义？？
+			if(PrintComEnums.WEICAISHIDAI.getPrintChannelId().equals(channel.getId())){
+				lotteryPrint.setTicketId(channel.getTicketMerchant()+""+dto.getTicketId());	
+			}else{
+				lotteryPrint.setTicketId(dto.getTicketId());
+			}
+			lotteryPrint.setAcceptTime(DateUtil.getCurrentTimeLong());
+			lotteryPrint.setBetType(dto.getBetType());
+			lotteryPrint.setMoney(BigDecimal.valueOf(dto.getMoney()*100));
+			lotteryPrint.setIssue(dto.getIssue());
+			lotteryPrint.setPlayType(dto.getPlayType());
+			lotteryPrint.setTimes(dto.getTimes());
+			lotteryPrint.setStakes(dto.getStakes());
+			lotteryPrint.setOrderSn(orderSn);
+			lotteryPrint.setRealRewardMoney(BigDecimal.valueOf(0.00));
+			lotteryPrint.setThirdPartRewardMoney(BigDecimal.valueOf(0.00));
+			lotteryPrint.setCompareStatus("0");
+			lotteryPrint.setComparedStakes("");
+			lotteryPrint.setRewardStakes("");
+			lotteryPrint.setStatus(0);
+			lotteryPrint.setPrintLotteryCom(classify.getTicketChannelId());
+			return lotteryPrint;
+		}).collect(Collectors.toList());
+		dlPrintLotteryMapper.batchInsertDlPrintLottery(models);
+		return;
 	}
 
 	

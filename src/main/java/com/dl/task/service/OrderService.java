@@ -63,6 +63,7 @@ import com.dl.task.dto.OrderDetailDataDTO;
 import com.dl.task.dto.OrderInfoAndDetailDTO;
 import com.dl.task.dto.OrderInfoDTO;
 import com.dl.task.dto.OrderWithUserDTO;
+import com.dl.task.dto.PrintChannelInfo;
 import com.dl.task.dto.TMatchBetMaxAndMinOddsList;
 import com.dl.task.dto.TicketInfo;
 import com.dl.task.dto.TicketPlayInfo;
@@ -85,6 +86,8 @@ import com.dl.task.param.MessageAddParam;
 import com.dl.task.param.OrderSnParam;
 import com.dl.task.param.UpdateOrderInfoParam;
 import com.dl.task.printlottery.PrintLotteryAdapter;
+import com.dl.task.util.GeTuiMessage;
+import com.dl.task.util.GeTuiUtil;
 
 @Slf4j
 @Service
@@ -130,6 +133,9 @@ public class OrderService extends AbstractService<Order> {
     private UserMatchCollectMapper userMatchCollectMapper;
     @Resource
     private PrintLotteryAdapter printLotteryAdapter;
+    
+    @Resource
+    private GeTuiUtil geTuiUtil;
     
 	/**
 	 * 更新订单状态
@@ -352,13 +358,12 @@ public class OrderService extends AbstractService<Order> {
 		Integer acceptTime = 0;
 		Integer ticketTime = 0;
 		for(DlPrintLottery printLottery: succPrintLotterys) {
-			if(!"T51".equals(printLottery.getGame())){
-//				其他玩法直接退出
-				return ;
+			if("T51".equals(printLottery.getGame())){
+				
+				String stakes = printLottery.getStakes();
+				String printSp = printLottery.getPrintSp();
+				this.getPrintOdds(map, stakes, printSp);
 			}
-			String stakes = printLottery.getStakes();
-			String printSp = printLottery.getPrintSp();
-			this.getPrintOdds(map, stakes, printSp);
 			Integer acceptTime1 = printLottery.getAcceptTime();
 			acceptTime = acceptTime<acceptTime1?acceptTime1:acceptTime;
 			Integer ticketTime1 = DateUtil.getCurrentTimeLong(printLottery.getPrintTime().getTime()/1000);
@@ -366,6 +371,9 @@ public class OrderService extends AbstractService<Order> {
 		}
 		order.setAcceptTime(acceptTime);
 		order.setTicketTime(ticketTime);
+		if(Integer.valueOf(2).equals(order.getLotteryClassifyId())){
+			return;
+		}
 		// 更新订单详情表
 		List<OrderDetail> orderDetailList = orderDetailMapper.queryListByOrderSn(order.getOrderSn());
 		if (CollectionUtils.isEmpty(orderDetailList)) {
@@ -454,6 +462,7 @@ public class OrderService extends AbstractService<Order> {
 	private void goLotteryMessage(List<Order> orders) {
 		AddMessageParam addParam = new AddMessageParam();
 		List<MessageAddParam> params = new ArrayList<MessageAddParam>(orders.size());
+		List<Integer> lotteryFailUserIds = new ArrayList<Integer>(orders.size());
 		for (Order order : orders) {
 			// 消息
 			MessageAddParam messageAddParam = new MessageAddParam();
@@ -471,7 +480,17 @@ public class OrderService extends AbstractService<Order> {
 			Integer addTime = order.getAddTime();
 			LocalDateTime loclaTime = LocalDateTime.ofEpochSecond(addTime, 0, ZoneOffset.of("+08:00"));
 			String format = loclaTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:dd"));
-			messageAddParam.setMsgDesc(MessageFormat.format(CommonConstants.FORMAT_PRINTLOTTERY_MSG_DESC, ticketAmount, format));
+			String gameDesc="竞彩足球";
+			if(Integer.valueOf(2).equals(order.getLotteryClassifyId())){
+				gameDesc="大乐透";
+			}
+			lotteryFailUserIds.add(order.getUserId());
+			User user = userMapper.queryUserByUserId(order.getUserId());
+			String pushKey= user.getPushKey();
+			String content = MessageFormat.format(CommonConstants.FORMAT_PRINTLOTTERY_PUSH_DESC,pushKey);
+			GeTuiMessage getuiMessage = new GeTuiMessage(CommonConstants.FORMAT_PRINTLOTTERY_PUSH_TITLE, content, DateUtil.getCurrentTimeLong());
+			geTuiUtil.pushMessage(pushKey, getuiMessage);
+			messageAddParam.setMsgDesc(MessageFormat.format(CommonConstants.FORMAT_PRINTLOTTERY_MSG_DESC,gameDesc,ticketAmount, format));
 			params.add(messageAddParam);
 		}
 		addParam.setParams(params);
@@ -534,6 +553,7 @@ public class OrderService extends AbstractService<Order> {
 				OrderDetail od = new OrderDetail();
 				od.setOrderDetailId(orderDetail.getOrderDetailId());
 				StringBuffer sbuf = new StringBuffer();
+				int hasResultCount=0;
 				for (String ticketData : split) {
 					if (StringUtils.isBlank(ticketData) || !ticketData.contains("|")) {
 						continue;
@@ -570,17 +590,19 @@ public class OrderService extends AbstractService<Order> {
 							}
 						}
 						if (cellCode != null) {
+							hasResultCount++;
 							sbuf.append("07|").append(playCode).append("|").append(cellCode).append(";");
 						}
 					} else {
 						for (DlLeagueMatchResult dto : resultDTOs) {
 							if (playType.equals(dto.getPlayType())) {
+								hasResultCount++;
 								sbuf.append("0").append(dto.getPlayType()).append("|").append(playCode).append("|").append(dto.getCellCode()).append(";");
 							}
 						}
 					}
 				}
-				if (sbuf.length() > 0) {
+				if (sbuf.length() > 0&& hasResultCount==split.length) {
 					od.setMatchResult(sbuf.substring(0, sbuf.length() - 1));
 					orderDetailList.add(od);
 				}
@@ -634,6 +656,7 @@ public class OrderService extends AbstractService<Order> {
 				userIdAndRewardDTO.setBetMoney(orderWithUserDTO.getBetMoney());
 				userIdAndRewardDTO.setBetTime(DateUtil.getTimeString(betTime, DateUtil.datetimeFormat));
 				userIdAndRewardDTOs.add(userIdAndRewardDTO);
+				userIdAndRewardDTO.setLotteryClassifyId(orderWithUserDTO.getLotteryClassifyId());
 			}
 			userAccountService.batchUpdateUserAccount(userIdAndRewardDTOs,ProjectConstant.REWARD_AUTO);
 		}
@@ -1300,23 +1323,21 @@ public class OrderService extends AbstractService<Order> {
 				}
 				List<LotteryPrintDTO> lotteryPrints = dlPrintLotteryService.getPrintLotteryListByOrderInfo(orderDetail,orderSn);
 				if(CollectionUtils.isNotEmpty(lotteryPrints)) {
-					Double printLotteryRoutAmount = dlPrintLotteryMapper.printLotteryRoutAmount();
-			        int printLotteryCom = 1 ;//河南出票公司
-			        log.info("save printLotteryCom orderSn={},ticketAmount={},canBetMoney={}",order.getOrderSn(),order.getTicketAmount(),printLotteryRoutAmount);
-			        if(order.getTicketAmount().subtract(new BigDecimal(printLotteryRoutAmount)).compareTo(BigDecimal.ZERO)<0){
-			            log.info("orderSn={},设置出票公司为西安出票公司",order.getOrderSn());
-			            printLotteryCom = 4;//西安出票公司
-			        }
-					dlPrintLotteryService.saveLotteryPrintInfo(lotteryPrints, order.getOrderSn(),printLotteryCom);
-//					List<DlTicketChannelLotteryClassify> isOkChannels = printLotteryAdapter.getPrintChannelId(lotteryClassifyId,amount);
-//					if(!CollectionUtils.isEmpty(isOkChannels)){
-//						Integer tailNumber = Integer.parseInt(orderSn.substring(orderSn.length()-4,orderSn.length()));
-//						int channelIndex = tailNumber%isOkChannels.size();
-//						DlTicketChannelLotteryClassify classify = isOkChannels.get(channelIndex);
-//						dlPrintLotteryService.saveLotteryPrintInfo(lotteryPrints, order.getOrderSn(),classify);
-//					}else{
-//						log.error("严重：order_sn={},出票失败，未找到对应的出票公司classfyId={},ticketAmount={}",order.getOrderSn(),order.getLotteryClassifyId(),order.getTicketAmount());
-//					}
+//					Double printLotteryRoutAmount = dlPrintLotteryMapper.printLotteryRoutAmount();
+//			        int printLotteryCom = 1 ;//河南出票公司
+//			        log.info("save printLotteryCom orderSn={},ticketAmount={},canBetMoney={}",order.getOrderSn(),order.getTicketAmount(),printLotteryRoutAmount);
+//			        if(order.getTicketAmount().subtract(new BigDecimal(printLotteryRoutAmount)).compareTo(BigDecimal.ZERO)<0){
+//			            log.info("orderSn={},设置出票公司为西安出票公司",order.getOrderSn());
+//			            printLotteryCom = 4;//西安出票公司
+//			        }
+//					dlPrintLotteryService.saveLotteryPrintInfo(lotteryPrints, order.getOrderSn(),printLotteryCom);
+					Date minMatchStartTime = orderDetail.getOrderInfoDTO().getMinMatchStartTime();
+					PrintChannelInfo isOkChannels = printLotteryAdapter.getPrintChannelId(lotteryClassifyId,orderSn,minMatchStartTime,amount);
+					if(isOkChannels!=null){
+						dlPrintLotteryService.saveLotteryPrintInfo(lotteryPrints, order.getOrderSn(),isOkChannels);
+					}else{
+						log.error("严重：order_sn={},出票失败，未找到对应的出票公司classfyId={},ticketAmount={}",order.getOrderSn(),order.getLotteryClassifyId(),order.getTicketAmount());
+					}
 			        return;
 				}
 			}
@@ -1382,6 +1403,7 @@ public class OrderService extends AbstractService<Order> {
 		orderInfoDTO.setLotteryPlayClassifyId(order.getLotteryPlayClassifyId());
 		orderInfoDTO.setPassType(order.getPassType());
 		orderInfoDTO.setPlayType(order.getPlayType());
+		Date minMatchStartTime = null;
 		orderInfoAndDetailDTO.setOrderInfoDTO(orderInfoDTO);
 		List<OrderDetailDataDTO> orderDetailDataDTOs = new LinkedList<OrderDetailDataDTO>();
 		if (CollectionUtils.isNotEmpty(orderDetails)) {
@@ -1394,11 +1416,20 @@ public class OrderService extends AbstractService<Order> {
 				orderDetailDataDTO.setMatchId(orderDetail.getMatchId());
 				orderDetailDataDTO.setMatchTeam(orderDetail.getMatchTeam());
 				orderDetailDataDTO.setMatchTime(orderDetail.getMatchTime());
+				if(minMatchStartTime==null){
+					minMatchStartTime = orderDetail.getMatchTime();
+				}else{
+					if(minMatchStartTime.after(orderDetail.getMatchTime())){
+						minMatchStartTime = orderDetail.getMatchTime();
+					}
+				}
 				orderDetailDataDTO.setTicketData(orderDetail.getTicketData());
 				orderDetailDataDTO.setIssue(orderDetail.getIssue());
+				orderDetailDataDTO.setBetType(orderDetail.getBetType());
 				orderDetailDataDTOs.add(orderDetailDataDTO);
 			}
 		}
+		orderInfoDTO.setMinMatchStartTime(minMatchStartTime);
 		orderInfoAndDetailDTO.setOrderDetailDataDTOs(orderDetailDataDTOs);
 		return orderInfoAndDetailDTO;
 	}

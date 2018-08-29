@@ -3,6 +3,7 @@ package com.dl.task.printlottery.channelImpl;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.math.BigDecimal;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -10,6 +11,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 import net.sf.json.JSONObject;
@@ -22,12 +24,15 @@ import com.dl.base.enums.ThirdApiEnum;
 import com.dl.base.util.DateUtil;
 import com.dl.task.dao.DlPrintLotteryMapper;
 import com.dl.task.enums.PrintLotteryStatusEnum;
+import com.dl.task.enums.ThirdRewardStatusEnum;
 import com.dl.task.model.DlPrintLottery;
 import com.dl.task.model.DlTicketChannel;
 import com.dl.task.printlottery.IPrintChannelService;
 import com.dl.task.printlottery.requestDto.CommonQueryStakeParam;
+import com.dl.task.printlottery.requestDto.CommonToQueryBanlanceParam;
 import com.dl.task.printlottery.requestDto.CommonToStakeParam;
 import com.dl.task.printlottery.requestDto.henan.HeNanQueryPrizeFileParam;
+import com.dl.task.printlottery.responseDto.QueryPrintBalanceDTO;
 import com.dl.task.printlottery.responseDto.QueryRewardResponseDTO;
 import com.dl.task.printlottery.responseDto.QueryRewardResponseDTO.QueryRewardOrderResponse;
 import com.dl.task.printlottery.responseDto.QueryStakeResponseDTO;
@@ -37,6 +42,8 @@ import com.dl.task.printlottery.responseDto.ToStakeResponseDTO.ToStakeBackOrderD
 import com.dl.task.printlottery.responseDto.henan.HeNanDlToStakeDTO;
 import com.dl.task.printlottery.responseDto.henan.HeNanDlToStakeDTO.HeNanBackOrderDetail;
 import com.dl.task.printlottery.responseDto.henan.HeNanQueryPrizeFileDTO;
+import com.dl.task.printlottery.responseDto.henan.HenanQueryRewardDTO;
+import com.dl.task.printlottery.responseDto.henan.HenanQueryRewardDTO.HenanQueryRewardOrderResponse;
 import com.dl.task.printlottery.responseDto.henan.HenanQueryStakeResponseDTO;
 import com.dl.task.printlottery.responseDto.henan.HenanQueryStakeResponseDTO.HenanQueryStakeOrderResponse;
 
@@ -152,15 +159,51 @@ public class PrintChannelHenanServiceImpl  implements IPrintChannelService{
 		return queryStakeResponseDto;
 	}
 	@Override
-	public QueryRewardResponseDTO queryRewardByLottery(
-			List<DlPrintLottery> dlPrintLotterys,
-			DlTicketChannel dlTicketChannel,
+	public QueryRewardResponseDTO queryRewardByLottery(List<DlPrintLottery> dlPrintLotterys,DlTicketChannel dlTicketChannel,
 			DlPrintLotteryMapper dlPrintLotteryMapper) {
-		QueryRewardResponseDTO notSupport = new QueryRewardResponseDTO();
-		notSupport.setQuerySuccess(Boolean.FALSE);
-		notSupport.setRetCode("-1");
-		notSupport.setRetDesc("notSupprt");
-		return notSupport;
+		CommonQueryStakeParam commonQueryStakeParam = defaultCommonQueryStakeParam(dlPrintLotterys, dlTicketChannel.getTicketMerchant(), version);
+		List<String> collect = dlPrintLotterys.stream().map(print-> print.getPlatformId()).collect(Collectors.toList());
+		String[] platformIds = collect.toArray(new String[collect.size()]);
+		commonQueryStakeParam.setOrders(platformIds);
+		JSONObject jo = JSONObject.fromObject(commonQueryStakeParam);
+		String backStr = defaultCommonRestRequest(dlTicketChannel, dlPrintLotteryMapper, jo, "/ticket_prize", ThirdApiEnum.HE_NAN_LOTTERY);
+		JSONObject backJo = JSONObject.fromObject(backStr);
+		@SuppressWarnings("rawtypes")
+		Map<String,Class> mapClass = new HashMap<String,Class>();
+		mapClass.put("orders", HenanQueryRewardOrderResponse.class);
+		HenanQueryRewardDTO dlQueryRewardDTO = (HenanQueryRewardDTO) JSONObject.toBean(backJo, HenanQueryRewardDTO.class, mapClass); 
+		QueryRewardResponseDTO queryRewardResponseDto = new QueryRewardResponseDTO();
+		queryRewardResponseDto.setQuerySuccess(Boolean.FALSE);
+		if(dlQueryRewardDTO==null){
+			return queryRewardResponseDto;
+		}
+		queryRewardResponseDto.setRetCode(dlQueryRewardDTO.getRetCode());
+		queryRewardResponseDto.setRetDesc(dlQueryRewardDTO.getRetDesc());
+		if(!CollectionUtils.isEmpty(dlQueryRewardDTO.getOrders())){
+			queryRewardResponseDto.setQuerySuccess(Boolean.TRUE);
+			List<QueryRewardOrderResponse> orders = new ArrayList<QueryRewardResponseDTO.QueryRewardOrderResponse>();
+			for(HenanQueryRewardOrderResponse rewardOrder:dlQueryRewardDTO.getOrders()){
+				QueryRewardOrderResponse queryRewardOrderResponse = new QueryRewardOrderResponse();
+				Integer status = rewardOrder.getStatus();
+				String ticketId = rewardOrder.getTicketId();
+				Boolean querySuccess = Boolean.FALSE;
+				if(Integer.valueOf(8).equals(status)||Integer.valueOf(9).equals(status)||Integer.valueOf(10).equals(status)){
+					querySuccess = Boolean.TRUE;
+				}
+				queryRewardOrderResponse.setQuerySuccess(querySuccess);
+				if(querySuccess){
+					queryRewardOrderResponse.setTicketId(ticketId);
+					queryRewardOrderResponse.setThirdRewardStatusEnum(ThirdRewardStatusEnum.REWARD_OVER);
+					Integer preTax = rewardOrder.getPreTax();
+					Integer tax = rewardOrder.getTax();
+					Integer prizeMoneyInteger = preTax-tax;
+					queryRewardOrderResponse.setPrizeMoney(prizeMoneyInteger);
+				}
+				orders.add(queryRewardOrderResponse);
+			}
+			queryRewardResponseDto.setOrders(orders);
+		}
+		return queryRewardResponseDto;
 	}
 	@Override
 	public QueryRewardResponseDTO queryRewardByIssue(String issueAndGame,DlTicketChannel dlTicketChannel,DlPrintLotteryMapper dlPrintLotteryMapper) {
@@ -210,5 +253,21 @@ public class PrintChannelHenanServiceImpl  implements IPrintChannelService{
 			}
 		}
 		return resultDto;
+	}
+	@Override
+	public QueryPrintBalanceDTO queryBalance(DlTicketChannel dlTicketChannel,DlPrintLotteryMapper dlPrintLotteryMapper) {
+		CommonToQueryBanlanceParam querybalance = defaultCommonToQueryBanlanceParam(dlTicketChannel.getTicketMerchant(),version);
+		JSONObject jo = JSONObject.fromObject(querybalance);
+		String backStr = defaultCommonRestRequest(dlTicketChannel, dlPrintLotteryMapper, jo, "/account", ThirdApiEnum.HE_NAN_LOTTERY);
+		JSONObject backJo = JSONObject.fromObject(backStr);
+		log.info("河南查询余额返回信息={}",backStr);
+		QueryPrintBalanceDTO dlQueryStakeDTO = (QueryPrintBalanceDTO) JSONObject.toBean(backJo, QueryPrintBalanceDTO.class); 
+		if(dlQueryStakeDTO==null||dlQueryStakeDTO.getBalance()==null||Integer.valueOf(0).equals(dlQueryStakeDTO.getBalance())){
+			dlQueryStakeDTO = new QueryPrintBalanceDTO();
+			dlQueryStakeDTO.setQuerySuccess(Boolean.FALSE);
+			return dlQueryStakeDTO;
+		}
+		dlQueryStakeDTO.setQuerySuccess(Boolean.TRUE);
+		return dlQueryStakeDTO;
 	}
 }

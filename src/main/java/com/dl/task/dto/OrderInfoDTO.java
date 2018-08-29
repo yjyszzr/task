@@ -1,6 +1,7 @@
 package com.dl.task.dto;
 
 import java.io.Serializable;
+import java.util.Date;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -24,4 +25,6 @@ public class OrderInfoDTO implements Serializable{
 	
 	@ApiModelProperty("玩法")
 	private String playType;
+	@ApiModelProperty("最早开赛时间")
+	private Date minMatchStartTime;
 }

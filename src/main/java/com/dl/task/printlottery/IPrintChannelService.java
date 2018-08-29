@@ -26,8 +26,10 @@ import com.dl.task.model.DlTicketChannel;
 import com.dl.task.model.LotteryThirdApiLog;
 import com.dl.task.param.DlQueryStakeParam;
 import com.dl.task.printlottery.requestDto.CommonQueryStakeParam;
+import com.dl.task.printlottery.requestDto.CommonToQueryBanlanceParam;
 import com.dl.task.printlottery.requestDto.CommonToStakeParam;
 import com.dl.task.printlottery.requestDto.CommonToStakeParam.CommonPrintTicketOrderParam;
+import com.dl.task.printlottery.responseDto.QueryPrintBalanceDTO;
 import com.dl.task.printlottery.responseDto.QueryRewardResponseDTO;
 import com.dl.task.printlottery.responseDto.QueryStakeResponseDTO;
 import com.dl.task.printlottery.responseDto.ToStakeResponseDTO;
@@ -79,12 +81,27 @@ public interface IPrintChannelService {
 		commonToStakeParam.setOrders(commonPrintTicketOrderParams);
 		return commonToStakeParam; 
     }
+	/**
+	 * 
+	 * @param dlPrintLotterys 投注出票集合
+	 * @param merchant 商户号
+	 * @param version 版本号
+	 * @return
+	 */
+	default CommonToQueryBanlanceParam defaultCommonToQueryBanlanceParam(String merchant,String version){
+		CommonToQueryBanlanceParam commonToStakeParam = new CommonToQueryBanlanceParam();
+		commonToStakeParam.setMerchant(merchant);
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		commonToStakeParam.setTimestamp(sdf.format(new Date()));
+		commonToStakeParam.setVersion(version);
+		return commonToStakeParam; 
+    }
 	default RestTemplate getRestTemplate(){
 		 SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
         //ms
-        factory.setReadTimeout(5000);
+        factory.setReadTimeout(50000);
         //ms
-        factory.setConnectTimeout(15000);
+        factory.setConnectTimeout(60000);
         RestTemplate restTemplate = new RestTemplate(factory);
         List<HttpMessageConverter<?>> messageConverters = Lists.newArrayList();
         for (HttpMessageConverter httpMessageConverter : restTemplate.getMessageConverters()) {
@@ -128,4 +145,5 @@ public interface IPrintChannelService {
 	QueryRewardResponseDTO queryRewardByLottery(List<DlPrintLottery> dlPrintLotterys,DlTicketChannel dlTicketChannel,DlPrintLotteryMapper dlPrintLotteryMapper);
 	
 	QueryRewardResponseDTO queryRewardByIssue(String issue,DlTicketChannel dlTicketChannel,DlPrintLotteryMapper dlPrintLotteryMapper);
+	QueryPrintBalanceDTO queryBalance(DlTicketChannel channel,DlPrintLotteryMapper dlPrintLotteryMapper);
 }
