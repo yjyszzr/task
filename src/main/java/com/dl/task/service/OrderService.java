@@ -1042,9 +1042,11 @@ public class OrderService extends AbstractService<Order> {
 							}
 						}
 						if (isa) {
-							List<Double> tnaList = new ArrayList<Double>(aList);
-							for (Double item : tnaList) {
-								naList.add(Double.sum(item, odds));
+                            if(!MatchResultHadEnum.HAD_H.getCode().equals(cellCode)) {
+                                List<Double> tnaList = new ArrayList<Double>(aList);
+                                for(Double item: tnaList) {
+                                    naList.add(Double.sum(item, odds));
+                                }
 							}
 							/*
 							 * tnaList.forEach(item->Double.sum(item, odds));
@@ -1052,14 +1054,14 @@ public class OrderService extends AbstractService<Order> {
 							 */
 						}
 					} else {
-						if (ish) {
-							List<Double> tnhList = new ArrayList<Double>(hList);
-							/*
-							 * tnhList.forEach(item->Double.sum(item, odds));
-							 * nhList.addAll(tnhList);
-							 */
-							for (Double item : tnhList) {
-								nhList.add(Double.sum(item, odds));
+                        if(ish) {
+                            if(!MatchResultHadEnum.HAD_A.getCode().equals(cellCode)) {
+                                List<Double> tnhList = new ArrayList<Double>(hList);
+                                /*tnhList.forEach(item->Double.sum(item, odds));
+                                nhList.addAll(tnhList);*/
+                                for(Double item: tnhList) {
+                                    nhList.add(Double.sum(item, odds));
+                                }
 							}
 						}
 						if (isd && MatchResultHadEnum.HAD_A.getCode().equals(cellCode)) {
@@ -1093,7 +1095,7 @@ public class OrderService extends AbstractService<Order> {
 				allOdds.addAll(ndList);
 			}
 		}
-		if (allOdds.size() == 0) {
+//		if (allOdds.size() == 0) {
 			if (hList != null) {
 				allOdds.addAll(hList);
 			}
@@ -1103,7 +1105,7 @@ public class OrderService extends AbstractService<Order> {
 			if (dList != null) {
 				allOdds.addAll(dList);
 			}
-		}
+//		}
 		// logger.info("--------------" + JSONHelper.bean2json(allOdds));
 		allBetSumOdds.addAll(allOdds);
 		return allBetSumOdds;
