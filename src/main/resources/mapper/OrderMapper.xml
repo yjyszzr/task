@@ -249,7 +249,7 @@
 		        AND order_status = 0
 		        AND pay_status = 0
 		        AND is_delete = 0
-		        AND (#{nowTime}-add_time) &gt; 600
+		        AND (#{nowTime}-add_time) &gt; 1800
 	     order by add_time
   </select>
   
