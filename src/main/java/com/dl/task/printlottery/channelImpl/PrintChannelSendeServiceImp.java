@@ -381,8 +381,11 @@ public class PrintChannelSendeServiceImp implements IPrintChannelService {
 	                httpPost.abort();
 	            }
 	        }
-	        LotteryThirdApiLog thirdApiLog = new LotteryThirdApiLog(url, ThirdApiEnum.SENDE_LOTTERY, JSONObject.fromObject(requestParams), respContent);
-			dlPrintLotteryMapper.saveLotteryThirdApiLog(thirdApiLog);
+	        JSONObject requsetParamJSONObject = JSONObject.fromObject(requestParams);
+	        if(requsetParamJSONObject!=null){	        	
+	        	LotteryThirdApiLog thirdApiLog = new LotteryThirdApiLog(url, ThirdApiEnum.SENDE_LOTTERY.getCode(),requsetParamJSONObject.toString(), respContent);
+	        	dlPrintLotteryMapper.saveLotteryThirdApiLog(thirdApiLog);
+	        }
 			return respContent;
 	    }
 
