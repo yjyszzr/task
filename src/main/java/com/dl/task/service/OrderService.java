@@ -1314,7 +1314,7 @@ public class OrderService extends AbstractService<Order> {
 			List<DlPrintLottery> dlPrints = dlPrintLotteryMapper.printLotterysByOrderSn(orderSn);
 			if(CollectionUtils.isEmpty(dlPrints)){
 				Integer lotteryClassifyId = order.getLotteryClassifyId();
-				BigDecimal amount = order.getTicketAmount();
+				BigDecimal orderAmount = order.getTicketAmount();
 				Integer lotteryPlayClassifyId = order.getLotteryPlayClassifyId();
 				OrderInfoAndDetailDTO orderDetail = getOrderWithDetailByOrder(order);
 				if(1== lotteryClassifyId && 8 == lotteryPlayClassifyId) {
@@ -1331,8 +1331,24 @@ public class OrderService extends AbstractService<Order> {
 //			            printLotteryCom = 4;//西安出票公司
 //			        }
 //					dlPrintLotteryService.saveLotteryPrintInfo(lotteryPrints, order.getOrderSn(),printLotteryCom);
+					BigDecimal minAmountLottery = null;
+					BigDecimal maxAmountLottery = null;
+					for(LotteryPrintDTO print:lotteryPrints){
+						if(minAmountLottery==null){
+							minAmountLottery=BigDecimal.valueOf(print.getMoney()*100);
+							maxAmountLottery=BigDecimal.valueOf(print.getMoney()*100);
+							continue;
+						}
+						if(BigDecimal.valueOf(print.getMoney()*100).subtract(minAmountLottery).compareTo(BigDecimal.ZERO)<0){
+							minAmountLottery = BigDecimal.valueOf(print.getMoney()*100);
+						}
+						if(BigDecimal.valueOf(print.getMoney()*100).subtract(maxAmountLottery).compareTo(BigDecimal.ZERO)>0){
+							maxAmountLottery = BigDecimal.valueOf(print.getMoney()*100);
+						}
+					}
+					String playType=orderDetail.getOrderInfoDTO().getPlayType();
 					Date minMatchStartTime = orderDetail.getOrderInfoDTO().getMinMatchStartTime();
-					PrintChannelInfo isOkChannels = printLotteryAdapter.getPrintChannelId(lotteryClassifyId,orderSn,minMatchStartTime,amount);
+					PrintChannelInfo isOkChannels = printLotteryAdapter.getPrintChannelId(lotteryClassifyId,orderSn,minMatchStartTime,orderAmount,playType,minAmountLottery,maxAmountLottery);
 					if(isOkChannels!=null){
 						dlPrintLotteryService.saveLotteryPrintInfo(lotteryPrints, order.getOrderSn(),isOkChannels);
 					}else{

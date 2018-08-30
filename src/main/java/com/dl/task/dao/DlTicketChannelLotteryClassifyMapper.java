@@ -9,5 +9,5 @@ import com.dl.base.mapper.Mapper;
 import com.dl.task.model.DlTicketChannelLotteryClassify;
 
 public interface DlTicketChannelLotteryClassifyMapper extends Mapper<DlTicketChannelLotteryClassify> {
-	List<DlTicketChannelLotteryClassify> selectOpenPrintChanel(@Param("lotteryClassifyId") Integer lotteryClassifyId,@Param("minMatchStartTimeSeconds") Integer minMatchStartTimeSeconds,@Param("ticketMoney") BigDecimal ticketMoney);
+	List<DlTicketChannelLotteryClassify> selectOpenPrintChanel(@Param("lotteryClassifyId") Integer lotteryClassifyId,@Param("minMatchStartTimeSeconds") Integer minMatchStartTimeSeconds,@Param("ticketMoney") BigDecimal ticketMoney, @Param("excludePlayType") String excludePlayType, @Param("minBetAmountLottery") BigDecimal minBetAmountLottery, @Param("maxBetAmountLottery") BigDecimal maxBetAmountLottery);
 }

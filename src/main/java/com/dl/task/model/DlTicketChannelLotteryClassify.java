@@ -86,6 +86,26 @@ public class DlTicketChannelLotteryClassify {
     @Column(name = "update_time")
     private Integer updateTime;
     /**
+     * 单张票最低投注金额
+     */
+    @Column(name = "min_bet_amount_lottery")
+    private BigDecimal minBetAmountLottery;
+    /**
+     * 单张票最大投注金额
+     */
+    @Column(name = "max_bet_amount_lottery")
+    private BigDecimal maxBetAmountLottery;
+    /**
+     * 单张票最大投注倍数
+     */
+    @Column(name = "max_times_lottery")
+    private Integer maxTimesLottery;
+    /**
+     * 排除的玩法多个玩法逗号分隔
+     */
+    @Column(name = "exclude_play_type")
+    private String excludePlayType;
+    /**
      * @return id
      */
     public Integer getId() {
