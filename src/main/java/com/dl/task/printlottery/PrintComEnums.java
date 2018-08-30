@@ -9,7 +9,8 @@ public enum PrintComEnums {
 	HENAN(1,"河南"),
 	XIAN(2,"西安"),
 	CAIXIAOMI(3,"彩小秘"),
-	WEICAISHIDAI(4,"微彩时代");
+	WEICAISHIDAI(4,"微彩时代"),
+	SENDE(5,"森德");
 	
 	private Integer printChannelId;
 	private Integer rewardType;//1批量按票出奖2 按照期次出奖

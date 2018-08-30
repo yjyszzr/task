@@ -59,6 +59,7 @@ public class DLSysAlarmTaskService {
 			case ALARM_LOTTERY_BALLANCE_XIAN: alarmLotteryBalance(PrintComEnums.XIAN,alarmTask) ;break;
 			case ALARM_LOTTERY_BALLANCE_CAIXIAOMI:alarmLotteryBalance(PrintComEnums.CAIXIAOMI,alarmTask) ;break;
 			case ALARM_LOTTERY_BALLANCE_WEICAISHIDAI:alarmLotteryBalance(PrintComEnums.WEICAISHIDAI,alarmTask) ;break;
+			case ALARM_LOTTERY_BALLANCE_SENDE:alarmLotteryBalance(PrintComEnums.SENDE,alarmTask) ;break;
 			default : log.error("未找到对应的报警设置项 alarmCode={}",alarmEnum.getAlarmCode());;
 		}
 	}

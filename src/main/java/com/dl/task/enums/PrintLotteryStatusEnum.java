@@ -6,9 +6,9 @@ package com.dl.task.enums;
  */
 public enum PrintLotteryStatusEnum {
 	INIT(0,"待出票"),
-	SUCCESS(1,"待出票"),
-	FAIL(2,"待出票"),
-	DOING(3,"待出票");
+	SUCCESS(1,"出票失败"),
+	FAIL(2,"出票失败"),
+	DOING(3,"出票中");
 	private Integer status;
 	private String desc;
 	private PrintLotteryStatusEnum(Integer status,String desc){
