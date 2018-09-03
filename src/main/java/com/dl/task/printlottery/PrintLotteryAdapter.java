@@ -31,6 +31,7 @@ import com.dl.task.printlottery.channelImpl.PrintChannelXianServiceImpl;
 import com.dl.task.printlottery.responseDto.QueryPrintBalanceDTO;
 import com.dl.task.printlottery.responseDto.QueryRewardResponseDTO;
 import com.dl.task.printlottery.responseDto.QueryStakeResponseDTO;
+import com.dl.task.printlottery.responseDto.ToRewardResponseDTO;
 import com.dl.task.printlottery.responseDto.ToStakeResponseDTO;
 
 @Service
@@ -95,8 +96,9 @@ public class PrintLotteryAdapter {
 	/**
 	 * 主动兑奖 有些公司需要
 	 */
-	public void award(PrintComEnums printComEnums){
+	public ToRewardResponseDTO toRewardByLottery(PrintComEnums printComEnums,List<DlPrintLottery> dlPrintLotterys, DlTicketChannel dlTicketChannel){
 		IPrintChannelService iPrintChannelService = getIPrintChannelServiceImpl(printComEnums);
+		return iPrintChannelService.toRewardByLottery(dlPrintLotterys, dlTicketChannel, dlPrintLotteryMapper);
 	}
 	public QueryRewardResponseDTO queryLotterysReward(PrintComEnums printComEnums, List<DlPrintLottery> dlPrintLotterys,DlTicketChannel dlTicketChannel) {
 		IPrintChannelService iPrintChannelService = getIPrintChannelServiceImpl(printComEnums);

@@ -33,8 +33,8 @@ import com.dl.task.printlottery.requestDto.CommonToStakeParam;
 import com.dl.task.printlottery.requestDto.CommonToStakeParam.CommonPrintTicketOrderParam;
 import com.dl.task.printlottery.responseDto.QueryPrintBalanceDTO;
 import com.dl.task.printlottery.responseDto.QueryRewardResponseDTO;
-import com.dl.task.printlottery.responseDto.QueryRewardStatusResponseDTO;
 import com.dl.task.printlottery.responseDto.QueryStakeResponseDTO;
+import com.dl.task.printlottery.responseDto.ToRewardResponseDTO;
 import com.dl.task.printlottery.responseDto.ToStakeResponseDTO;
 import com.google.common.collect.Lists;
 
@@ -234,14 +234,13 @@ public interface IPrintChannelService {
 	QueryRewardResponseDTO queryRewardByLottery(List<DlPrintLottery> dlPrintLotterys, DlTicketChannel dlTicketChannel, DlPrintLotteryMapper dlPrintLotteryMapper);
 
 	/**
-	 * 彩小秘兑奖状态
-	 * 
+	 * 兑奖(这个针对一些第三方不主动算奖的调用此接口进行提醒第三方兑奖)
 	 * @param dlPrintLotterys
 	 * @param dlTicketChannel
 	 * @param dlPrintLotteryMapper
 	 * @return
 	 */
-	QueryRewardStatusResponseDTO queryRewardStatusByLottery(List<DlPrintLottery> dlPrintLotterys, DlTicketChannel dlTicketChannel, DlPrintLotteryMapper dlPrintLotteryMapper);
+	ToRewardResponseDTO toRewardByLottery(List<DlPrintLottery> dlPrintLotterys, DlTicketChannel dlTicketChannel, DlPrintLotteryMapper dlPrintLotteryMapper);
 
 	QueryRewardResponseDTO queryRewardByIssue(String issue, DlTicketChannel dlTicketChannel, DlPrintLotteryMapper dlPrintLotteryMapper);
 

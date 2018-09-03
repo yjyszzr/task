@@ -47,9 +47,9 @@ import com.dl.task.printlottery.requestDto.weicaishidai.WeiCaiShiDaiQueryBodyReq
 import com.dl.task.printlottery.responseDto.QueryPrintBalanceDTO;
 import com.dl.task.printlottery.responseDto.QueryRewardResponseDTO;
 import com.dl.task.printlottery.responseDto.QueryRewardResponseDTO.QueryRewardOrderResponse;
-import com.dl.task.printlottery.responseDto.QueryRewardStatusResponseDTO;
 import com.dl.task.printlottery.responseDto.QueryStakeResponseDTO;
 import com.dl.task.printlottery.responseDto.QueryStakeResponseDTO.QueryStakeOrderResponse;
+import com.dl.task.printlottery.responseDto.ToRewardResponseDTO;
 import com.dl.task.printlottery.responseDto.ToStakeResponseDTO;
 import com.dl.task.printlottery.responseDto.ToStakeResponseDTO.ToStakeBackOrderDetail;
 import com.dl.task.printlottery.responseDto.weicaishidai.WeiCaiShiDaiDlToStakeDTO;
@@ -611,7 +611,7 @@ public class PrintChannelWeicaishidaiServiceImpl implements IPrintChannelService
 	}
 
 	@Override
-	public QueryRewardStatusResponseDTO queryRewardStatusByLottery(List<DlPrintLottery> dlPrintLotterys, DlTicketChannel dlTicketChannel, DlPrintLotteryMapper dlPrintLotteryMapper) {
+	public ToRewardResponseDTO toRewardByLottery(List<DlPrintLottery> dlPrintLotterys, DlTicketChannel dlTicketChannel, DlPrintLotteryMapper dlPrintLotteryMapper) {
 		// TODO Auto-generated method stub
 		return null;
 	}

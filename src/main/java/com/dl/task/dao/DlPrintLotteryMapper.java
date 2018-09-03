@@ -58,4 +58,5 @@ public interface DlPrintLotteryMapper extends Mapper<DlPrintLottery> {
 	public int beatchUpdateComparedStakes(@Param("isSsue") String isSsue);
 	public int updatePrintThirdRewardRewardStatus1To3AndPrintLottery(DlPrintLottery updateDlPrint);
 	public int updatePrintThirdRewardRewardStatus2To3AndPrintLottery(DlPrintLottery updateDlPrint);
+	public int batchUpdateDlPrintLotteryTowardDoing(@Param("dlPrintLotterys") List<DlPrintLottery> lotteryPrints);
 }

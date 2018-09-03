@@ -9,6 +9,10 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import lombok.extern.slf4j.Slf4j;
+import net.sf.json.JSONObject;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -32,19 +36,18 @@ import com.dl.task.model.DlTicketChannel;
 import com.dl.task.model.LotteryThirdApiLog;
 import com.dl.task.printlottery.IPrintChannelService;
 import com.dl.task.printlottery.requestDto.sende.BetContentSDParam;
-import com.dl.task.printlottery.requestDto.sende.RelationSDUtil;
-import com.dl.task.printlottery.requestDto.sende.StakeSDParam;
 import com.dl.task.printlottery.requestDto.sende.BetContentSDParam.MatchContentSDParam;
 import com.dl.task.printlottery.requestDto.sende.QueryStakeSDParam;
+import com.dl.task.printlottery.requestDto.sende.RelationSDUtil;
+import com.dl.task.printlottery.requestDto.sende.StakeSDParam;
 import com.dl.task.printlottery.responseDto.QueryPrintBalanceDTO;
 import com.dl.task.printlottery.responseDto.QueryRewardResponseDTO;
-import com.dl.task.printlottery.responseDto.QueryStakeResponseDTO;
-import com.dl.task.printlottery.responseDto.ToStakeResponseDTO;
 import com.dl.task.printlottery.responseDto.QueryRewardResponseDTO.QueryRewardOrderResponse;
-import com.dl.task.printlottery.responseDto.QueryRewardStatusResponseDTO;
+import com.dl.task.printlottery.responseDto.QueryStakeResponseDTO;
 import com.dl.task.printlottery.responseDto.QueryStakeResponseDTO.QueryStakeOrderResponse;
+import com.dl.task.printlottery.responseDto.ToRewardResponseDTO;
+import com.dl.task.printlottery.responseDto.ToStakeResponseDTO;
 import com.dl.task.printlottery.responseDto.ToStakeResponseDTO.ToStakeBackOrderDetail;
-import com.dl.task.printlottery.responseDto.sende.SendeResultToStakeDTO;
 import com.dl.task.printlottery.responseDto.sende.SendeQueryBalanceDTO;
 import com.dl.task.printlottery.responseDto.sende.SendeQueryBalanceDTO.SendeBalanceMessageDTO;
 import com.dl.task.printlottery.responseDto.sende.SendeQueryRewardDTO;
@@ -53,9 +56,7 @@ import com.dl.task.printlottery.responseDto.sende.SendeResultMessageDTO;
 import com.dl.task.printlottery.responseDto.sende.SendeResultMessageDTO.MatchNumber;
 import com.dl.task.printlottery.responseDto.sende.SendeResultMessageDTO.OddsDTO;
 import com.dl.task.printlottery.responseDto.sende.SendeResultMessageDTO.SpMap;
-
-import lombok.extern.slf4j.Slf4j;
-import net.sf.json.JSONObject;
+import com.dl.task.printlottery.responseDto.sende.SendeResultToStakeDTO;
 @Service
 @Slf4j
 public class PrintChannelSendeServiceImp implements IPrintChannelService {
@@ -397,7 +398,7 @@ public class PrintChannelSendeServiceImp implements IPrintChannelService {
 		}
 
 	@Override
-	public QueryRewardStatusResponseDTO queryRewardStatusByLottery(List<DlPrintLottery> dlPrintLotterys,
+	public ToRewardResponseDTO toRewardByLottery(List<DlPrintLottery> dlPrintLotterys,
 			DlTicketChannel dlTicketChannel, DlPrintLotteryMapper dlPrintLotteryMapper) {
 		// TODO Auto-generated method stub
 		return null;

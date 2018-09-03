@@ -13,6 +13,7 @@
     <result column="ticket_merchant_password" jdbcType="VARCHAR" property="ticketMerchantPassword" />
     <result column="ticket_notify_utl" jdbcType="VARCHAR" property="ticketNotifyUtl" />
     <result column="channel_status" jdbcType="INTEGER" property="channelStatus" />
+    <result column="max_num_batch_request" jdbcType="INTEGER" property="maxNumBatchRequest" />
     <result column="add_time" jdbcType="INTEGER" property="addTime" />
     <result column="update_time" jdbcType="INTEGER" property="updateTime" />
   </resultMap>

@@ -52,7 +52,12 @@ public class DlTicketChannel {
      */
     @Column(name = "channel_status")
     private Integer channelStatus;
-
+    /**
+     * 批量请求的允许的最大数量
+     */
+    @Column(name = "max_num_batch_request")
+    private Integer maxNumBatchRequest;
+    
     /**
      * 添加时间
      */
@@ -209,7 +214,15 @@ public class DlTicketChannel {
         this.channelStatus = channelStatus;
     }
 
-    /**
+    public Integer getMaxNumBatchRequest() {
+		return maxNumBatchRequest;
+	}
+
+	public void setMaxNumBatchRequest(Integer maxNumBatchRequest) {
+		this.maxNumBatchRequest = maxNumBatchRequest;
+	}
+
+	/**
      * 获取添加时间
      *
      * @return add_time - 添加时间

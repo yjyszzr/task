@@ -1,14 +1,16 @@
-package com.dl.task.printlottery.responseDto;
+package com.dl.task.printlottery.responseDto.caixiaomi;
 
 import io.swagger.annotations.ApiModelProperty;
 
 import java.io.Serializable;
 import java.util.List;
 
+import com.dl.task.enums.ThirdRewardStatusEnum;
+
 import lombok.Data;
 
 @Data
-public class QueryRewardStatusResponseDTO implements Serializable {
+public class CaiXiaoMiToRewardResponseDTO implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	private Boolean querySuccess;
@@ -20,14 +22,15 @@ public class QueryRewardStatusResponseDTO implements Serializable {
 	private String retDesc;
 
 	@ApiModelProperty(value = "返回订单详情", required = true)
-	private List<QueryRewardStatusOrderResponse> orders;
+	private List<CaiXiaoMiToRewardOrderResponse> orders;
 
 	@Data
-	public static class QueryRewardStatusOrderResponse {
+	public static class CaiXiaoMiToRewardOrderResponse {
 		private Boolean querySuccess = Boolean.FALSE;
 
 		@ApiModelProperty(value = "商户订单号", required = true)
 		private String ticketId;
+		
 		@ApiModelProperty(value = "中奖状态 0: 成功 8:已兑奖", required = true)
 		private Integer errorCode;
 	}

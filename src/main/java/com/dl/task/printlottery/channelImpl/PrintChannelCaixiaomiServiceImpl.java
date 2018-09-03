@@ -25,10 +25,10 @@ import com.dl.task.printlottery.requestDto.CommonToStakeParam;
 import com.dl.task.printlottery.responseDto.QueryPrintBalanceDTO;
 import com.dl.task.printlottery.responseDto.QueryRewardResponseDTO;
 import com.dl.task.printlottery.responseDto.QueryRewardResponseDTO.QueryRewardOrderResponse;
-import com.dl.task.printlottery.responseDto.QueryRewardStatusResponseDTO;
-import com.dl.task.printlottery.responseDto.QueryRewardStatusResponseDTO.QueryRewardStatusOrderResponse;
 import com.dl.task.printlottery.responseDto.QueryStakeResponseDTO;
 import com.dl.task.printlottery.responseDto.QueryStakeResponseDTO.QueryStakeOrderResponse;
+import com.dl.task.printlottery.responseDto.ToRewardResponseDTO;
+import com.dl.task.printlottery.responseDto.ToRewardResponseDTO.ToRewardOrderResponse;
 import com.dl.task.printlottery.responseDto.ToStakeResponseDTO;
 import com.dl.task.printlottery.responseDto.ToStakeResponseDTO.ToStakeBackOrderDetail;
 import com.dl.task.printlottery.responseDto.caixiaomi.CaiXiaoMiDlToStakeDTO;
@@ -37,6 +37,8 @@ import com.dl.task.printlottery.responseDto.caixiaomi.CaiXiaoMiQueryRewardDTO;
 import com.dl.task.printlottery.responseDto.caixiaomi.CaiXiaoMiQueryRewardDTO.CaixiaoMiQueryRewardOrderResponse;
 import com.dl.task.printlottery.responseDto.caixiaomi.CaiXiaoMiQueryStakeResponseDTO;
 import com.dl.task.printlottery.responseDto.caixiaomi.CaiXiaoMiQueryStakeResponseDTO.CaiXiaoMiQueryStakeOrderResponse;
+import com.dl.task.printlottery.responseDto.caixiaomi.CaiXiaoMiToRewardResponseDTO;
+import com.dl.task.printlottery.responseDto.caixiaomi.CaiXiaoMiToRewardResponseDTO.CaiXiaoMiToRewardOrderResponse;
 
 @Service
 @Slf4j
@@ -200,7 +202,7 @@ public class PrintChannelCaixiaomiServiceImpl implements IPrintChannelService {
 	}
 
 	@Override
-	public QueryRewardStatusResponseDTO queryRewardStatusByLottery(List<DlPrintLottery> dlPrintLotterys, DlTicketChannel dlTicketChannel, DlPrintLotteryMapper dlPrintLotteryMapper) {
+	public ToRewardResponseDTO toRewardByLottery(List<DlPrintLottery> dlPrintLotterys, DlTicketChannel dlTicketChannel, DlPrintLotteryMapper dlPrintLotteryMapper) {
 		CommonQueryStakeParam commonQueryStakeParam = defaultCommonQueryStakeParam(dlPrintLotterys, dlTicketChannel.getTicketMerchant(), version);
 		List<String> collect = new ArrayList<String>(dlPrintLotterys.size());
 		for (int i = 0; i < dlPrintLotterys.size(); i++) {
@@ -215,26 +217,24 @@ public class PrintChannelCaixiaomiServiceImpl implements IPrintChannelService {
 		JSONObject backJo = JSONObject.fromObject(backStr);
 		@SuppressWarnings("rawtypes")
 		Map<String, Class> mapClass = new HashMap<String, Class>();
-		mapClass.put("orders", QueryRewardStatusOrderResponse.class);
-		QueryRewardStatusResponseDTO dlQueryRewardDTO = (QueryRewardStatusResponseDTO) JSONObject.toBean(backJo, QueryRewardStatusResponseDTO.class, mapClass);
-		if (dlQueryRewardDTO != null) {
-			dlQueryRewardDTO.setQuerySuccess(Boolean.TRUE);
-			if (!CollectionUtils.isEmpty(dlQueryRewardDTO.getOrders())) {
-				for (int i = 0; i < dlQueryRewardDTO.getOrders().size(); i++) {
-					QueryRewardStatusOrderResponse rewardOrder = new QueryRewardStatusOrderResponse();
-					Integer status = rewardOrder.getErrorCode();
-					Boolean querySuccess = Boolean.FALSE;
-					if (Integer.valueOf(0).equals(status) || Integer.valueOf(8).equals(status) || Integer.valueOf(9).equals(status) || Integer.valueOf(10).equals(status)) {
-						querySuccess = Boolean.TRUE;
-						rewardOrder.setQuerySuccess(querySuccess);
-						dlQueryRewardDTO.getOrders().set(i, rewardOrder);
-					}
+		mapClass.put("orders", CaiXiaoMiToRewardOrderResponse.class);
+		CaiXiaoMiToRewardResponseDTO dlQueryRewardDTO = (CaiXiaoMiToRewardResponseDTO) JSONObject.toBean(backJo, CaiXiaoMiToRewardResponseDTO.class, mapClass);
+		ToRewardResponseDTO toRewardResponseDTO = new ToRewardResponseDTO();
+		toRewardResponseDTO.setQuerySuccess(Boolean.FALSE);
+		if (dlQueryRewardDTO != null&&!CollectionUtils.isEmpty(dlQueryRewardDTO.getOrders())) {
+			toRewardResponseDTO.setQuerySuccess(Boolean.TRUE);
+			List<ToRewardOrderResponse> orders = new ArrayList<ToRewardOrderResponse>();
+			for (CaiXiaoMiToRewardOrderResponse caiXiaoMiToRewardResponse:dlQueryRewardDTO.getOrders()) {
+				ToRewardOrderResponse toRewardResponse = new ToRewardOrderResponse();
+				Integer status = caiXiaoMiToRewardResponse.getErrorCode();
+				if (Integer.valueOf(0).equals(status) || Integer.valueOf(8).equals(status) || Integer.valueOf(9).equals(status) || Integer.valueOf(10).equals(status)) {
+					toRewardResponse.setQuerySuccess(Boolean.TRUE);
+					toRewardResponse.setThirdRewardStatusEnum(ThirdRewardStatusEnum.DOING);
+					orders.add(toRewardResponse);
 				}
 			}
-		} else {
-			return dlQueryRewardDTO;
 		}
-		return dlQueryRewardDTO;
+		return toRewardResponseDTO;
 	}
 
 	@Override

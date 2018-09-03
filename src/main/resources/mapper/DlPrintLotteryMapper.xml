@@ -114,7 +114,6 @@
            print_time = #{printTime}
     where status=3 and ticket_id = #{ticketId}
   </update>
-  
   <update id="beatchUpdateLotteryPrintByCallBack">
     <foreach collection="lotteryPrints" separator=";" item="lottery">
     update dl_print_lottery set
@@ -125,6 +124,13 @@
            print_no = #{lottery.printNo},
            print_time = #{lottery.printTime}
     where status=3 and ticket_id = #{lottery.ticketId}
+    </foreach>
+  </update>
+  <update id="batchUpdateDlPrintLotteryTowardDoing">
+    <foreach collection="dlPrintLotterys" separator=";" item="lottery">
+    update dl_print_lottery set
+           third_reward_status = 2
+    where third_reward_status=1 and ticket_id = #{lottery.ticketId}
     </foreach>
   </update>
   
