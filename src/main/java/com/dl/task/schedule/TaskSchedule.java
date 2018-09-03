@@ -88,17 +88,6 @@ public class TaskSchedule {
 	 */
 	@Scheduled(cron = "${task.schedule.lottery.print.lottery}")
 	public void printLottery() {
-		// log.info("出票定时任务启动");
-		// dlPrintLotteryService.goPrintLottery();
-		// log.info("出票定时任务结束");
-		// // 每天9点前不作查询处理，只作出票处理
-		// LocalTime localTime = LocalTime.now(ZoneId.systemDefault());
-		// int hour = localTime.getHour();
-		// if (hour < 1 || hour >= 9) {
-		// log.info("彩票出票状态查询定时任务启动");
-		// dlPrintLotteryService.goQueryStake();
-		// log.info("彩票出票状态查询定时任务结束");
-		// }
 		dlPrintLotteryService.goPrintLotteryVersion2();
 	}
 
@@ -135,21 +124,18 @@ public class TaskSchedule {
 		}
 	}
 	/**
+	 * 去兑奖
+	 */
+	@Scheduled(cron = "${task.schedule.lottery.print.caixaiomi.toreward}")
+	public void updatePrintLotteryCaiXiaoMiToRewardInfo() {
+		dlPrintLotteryService.toRewardPrintLotteryVersion2(PrintComEnums.CAIXIAOMI);
+	}
+	/**
 	 * 更新出票的中奖信息
 	 */
 	@Scheduled(cron = "${task.schedule.lottery.print.third.reward}")
 	public void updatePrintLotteryThirdRewardInfo() {
 		dlPrintLotteryService.rewardPrintLotteryVersion2();
-		// try {
-		// dlPrintLotteryService.updatePrintLotterysThirdRewardXian();
-		// } catch (Exception e) {
-		// log.error("定时更新西安获奖信息失败", e);
-		// }
-		// try {
-		// dlPrintLotteryService.updatePrintLotteryThirdRewardHeNan();
-		// } catch (Exception e) {
-		// log.error("定时更新河南获奖信息失败", e);
-		// }
 	}
 
 	/**

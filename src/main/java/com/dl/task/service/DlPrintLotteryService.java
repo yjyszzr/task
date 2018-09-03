@@ -2,14 +2,8 @@ package com.dl.task.service;
 
 import io.jsonwebtoken.lang.Collections;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.math.BigDecimal;
-import java.net.URL;
-import java.nio.charset.Charset;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -19,41 +13,28 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
 import lombok.extern.slf4j.Slf4j;
-import net.sf.json.JSONObject;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.client.ClientHttpRequestFactory;
-import org.springframework.http.client.SimpleClientHttpRequestFactory;
-import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.RestTemplate;
 
-import com.dl.base.configurer.RestTemplateConfig;
 import com.dl.base.enums.MatchPlayTypeEnum;
 import com.dl.base.enums.MatchResultCrsEnum;
 import com.dl.base.enums.MatchResultHadEnum;
 import com.dl.base.enums.MatchResultHafuEnum;
 import com.dl.base.enums.SNBusinessCodeEnum;
-import com.dl.base.enums.ThirdApiEnum;
 import com.dl.base.result.BaseResult;
 import com.dl.base.result.ResultGenerator;
 import com.dl.base.util.BetUtils;
 import com.dl.base.util.DateUtil;
 import com.dl.base.util.JSONHelper;
-import com.dl.base.util.MD5Utils;
 import com.dl.base.util.SNGenerator;
 import com.dl.task.core.ProjectConstant;
 import com.dl.task.dao.DlPrintLotteryMapper;
@@ -63,11 +44,6 @@ import com.dl.task.dao2.DlLeagueMatchResultMapper;
 import com.dl.task.dao2.DlSuperLottoMapper;
 import com.dl.task.dao2.LotteryMatchMapper;
 import com.dl.task.dto.DlJcZqMatchCellDTO;
-import com.dl.task.dto.DlQueryPrizeFileDTO;
-import com.dl.task.dto.DlQueryStakeDTO;
-import com.dl.task.dto.DlQueryStakeDTO.BackQueryStake;
-import com.dl.task.dto.DlToStakeDTO;
-import com.dl.task.dto.DlToStakeDTO.BackOrderDetail;
 import com.dl.task.dto.LotteryPrintDTO;
 import com.dl.task.dto.MatchBetCellDTO;
 import com.dl.task.dto.MatchBetPlayCellDTO;
@@ -76,10 +52,6 @@ import com.dl.task.dto.OrderDetailDataDTO;
 import com.dl.task.dto.OrderInfoAndDetailDTO;
 import com.dl.task.dto.OrderInfoDTO;
 import com.dl.task.dto.PrintChannelInfo;
-import com.dl.task.dto.XianDlQueryStakeDTO;
-import com.dl.task.dto.XianDlQueryStakeDTO.XianBackQueryStake;
-import com.dl.task.dto.XianDlToStakeDTO;
-import com.dl.task.dto.XianDlToStakeDTO.XianBackOrderDetail;
 import com.dl.task.enums.PrintLotteryStatusEnum;
 import com.dl.task.enums.ThirdRewardStatusEnum;
 import com.dl.task.model.BetResultInfo;
@@ -88,12 +60,7 @@ import com.dl.task.model.DlPrintLottery;
 import com.dl.task.model.DlSuperLotto;
 import com.dl.task.model.DlTicketChannel;
 import com.dl.task.model.DlTicketChannelLotteryClassify;
-import com.dl.task.model.LotteryThirdApiLog;
 import com.dl.task.param.DlJcZqMatchBetParam;
-import com.dl.task.param.DlQueryPrizeFileParam;
-import com.dl.task.param.DlQueryStakeParam;
-import com.dl.task.param.DlToStakeParam;
-import com.dl.task.param.DlToStakeParam.PrintTicketOrderParam;
 import com.dl.task.printlottery.PrintComEnums;
 import com.dl.task.printlottery.PrintLotteryAdapter;
 import com.dl.task.printlottery.responseDto.QueryRewardResponseDTO;
@@ -102,7 +69,6 @@ import com.dl.task.printlottery.responseDto.QueryStakeResponseDTO;
 import com.dl.task.printlottery.responseDto.QueryStakeResponseDTO.QueryStakeOrderResponse;
 import com.dl.task.printlottery.responseDto.ToStakeResponseDTO;
 import com.dl.task.printlottery.responseDto.ToStakeResponseDTO.ToStakeBackOrderDetail;
-import com.google.common.collect.Lists;
 
 @Service
 @Slf4j
@@ -125,777 +91,14 @@ public class DlPrintLotteryService {
 	private DlSuperLottoMapper dlSuperLottoMapper;
 	@Resource
 	private OrderDetailMapper orderDetailMapper;
-	@Resource
-	private RestTemplateConfig restTemplateConfig;
-
-	@Resource
-	private RestTemplate restTemplate;
 
 	@Resource
 	private PrintLotteryAdapter printLotteryAdapter;
 	
-	@Value("${print.ticket.url}")
-	private String printTicketUrl;
 
 	@Value("${print.ticket.merchant}")
 	private String merchant;
-
-	@Value("${print.ticket.merchantPassword}")
-	private String merchantPassword;
 	
-	@Value("${print.ticket.xian.url}")
-	private String printTicketXianUrl;
-	
-	@Value("${print.ticket.xian.merchant}")
-	private String xianMerchant;
-	
-	@Value("${print.ticket.xian.merchantPassword}")
-	private String xianMerchantPassword;
-
-	public void goQueryStake() {
-		goQueryStakeHenan();
-		goQueryStakeXian();
-	}
-	
-	/**
-	 * 定时任务去主动查询发票状态
-	 */
-	public void goQueryStakeXian() {
-		List<DlPrintLottery> prints = dlPrintLotteryMapper.getPrintIngLotterysXian();
-		log.info("西安 彩票出票状态查询数据："+prints.size());
-		while(prints.size() > 0) {
-			log.info("西安 彩票出票状态查询数据还有："+prints.size());
-			int endIndex = prints.size()>20?20:prints.size();
-			List<DlPrintLottery> subList = prints.subList(0, endIndex);
-			List<String> collect = subList.stream().map(print-> print.getTicketId()).collect(Collectors.toList());
-			String[] orders = collect.toArray(new String[collect.size()]);
-			this.goQueryStakeXian(orders);
-			prints.removeAll(subList);
-		}
-	}
-	private void goQueryStakeXian(String[] orders) {
-		DlQueryStakeParam queryStakeParam = new DlQueryStakeParam();
-		queryStakeParam.setMerchant(xianMerchant);
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		queryStakeParam.setTimestamp(sdf.format(new Date()));
-		queryStakeParam.setVersion("1.0");
-		queryStakeParam.setOrders(orders);
-		XianDlQueryStakeDTO dlQueryStakeDTO = this.queryStakeXian(queryStakeParam);
-		String retCode = dlQueryStakeDTO.getRetCode();
-		if("0".equals(retCode)) {
-			List<XianBackQueryStake> queryStakes = dlQueryStakeDTO.getOrders();
-			log.info("西安  查询返回结果数据：size="+queryStakes.size());
-			List<DlPrintLottery> lotteryPrints = new ArrayList<>(queryStakes.size());
-			for(XianBackQueryStake stake: queryStakes) {
-				String ticketId = stake.getTicketId();
-				DlPrintLottery lotteryPrint = dlPrintLotteryMapper.selectDlPrintLotteryByTicketId(ticketId);
-				if(null != lotteryPrint) {
-					Integer printStatus = stake.getPrintStatus();
-					if(printStatus.equals(ProjectConstant.PRINT_STATUS_FAIL)) {
-						lotteryPrint.setStatus(2);
-					}else if(printStatus.equals(ProjectConstant.PRINT_STATUS_SUCCESS)) {
-						lotteryPrint.setStatus(1);
-					}else if(printStatus.equals(ProjectConstant.PRINT_STATUS_PRINT)) {
-						lotteryPrint.setStatus(3);
-					} else {
-						continue;
-					}
-					String sp = stake.getSp();
-					lotteryPrint.setPlatformId(stake.getPlatformId());
-					lotteryPrint.setPrintNo(stake.getPrintNo());
-					lotteryPrint.setPrintSp(sp);
-					lotteryPrint.setPrintStatus(printStatus);
-					Date printTime = null;
-					String printTimeStr = stake.getPrintTime();
-					if(StringUtils.isNotBlank(printTimeStr)) {
-						try {
-							printTimeStr = printTimeStr.replaceAll("/", "-");
-							printTime = sdf.parse(printTimeStr);
-							lotteryPrint.setPrintTime(printTime);
-						} catch (ParseException e) {
-							log.error("订单编号：" + stake.getTicketId() + "，出票回调，时间转换异常", e);
-							continue;
-						}
-					}
-					lotteryPrints.add(lotteryPrint);
-				}
-			}
-			log.info("goQueryStake orders size=" + orders.length + " -> updateLotteryPrintByCallBack size:" + lotteryPrints.size());
-			if (CollectionUtils.isNotEmpty(lotteryPrints)) {
-				for (DlPrintLottery print : lotteryPrints) {
-					dlPrintLotteryMapper.updateLotteryPrintByCallBack(print);
-				}
-			}
-		}
-	}
-	/**
-	 * 投注结果查询
-	 * @return
-	 */
-	public XianDlQueryStakeDTO queryStakeXian(DlQueryStakeParam param) {
-		param.setTimestamp(DateUtil.getCurrentTimeString(DateUtil.getCurrentTimeLong().longValue(), DateUtil.datetimeFormat));
-		JSONObject jo = JSONObject.fromObject(param);
-		String backStr = getBackDateByJsonDataXian(jo, "/order/query");
-		log.info("西安出票查询参数={},响应信息={}",jo,backStr);
-		JSONObject backJo = JSONObject.fromObject(backStr);
-		@SuppressWarnings("rawtypes")
-		Map<String,Class> mapClass = new HashMap<String,Class>();
-		mapClass.put("orders", XianBackQueryStake.class);
-		XianDlQueryStakeDTO dlQueryStakeDTO = (XianDlQueryStakeDTO) JSONObject.toBean(backJo, XianDlQueryStakeDTO.class, mapClass); 
-		if(dlQueryStakeDTO.getOrders()==null){
-			log.error("西安出票查询失败，retCode={},retDesc={}",dlQueryStakeDTO.getRetCode(),dlQueryStakeDTO.getRetDesc());
-		}
-//		转化 一些特定参数例如利率，票号
-		for(XianBackQueryStake stake : dlQueryStakeDTO.getOrders()){
-			praseXianPrintSpToOurSp(stake);
-		}
-		return dlQueryStakeDTO;
-	}
-	/**
-	 * 对赔率字段特殊处理
-	 * @param xianStake
-	 */
-	private void praseXianPrintSpToOurSp(XianBackQueryStake xianStake) {
-		log.info("西安赔率处理 ticketId={},sp={}",xianStake.getTicketId(),xianStake.getSp());
-		String ourSp = parseStakeIssues(xianStake.getSp(),Boolean.TRUE);
-		log.info("转化后的赔率格式是={}",ourSp);
-		xianStake.setSp(ourSp);
-	}
-	/**
-	 * 处理投注信息转化
-	 * @param stakeIssues
-	 * @param removePlayCode
-	 * @return
-	 */
-	private static String parseStakeIssues(String stakeIssues,Boolean removePlayCode){
-		StringBuffer ourStakeSpResult = new StringBuffer();
-		if(StringUtils.isNotEmpty(stakeIssues)){
-			TreeMap<String, String> ourStakes = new TreeMap<String, String>();
-			stakeIssues = stakeIssues.replace(":", "");//替换掉冒号
-			String[] xianSpList = stakeIssues.split(";");
-			for(int i=0;i<xianSpList.length;i++){
-				String one = xianSpList[i];
-				String[] issueStakes = one.split("\\|");
-				if(issueStakes.length==3){// 玩法|场次|赔率					
-//					统一场次只存一个
-					String playAndIssue = issueStakes[0]+"|"+issueStakes[1];
-					if(ourStakes.containsKey(playAndIssue)){
-						String result = ourStakes.get(playAndIssue);
-						ourStakes.put(playAndIssue, result+","+issueStakes[2]);
-					}else{
-						ourStakes.put(playAndIssue, issueStakes[2]);
-					}
-				}else{
-					log.info("西安返回的赔率格式异常sp={}",stakeIssues);
-				}
-			}
-			log.info("prase keymap={}",ourStakes.toString());
-			for(String key : ourStakes.keySet()){
-				if(ourStakeSpResult.length()>0){//除第一条数据外，其他的都要加上分号
-					ourStakeSpResult.append(";");
-				}
-				if(removePlayCode){
-					String[] playCodeAndeIssueArr = key.split("\\|");
-					ourStakeSpResult.append(playCodeAndeIssueArr[1]);
-				}else{					
-					ourStakeSpResult.append(key);
-				}
-				ourStakeSpResult.append("|");
-				ourStakeSpResult.append(ourStakes.get(key));
-			}
-		}
-		return ourStakeSpResult.length()==0?"":ourStakeSpResult.toString();
-	}
-	/**
-	 * 定时任务去主动查询发票状态
-	 */
-	public void goQueryStakeHenan() {
-		List<DlPrintLottery> prints = dlPrintLotteryMapper.getPrintIngLotterysHenan();
-		log.info("彩票出票状态查询数据："+prints.size());
-		while(prints.size() > 0) {
-			log.info("彩票出票状态查询数据还有："+prints.size());
-			int endIndex = prints.size()>20?20:prints.size();
-			List<DlPrintLottery> subList = prints.subList(0, endIndex);
-			List<String> collect = subList.stream().map(print-> print.getTicketId()).collect(Collectors.toList());
-			String[] orders = collect.toArray(new String[collect.size()]);
-			this.goQueryStakeHenan(orders);
-			prints.removeAll(subList);
-		}
-	}
-	private void goQueryStakeHenan(String[] orders) {
-		DlQueryStakeParam queryStakeParam = new DlQueryStakeParam();
-		queryStakeParam.setMerchant(merchant);
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		queryStakeParam.setTimestamp(sdf.format(new Date()));
-		queryStakeParam.setVersion("1.0");
-		queryStakeParam.setOrders(orders);
-		DlQueryStakeDTO dlQueryStakeDTO = this.queryStakeHenan(queryStakeParam);
-		String retCode = dlQueryStakeDTO.getRetCode();
-		if("0".equals(retCode)) {
-			List<BackQueryStake> queryStakes = dlQueryStakeDTO.getOrders();
-			log.info("查询返回结果数据：size="+queryStakes.size());
-			List<DlPrintLottery> lotteryPrints = new ArrayList<>(queryStakes.size());
-			for(BackQueryStake stake: queryStakes) {
-				String ticketId = stake.getTicketId();
-				DlPrintLottery lotteryPrint = dlPrintLotteryMapper.selectDlPrintLotteryByTicketId(ticketId);
-				if(null != lotteryPrint) {
-					Integer printStatus = stake.getPrintStatus();
-					if(printStatus.equals(ProjectConstant.PRINT_STATUS_FAIL)) {
-						lotteryPrint.setStatus(2);
-					}else if(printStatus.equals(ProjectConstant.PRINT_STATUS_SUCCESS)) {
-						lotteryPrint.setStatus(1);
-					}else if(printStatus.equals(ProjectConstant.PRINT_STATUS_PRINT)) {
-						lotteryPrint.setStatus(3);
-					} else {
-						continue;
-					}
-//					String stakes = lotteryPrint.getStakes();
-					String sp = stake.getSp();
-//					String comparePrintSp = getComparePrintSpHenan(sp, stake.getTicketId());
-//					comparePrintSp = StringUtils.isBlank(comparePrintSp)?sp:comparePrintSp;
-
-//					String game = lotteryPrint.getGame();
-//					String printSp = null;
-//					if("T51".equals(game) && StringUtils.isNotBlank(comparePrintSp)) {
-//						printSp = this.getPrintSp(stakes, comparePrintSp);
-//					} else if("T56".equals(game)) {
-//						printSp = comparePrintSp;
-//					}
-					lotteryPrint.setPlatformId(stake.getPlatformId());
-					lotteryPrint.setPrintNo(stake.getPrintNo());
-					lotteryPrint.setPrintSp(sp);
-					lotteryPrint.setPrintStatus(printStatus);
-					Date printTime = null;
-					String printTimeStr = stake.getPrintTime();
-					if(StringUtils.isNotBlank(printTimeStr)) {
-						try {
-							printTimeStr = printTimeStr.replaceAll("/", "-");
-							printTime = sdf.parse(printTimeStr);
-							lotteryPrint.setPrintTime(printTime);
-						} catch (ParseException e) {
-							log.error("订单编号：" + stake.getTicketId() + "，出票回调，时间转换异常", e);
-							continue;
-						}
-					}
-					lotteryPrints.add(lotteryPrint);
-				}
-			}
-			log.info("goQueryStake orders size=" + orders.length + " -> updateLotteryPrintByCallBack size:" + lotteryPrints.size());
-			if (CollectionUtils.isNotEmpty(lotteryPrints)) {
-				for (DlPrintLottery print : lotteryPrints) {
-					dlPrintLotteryMapper.updateLotteryPrintByCallBack(print);
-				}
-			}
-		}
-	}
-	/**
-	 * 获取我们需要的带玩法的赔率,供订单修改详情赔率计算奖金使用
-	 */
-	private String getPrintSp(String stakes, String spStr) {
-		String[] stakesList = stakes.split(";");
-		Map<String, String> codeTypeMap = new HashMap<String, String>();
-		for(int i=0; i<stakesList.length; i++) {
-			String stake = stakesList[i];
-			String playType = stake.substring(0, stake.indexOf("|"));
-			String playCode = stake.substring(stake.indexOf("|") + 1, stake.lastIndexOf("|"));
-			codeTypeMap.put(playCode, playType);
-		}
-		String[] spArr = spStr.split(";");
-		StringBuffer sbuf = new StringBuffer();
-		for(String sp: spArr) {
-			String[] split = sp.split("\\|");
-			String playCode = split[0];
-			String playType = codeTypeMap.get(playCode);
-			String nsp = playType+"|"+sp;
-			sbuf.append(nsp).append(";");
-		}
-		String printSp = sbuf.substring(0, sbuf.length()-1);
-		return printSp;
-		
-	}
-	/**
-	 * 比较回调和主动查询的赔率是否一致，如果不一致，以主动查询成功的结果为准
-	 * @param callBackSp
-	 * @param issue
-	 * @return
-	 */
-	private String getComparePrintSpHenan(String callBackSp, String ticketId) {
-		DlQueryStakeParam param = new DlQueryStakeParam();
-		param.setMerchant(merchant);
-		String[] orders = new String[1];
-		orders[0] = ticketId;
-		param.setOrders(orders);
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		param.setTimestamp(sdf.format(new Date()));
-		param.setVersion("1.0");
-		DlQueryStakeDTO dlQueryStakeDTO = queryStakeHenan(param);
-		if(!dlQueryStakeDTO.getRetCode().equals("0")) {
-			return callBackSp;
-		}
-		List<BackQueryStake> backQueryStakes = dlQueryStakeDTO.getOrders();
-		if(CollectionUtils.isEmpty(backQueryStakes)) {
-			return callBackSp;
-		}
-		BackQueryStake backQueryStake = backQueryStakes.get(0);
-		if(null == backQueryStake || backQueryStake.getPrintStatus() != 16) {
-			return callBackSp;
-		}
-		if(StringUtils.isNotEmpty(callBackSp) && StringUtils.isNotEmpty(backQueryStake.getSp())) {
-			if(callBackSp.equals(backQueryStake.getSp())) {
-				return callBackSp;
-			} else {
-				return backQueryStake.getSp();
-			}
-		} else if(StringUtils.isNotEmpty(callBackSp)) {
-			return callBackSp;
-		}
-		
-		return backQueryStake.getSp();
-	}
-	/**
-	 * 比较回调和主动查询的赔率是否一致，如果不一致，以主动查询成功的结果为准
-	 * @param callBackSp
-	 * @param issue
-	 * @return
-	 */
-	private String getComparePrintSpXian(String callBackSp, String ticketId) {
-		DlQueryStakeParam param = new DlQueryStakeParam();
-		param.setMerchant(xianMerchant);
-		String[] orders = new String[1];
-		orders[0] = ticketId;
-		param.setOrders(orders);
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		param.setTimestamp(sdf.format(new Date()));
-		param.setVersion("1.0");
-		XianDlQueryStakeDTO dlQueryStakeDTO = queryStakeXian(param);
-		if(!dlQueryStakeDTO.getRetCode().equals("0")) {
-			return callBackSp;
-		}
-		List<XianBackQueryStake> backQueryStakes = dlQueryStakeDTO.getOrders();
-		if(CollectionUtils.isEmpty(backQueryStakes)) {
-			return callBackSp;
-		}
-		XianBackQueryStake backQueryStake = backQueryStakes.get(0);
-		if(null == backQueryStake || backQueryStake.getPrintStatus() != 16) {
-			return callBackSp;
-		}
-		if(StringUtils.isNotEmpty(callBackSp) && StringUtils.isNotEmpty(backQueryStake.getSp())) {
-			if(callBackSp.equals(backQueryStake.getSp())) {
-				return callBackSp;
-			} else {
-				return backQueryStake.getSp();
-			}
-		} else if(StringUtils.isNotEmpty(callBackSp)) {
-			return callBackSp;
-		}
-		
-		return backQueryStake.getSp();
-	}
-	/**
-	 * 投注结果查询
-	 * @return
-	 */
-	public DlQueryStakeDTO queryStakeHenan(DlQueryStakeParam param) {
-		param.setTimestamp(DateUtil.getCurrentTimeString(DateUtil.getCurrentTimeLong().longValue(), DateUtil.datetimeFormat));
-		JSONObject jo = JSONObject.fromObject(param);
-		String backStr = getBackDateByJsonDataHenan(jo, "/stake_query");
-		JSONObject backJo = JSONObject.fromObject(backStr);
-		@SuppressWarnings("rawtypes")
-		Map<String,Class> mapClass = new HashMap<String,Class>();
-		mapClass.put("orders", BackQueryStake.class);
-		DlQueryStakeDTO dlQueryStakeDTO = (DlQueryStakeDTO) JSONObject.toBean(backJo, DlQueryStakeDTO.class, mapClass); 
-		return dlQueryStakeDTO;
-	}
-	/**
-	 * 出票定时任务
-	 */
-	public void goPrintLottery() {
-		doHenanPrintLotterys();
-        doXianPrintLotterys();
-	}
-	/**
-	 * 西安出票处理
-	 */
-	private void doXianPrintLotterys() {
-//      西安
-      List<DlPrintLottery> lotteryPrintXianList = dlPrintLotteryMapper.lotteryPrintsXianByUnPrint();
-      log.info("西安 goPrintLottery 未出票数："+lotteryPrintXianList.size());
-      if(CollectionUtils.isNotEmpty(lotteryPrintXianList)) {
-      	log.info("西安 lotteryPrintList size="+lotteryPrintXianList.size());
-      	while(lotteryPrintXianList.size() > 0) {
-      		int toIndex = lotteryPrintXianList.size() > 50?50:lotteryPrintXianList.size();
-      		List<DlPrintLottery> lotteryPrints = lotteryPrintXianList.subList(0, toIndex);
-      		log.info("西安 go tostake size="+lotteryPrints.size());
-      		Set<String> errOrderSns = this.gotoStakXian(lotteryPrints);
-      		log.info("西安出票失败订单数："+errOrderSns.size());
-      		lotteryPrintXianList.removeAll(lotteryPrints);
-      	}
-      }
-	}
-	/**
-	 * 调用第三方出票
-	 * @param successOrderSn
-	 * @param lotteryPrintList
-	 * @return 返回
-	 */
-	private Set<String> gotoStakXian(List<DlPrintLottery> lotteryPrints) {
-		DlToStakeParam dlToStakeParam = new DlToStakeParam();
-		dlToStakeParam.setMerchant(xianMerchant);
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		dlToStakeParam.setTimestamp(sdf.format(new Date()));
-		dlToStakeParam.setVersion("1.0");
-		List<PrintTicketOrderParam> printTicketOrderParams = new LinkedList<PrintTicketOrderParam>();
-		Map<String, String> ticketIdOrderSnMap = new HashMap<String, String>();
-		Set<String> allOrderSns = new HashSet<String>(lotteryPrints.size());
-		Set<String> successOrderSn = new HashSet<String>(lotteryPrints.size());
-		lotteryPrints.forEach(lp->{
-			PrintTicketOrderParam printTicketOrderParam = new PrintTicketOrderParam();
-			printTicketOrderParam.setTicketId(lp.getTicketId());
-			printTicketOrderParam.setGame(lp.getGame());
-			printTicketOrderParam.setIssue(lp.getIssue());
-			printTicketOrderParam.setPlayType(lp.getPlayType());
-			printTicketOrderParam.setBetType(lp.getBetType());
-			printTicketOrderParam.setTimes(lp.getTimes());
-			printTicketOrderParam.setMoney(lp.getMoney().intValue());
-			printTicketOrderParam.setStakes(lp.getStakes());
-			printTicketOrderParams.add(printTicketOrderParam);
-			ticketIdOrderSnMap.put(lp.getTicketId(), lp.getOrderSn());
-			allOrderSns.add(lp.getOrderSn());
-		});
-		dlToStakeParam.setOrders(printTicketOrderParams);
-		XianDlToStakeDTO dlToStakeDTO = this.toStakeXian(dlToStakeParam);
-		if(null != dlToStakeDTO && CollectionUtils.isNotEmpty(dlToStakeDTO.getOrders())) {
-			log.info("inf tostake orders");
-			List<DlPrintLottery> lotteryPrintErrors = new LinkedList<DlPrintLottery>();
-			List<DlPrintLottery> lotteryPrintSuccess = new LinkedList<DlPrintLottery>();
-			for(XianBackOrderDetail backOrderDetail : dlToStakeDTO.getOrders()) {
-				DlPrintLottery lotteryPrint = new DlPrintLottery();
-				lotteryPrint.setTicketId(backOrderDetail.getTicketId());
-				Integer errorCode = backOrderDetail.getErrorCode();
-				if(errorCode != 0) {
-					if(3002 == errorCode) {
-						lotteryPrint.setStatus(3);
-						lotteryPrintSuccess.add(lotteryPrint);
-						successOrderSn.add(ticketIdOrderSnMap.get(backOrderDetail.getTicketId()));
-					}else {
-						lotteryPrint.setErrorCode(errorCode);
-						//出票失败
-						lotteryPrint.setStatus(2);
-						lotteryPrint.setPrintTime(new Date());
-						lotteryPrintErrors.add(lotteryPrint);
-					}
-				} else {
-					//出票中
-					successOrderSn.add(ticketIdOrderSnMap.get(backOrderDetail.getTicketId()));
-					lotteryPrint.setStatus(3);
-					lotteryPrintSuccess.add(lotteryPrint);
-				}
-			}
-			if(CollectionUtils.isNotEmpty(lotteryPrintErrors)) {
-				log.info("lotteryPrintErrors size = "+lotteryPrintErrors.size());
-				long start = System.currentTimeMillis();
-				int num = 0;
-				for(DlPrintLottery lotteryPrint:lotteryPrintErrors) {
-					int rst = this.updatePrintStatusByTicketId(lotteryPrint);
-					num+=rst<0?0:rst;
-				}
-				long end = System.currentTimeMillis();
-				log.info("lotteryPrintErrors size = "+lotteryPrintErrors.size() +" rst size="+ num+ "  times=" + (end-start));
-			}
-			if(CollectionUtils.isNotEmpty(lotteryPrintSuccess)) {
-				log.info("lotteryPrintSuccess size="+lotteryPrintSuccess.size());
-				long start = System.currentTimeMillis();
-				int num = 0;
-				for(DlPrintLottery lotteryPrint:lotteryPrintSuccess) {
-					int rst = this.updatePrintStatusByTicketId(lotteryPrint);
-					num+=rst<0?0:rst;
-				}
-				long end = System.currentTimeMillis();
-				log.info("lotteryPrintSuccess size="+lotteryPrintSuccess.size()+" rst size="+ num + "  times=" + (end-start));
-			}
-		}
-		allOrderSns.removeAll(successOrderSn);
-		return allOrderSns;
-	}
-	/**
-	 * 投注接口（竞彩足球，game参数都是T51）
-	 * @return
-	 */
-	public XianDlToStakeDTO toStakeXian(DlToStakeParam param) {
-		param.setTimestamp(DateUtil.getCurrentTimeString(DateUtil.getCurrentTimeLong().longValue(), DateUtil.datetimeFormat));
-		JSONObject jo = JSONObject.fromObject(param);
-		String backStr = getBackDateByJsonDataXian(jo, "/order/create");
-		JSONObject backJo = JSONObject.fromObject(backStr);
-		@SuppressWarnings("rawtypes")
-		Map<String,Class> mapClass = new HashMap<String,Class>();
-		mapClass.put("orders", XianBackOrderDetail.class);
-		XianDlToStakeDTO dlToStakeDTO = (XianDlToStakeDTO) JSONObject.toBean(backJo, XianDlToStakeDTO.class, mapClass); 
-		return dlToStakeDTO;
-	}
-	/**
-	 * 获取返回信息
-	 * @param jo
-	 * @return
-	 */
-	private String getBackDateByJsonDataXian(JSONObject jo, String inter) {
-		String authStr = xianMerchant + xianMerchantPassword + jo.toString();
-		ClientHttpRequestFactory clientFactory = restTemplateConfig.simpleClientHttpRequestFactory();
-		RestTemplate rest = restTemplateConfig.restTemplate(clientFactory);
-		HttpHeaders headers = new HttpHeaders();
-		MediaType type = MediaType.parseMediaType("application/json;charset=UTF-8");
-		headers.setContentType(type);
-		String authorization = MD5Utils.MD5(authStr);
-		headers.add("Authorization", authorization);
-		HttpEntity<JSONObject> requestEntity = new HttpEntity<JSONObject>(jo, headers);
-		String requestUrl = printTicketXianUrl + inter;
-		String response = rest.postForObject(requestUrl, requestEntity, String.class);
-		String requestParam = JSONHelper.bean2json(requestEntity);
-		LotteryThirdApiLog thirdApiLog = new LotteryThirdApiLog(requestUrl, ThirdApiEnum.HE_NAN_LOTTERY.getCode(), requestParam, response);
-        dlPrintLotteryMapper.saveLotteryThirdApiLog(thirdApiLog);
-		return response;
-	}
-//	FIXME 用于调试河南期次兑奖文件main方法
-	public static void main(String[] args) {
-//		String heNanUrl="http://capi.bjzhongteng.com";
-//		String heNanMerchant="caixiaomi_pro";
-//		String heNanPwd="zoo3ReabDeGo6Ao4";
-		String heNanUrl="devcapi.bjzhongteng.com";
-		String heNanMerchant="caixiaomi_dev";
-		String heNanPwd="Udohdup9shoh0Pee";
-		queryOrder(heNanUrl,heNanMerchant,heNanPwd);
-//		queryPrizeFile(heNanUrl,heNanMerchant,heNanPwd);
-	}
-	private static void queryOrder(String heNanUrl, String heNanMerchant,
-			String heNanPwd) {
-//		String[] orders=new String[]{"2018070220336551340874","2018070220343831340875","2018070220344721290876","2018070220342271280877"};
-//		2018070220336551340874
-//		2018070220343831340875
-//		2018070220344721290876
-//		2018070220342271280877		
-//		String[] orders=new String[]{"2018070220344071350880","2018070220343531290879","2018070220347661330878"};
-//		2018070220344071350880
-//		2018070220343531290879
-//		2018070220347661330878
-		String[] orders=new String[]{"2018070220348623260972","2018070220341183790973","2018070220343653130975"};
-//		2018070220348623260972
-//		2018070220341183790973
-//		2018070220343653130975
-//		2018070220345593790970
-//		2018070220347713260976
-//		2018070220346653250971
-//		2018070220347413880974
-		Map<String,Object> param = new HashMap<String, Object>();
-		param.put("orders", orders);
-		param.put("merchant", heNanMerchant);
-		param.put("version", "1.0");
-		param.put("timestamp", DateUtil.getCurrentTimeString(DateUtil.getCurrentTimeLong().longValue(), DateUtil.datetimeFormat));
-		JSONObject jo = JSONObject.fromObject(param);
-		String authStr = heNanMerchant + heNanPwd + jo.toString();
-		HttpHeaders headers = new HttpHeaders();
-		MediaType type = MediaType.parseMediaType("application/json;charset=UTF-8");
-		headers.setContentType(type);
-		String authorization = MD5Utils.MD5(authStr);
-		headers.add("Authorization", authorization);
-		HttpEntity<JSONObject> requestEntity = new HttpEntity<JSONObject>(jo, headers);
-		String requestUrl = heNanUrl + "/order/query";
-		SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
-        //ms
-        factory.setReadTimeout(5000);
-        //ms
-        factory.setConnectTimeout(15000);
-        RestTemplate restTemplate = new RestTemplate(factory);
-        List<HttpMessageConverter<?>> messageConverters = Lists.newArrayList();
-        for (HttpMessageConverter httpMessageConverter : restTemplate.getMessageConverters()) {
-            if (httpMessageConverter instanceof StringHttpMessageConverter) {
-                messageConverters.add(new StringHttpMessageConverter(Charset.forName("UTF-8")));
-                continue;
-            }
-            messageConverters.add(httpMessageConverter);
-        }
-        restTemplate.setMessageConverters(messageConverters);
-		String response = restTemplate.postForObject(requestUrl, requestEntity, String.class);
-		log.info(response);
-	}
-
-	private static void queryPrizeFile(String heNanUrl,String heNanMerchant,String heNanPwd){
-//		String heNanUrl="http://1.192.90.178:9085";
-//		String heNanMerchant="180326";
-//		String heNanPwd="0FC67A15";
-		Map<String,Object> param = new HashMap<String, Object>();
-		param.put("game", "T51");
-		param.put("issue", "201806306110");
-		param.put("merchant", heNanMerchant);
-		param.put("version", "1.0");
-		param.put("timestamp", DateUtil.getCurrentTimeString(DateUtil.getCurrentTimeLong().longValue(), DateUtil.datetimeFormat));
-		JSONObject jo = JSONObject.fromObject(param);
-		String authStr = heNanMerchant + heNanPwd + jo.toString();
-		HttpHeaders headers = new HttpHeaders();
-		MediaType type = MediaType.parseMediaType("application/json;charset=UTF-8");
-		headers.setContentType(type);
-		String authorization = MD5Utils.MD5(authStr);
-		headers.add("Authorization", authorization);
-		HttpEntity<JSONObject> requestEntity = new HttpEntity<JSONObject>(jo, headers);
-		String requestUrl = heNanUrl + "/prize_file";
-		SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
-        //ms
-        factory.setReadTimeout(5000);
-        //ms
-        factory.setConnectTimeout(15000);
-        RestTemplate restTemplate = new RestTemplate(factory);
-        List<HttpMessageConverter<?>> messageConverters = Lists.newArrayList();
-        for (HttpMessageConverter httpMessageConverter : restTemplate.getMessageConverters()) {
-            if (httpMessageConverter instanceof StringHttpMessageConverter) {
-                messageConverters.add(new StringHttpMessageConverter(Charset.forName("UTF-8")));
-                continue;
-            }
-            messageConverters.add(httpMessageConverter);
-        }
-        restTemplate.setMessageConverters(messageConverters);
-		String response = restTemplate.postForObject(requestUrl, requestEntity, String.class);
-		log.info(response);
-	}
-	/**
-	 * 河南出票处理
-	 */
-	private void doHenanPrintLotterys() {
-		List<DlPrintLottery> lotteryPrintList = dlPrintLotteryMapper.lotteryPrintsHenanByUnPrint();
-        log.info("goPrintLottery 未出票数："+lotteryPrintList.size());
-        if(CollectionUtils.isNotEmpty(lotteryPrintList)) {
-        	log.info("lotteryPrintList size="+lotteryPrintList.size());
-        	while(lotteryPrintList.size() > 0) {
-        		int toIndex = lotteryPrintList.size() > 50?50:lotteryPrintList.size();
-        		List<DlPrintLottery> lotteryPrints = lotteryPrintList.subList(0, toIndex);
-        		log.info(" go tostake size="+lotteryPrints.size());
-        		Set<String> errOrderSns = this.gotoStak(lotteryPrints);
-        		log.info("出票失败订单数："+errOrderSns.size());
-        		lotteryPrintList.removeAll(lotteryPrints);
-        	}
-        }
-	}
-	/**
-	 * 调用第三方出票
-	 * @param successOrderSn
-	 * @param lotteryPrintList
-	 * @return 返回
-	 */
-	private Set<String> gotoStak(List<DlPrintLottery> lotteryPrints) {
-		DlToStakeParam dlToStakeParam = new DlToStakeParam();
-		dlToStakeParam.setMerchant(lotteryPrints.get(0).getMerchant());
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		dlToStakeParam.setTimestamp(sdf.format(new Date()));
-		dlToStakeParam.setVersion("1.0");
-		List<PrintTicketOrderParam> printTicketOrderParams = new LinkedList<PrintTicketOrderParam>();
-		Map<String, String> ticketIdOrderSnMap = new HashMap<String, String>();
-		Set<String> allOrderSns = new HashSet<String>(lotteryPrints.size());
-		Set<String> successOrderSn = new HashSet<String>(lotteryPrints.size());
-		lotteryPrints.forEach(lp->{
-			PrintTicketOrderParam printTicketOrderParam = new PrintTicketOrderParam();
-			printTicketOrderParam.setTicketId(lp.getTicketId());
-			printTicketOrderParam.setGame(lp.getGame());
-			printTicketOrderParam.setIssue(lp.getIssue());
-			printTicketOrderParam.setPlayType(lp.getPlayType());
-			printTicketOrderParam.setBetType(lp.getBetType());
-			printTicketOrderParam.setTimes(lp.getTimes());
-			printTicketOrderParam.setMoney(lp.getMoney().intValue());
-			printTicketOrderParam.setStakes(lp.getStakes());
-			printTicketOrderParams.add(printTicketOrderParam);
-			ticketIdOrderSnMap.put(lp.getTicketId(), lp.getOrderSn());
-			allOrderSns.add(lp.getOrderSn());
-		});
-		dlToStakeParam.setOrders(printTicketOrderParams);
-		DlToStakeDTO dlToStakeDTO = this.toStakeHenan(dlToStakeParam);
-		if(null != dlToStakeDTO && CollectionUtils.isNotEmpty(dlToStakeDTO.getOrders())) {
-			log.info("inf tostake orders");
-			List<DlPrintLottery> lotteryPrintErrors = new LinkedList<DlPrintLottery>();
-			List<DlPrintLottery> lotteryPrintSuccess = new LinkedList<DlPrintLottery>();
-			for(BackOrderDetail backOrderDetail : dlToStakeDTO.getOrders()) {
-				DlPrintLottery lotteryPrint = new DlPrintLottery();
-				lotteryPrint.setTicketId(backOrderDetail.getTicketId());
-				Integer errorCode = backOrderDetail.getErrorCode();
-				if(errorCode != 0) {
-					if(3002 == errorCode) {
-						successOrderSn.add(ticketIdOrderSnMap.get(backOrderDetail.getTicketId()));
-					}else {
-						lotteryPrint.setErrorCode(errorCode);
-						//出票失败
-						lotteryPrint.setStatus(2);
-						lotteryPrint.setPrintTime(new Date());
-						lotteryPrintErrors.add(lotteryPrint);
-					}
-				} else {
-					//出票中
-					successOrderSn.add(ticketIdOrderSnMap.get(backOrderDetail.getTicketId()));
-					lotteryPrint.setStatus(3);
-					lotteryPrintSuccess.add(lotteryPrint);
-				}
-			}
-			if(CollectionUtils.isNotEmpty(lotteryPrintErrors)) {
-				log.info("lotteryPrintErrors size = "+lotteryPrintErrors.size());
-				long start = System.currentTimeMillis();
-				int num = 0;
-				for(DlPrintLottery lotteryPrint:lotteryPrintErrors) {
-					int rst = this.updatePrintStatusByTicketId(lotteryPrint);
-					num+=rst<0?0:rst;
-				}
-				long end = System.currentTimeMillis();
-				log.info("lotteryPrintErrors size = "+lotteryPrintErrors.size() +" rst size="+ num+ "  times=" + (end-start));
-			}
-			if(CollectionUtils.isNotEmpty(lotteryPrintSuccess)) {
-				log.info("lotteryPrintSuccess size="+lotteryPrintSuccess.size());
-				long start = System.currentTimeMillis();
-				int num = 0;
-				for(DlPrintLottery lotteryPrint:lotteryPrintSuccess) {
-					int rst = this.updatePrintStatusByTicketId(lotteryPrint);
-					num+=rst<0?0:rst;
-				}
-				long end = System.currentTimeMillis();
-				log.info("lotteryPrintSuccess size="+lotteryPrintSuccess.size()+" rst size="+ num + "  times=" + (end-start));
-			}
-		}
-		allOrderSns.removeAll(successOrderSn);
-		return allOrderSns;
-	}
-	public int updatePrintStatusByTicketId(DlPrintLottery lotteryPrint) {
-		return dlPrintLotteryMapper.updatePrintStatusByTicketId(lotteryPrint);
-	}
-	/**
-	 * 投注接口（竞彩足球，game参数都是T51）
-	 * @return
-	 */
-	public DlToStakeDTO toStakeHenan(DlToStakeParam param) {
-		param.setTimestamp(DateUtil.getCurrentTimeString(DateUtil.getCurrentTimeLong().longValue(), DateUtil.datetimeFormat));
-		JSONObject jo = JSONObject.fromObject(param);
-		String backStr = getBackDateByJsonDataHenan(jo, "/stake");
-		JSONObject backJo = JSONObject.fromObject(backStr);
-		@SuppressWarnings("rawtypes")
-		Map<String,Class> mapClass = new HashMap<String,Class>();
-		mapClass.put("orders", BackOrderDetail.class);
-		DlToStakeDTO dlToStakeDTO = (DlToStakeDTO) JSONObject.toBean(backJo, DlToStakeDTO.class, mapClass); 
-		return dlToStakeDTO;
-	}
-	/**
-	 * 获取返回信息
-	 * @param jo
-	 * @return
-	 */
-	private String getBackDateByJsonDataHenan(JSONObject jo, String inter) {
-		String authStr = merchant + merchantPassword + jo.toString();
-		ClientHttpRequestFactory clientFactory = restTemplateConfig.simpleClientHttpRequestFactory();
-		RestTemplate rest = restTemplateConfig.restTemplate(clientFactory);
-		HttpHeaders headers = new HttpHeaders();
-		MediaType type = MediaType.parseMediaType("application/json;charset=UTF-8");
-		headers.setContentType(type);
-		String authorization = MD5Utils.MD5(authStr);
-		headers.add("Authorization", authorization);
-		HttpEntity<JSONObject> requestEntity = new HttpEntity<JSONObject>(jo, headers);
-		String requestUrl = printTicketUrl + inter;
-		String response = rest.postForObject(requestUrl, requestEntity, String.class);
-		log.info("河南出票调用requestUrl={},响应={}",requestUrl,response);
-		String requestParam = JSONHelper.bean2json(requestEntity);
-		LotteryThirdApiLog thirdApiLog = new LotteryThirdApiLog(requestUrl, ThirdApiEnum.HE_NAN_LOTTERY.getCode(), requestParam, response);
-		dlPrintLotteryMapper.saveLotteryThirdApiLog(thirdApiLog);
-		return response;
-	}
 	/**
 	 * 更新赛果信息
 	 */
@@ -1079,8 +282,9 @@ public class DlPrintLotteryService {
 							List<Double> rewardList = new ArrayList<Double>();
 							// 2018-06-04计算税
 							this.groupByRewardList(2.0, Integer.valueOf(print.getBetType()) / 10, winSPList, rewardList);
-							double rewardSum = rewardList.stream().reduce(0.00, Double::sum) * print.getTimes();
-							updatePrint.setRealRewardMoney(BigDecimal.valueOf(rewardSum));
+							Double oneTimeReward = rewardList.stream().reduce(0.00, Double::sum);
+							BigDecimal allTimesReward = new BigDecimal(oneTimeReward).setScale(2, RoundingMode.HALF_EVEN).multiply(new BigDecimal(print.getTimes()));
+							updatePrint.setRealRewardMoney(allTimesReward);
 							// 保存第三方给计算的单张彩票的价格
 							/*
 							 * PeriodRewardDetail periodRewardDetail = new
@@ -1187,42 +391,6 @@ public class DlPrintLotteryService {
 			}
 		}
 		return spMap;
-	}
-	/**
-	 * 保存预出票信息
-	 * @param list
-	 * @return
-	 */
-	@Transactional(value="transactionManager1")
-	public BaseResult<String> saveLotteryPrintInfo(List<LotteryPrintDTO> list, String orderSn,int printLotteryCom) {
-		List<DlPrintLottery> printLotterysByOrderSn = dlPrintLotteryMapper.printLotterysByOrderSn(orderSn);
-		if(CollectionUtils.isNotEmpty(printLotterysByOrderSn)) {
-			return ResultGenerator.genSuccessResult("已创建");
-		}
-		List<DlPrintLottery> models = list.stream().map(dto->{
-			DlPrintLottery lotteryPrint = new DlPrintLottery();
-			lotteryPrint.setGame("T51");
-			lotteryPrint.setMerchant(printLotteryCom==1?merchant:xianMerchant);
-			lotteryPrint.setTicketId(dto.getTicketId());
-			lotteryPrint.setAcceptTime(DateUtil.getCurrentTimeLong());
-			lotteryPrint.setBetType(dto.getBetType());
-			lotteryPrint.setMoney(BigDecimal.valueOf(dto.getMoney()*100));
-			lotteryPrint.setIssue(dto.getIssue());
-			lotteryPrint.setPlayType(dto.getPlayType());
-			lotteryPrint.setTimes(dto.getTimes());
-			lotteryPrint.setStakes(dto.getStakes());
-			lotteryPrint.setOrderSn(orderSn);
-			lotteryPrint.setRealRewardMoney(BigDecimal.valueOf(0.00));
-			lotteryPrint.setThirdPartRewardMoney(BigDecimal.valueOf(0.00));
-			lotteryPrint.setCompareStatus("0");
-			lotteryPrint.setComparedStakes("");
-			lotteryPrint.setRewardStakes("");
-			lotteryPrint.setStatus(0);
-			lotteryPrint.setPrintLotteryCom(printLotteryCom);
-			return lotteryPrint;
-		}).collect(Collectors.toList());
-		dlPrintLotteryMapper.batchInsertDlPrintLottery(models);
-		return ResultGenerator.genSuccessResult();
 	}
 	@Transactional(value="transactionManager1")
 	public BaseResult<String> saveLotteryPrintInfo(OrderInfoAndDetailDTO data, String orderSn) {
@@ -1650,133 +818,6 @@ public class DlPrintLotteryService {
 			}
 		}
 	}
-
-	/**
-	 * 获取河南已出票未获取第三方出奖信息的进行出奖
-	 */
-	public void updatePrintLotteryThirdRewardHeNan() {
-//		每一期次进行处理
-		List<DlPrintLottery> dlPrintLotterys = dlPrintLotteryMapper.selectFinishPrintLotteryButNotRewardHeNan();
-		if(CollectionUtils.isEmpty(dlPrintLotterys)){
-			return ;
-		}
-		List<String> issueAndGameList = new ArrayList<String>();
-		dlPrintLotterys.forEach(print->{
-			String issueAndGame = print.getGame()+";"+print.getIssue();
-			if(!issueAndGameList.contains(issueAndGame)){
-				issueAndGameList.add(issueAndGame);
-			}
-		});
-		log.info("河南期次查询集合={}",issueAndGameList);
-//		获取每一期次的逻辑处理
-		for(String issueAndGame : issueAndGameList){
-			String[] issueAndGameArr = issueAndGame.split(";");
-			DlQueryPrizeFileParam param = new DlQueryPrizeFileParam();
-			param.setMerchant(merchant);
-			param.setVersion("1.0");
-			param.setGame(issueAndGameArr[0]);
-			param.setIssue(issueAndGameArr[1]);
-			DlQueryPrizeFileDTO dto = queryPrizeFile(param);
-			if(dto!=null&&StringUtils.isNotEmpty(dto.getUrl())){
-//				读取文件内容
-				try {
-					List<DlPrintLottery> dlPrintList = readFileFromUrl(dto.getUrl());
-					for(DlPrintLottery updateDlPrint : dlPrintList){//FIXME 后面有时间改为批量更新
-						log.info("河南更新第三方奖金 ticketId={},thirdRewardMoney={}",updateDlPrint.getTicketId(),updateDlPrint.getThirdPartRewardMoney());
-						dlPrintLotteryMapper.updatePrintThirdRewardRewardStatus1To3(updateDlPrint);
-					}
-				} catch (IOException e) {
-					log.info("解析河南出票奖金文件失败",e);
-				}
-				
-			}
-		}
-	}
-	
-	
-
-	/**
-	 * 读取文件封装为对应参数
-	 * @param printMap 
-	 * @param url
-	 * @return
-	 * @throws IOException 
-	 */
-	private List<DlPrintLottery> readFileFromUrl(String urlStr) throws IOException {
-		List<DlPrintLottery> issueList = new ArrayList<DlPrintLottery>();
-		log.info("解析河南出票兑奖信息 文件地址={}",urlStr);
-		 URL url = new URL(urlStr);
-        BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
-        String s;
-        int row=0;
-        while ((s = reader.readLine()) != null) {
-        	log.info("查询河南出奖信息内容为={}",s);
-        	row++;
-        	if(row==1){
-        		continue;
-        	}
-        	String[] printPrizeInfoArr = s.split("\t");
-        	log.info("出奖信息={}",printPrizeInfoArr);
-        	String ticketId = printPrizeInfoArr[1];
-        	String thirdReward = printPrizeInfoArr[3];
-			DlPrintLottery updateDlPrint = new DlPrintLottery();
-			updateDlPrint.setThirdPartRewardMoney(BigDecimal.valueOf(Integer.parseInt(thirdReward)));
-			updateDlPrint.setTicketId(ticketId);
-			issueList.add(updateDlPrint);
-        }
-        reader.close();
-		return issueList;
-	}
-
-	public void updatePrintLotterysThirdRewardXian() {
-		List<DlPrintLottery> dlPrintLotterys = dlPrintLotteryMapper.selectFinishPrintLotteryButNotRewardXian();
-		if(CollectionUtils.isEmpty(dlPrintLotterys)){
-			return ;
-		}
-//		获取第三方奖金信息
-		List<String> tickets = dlPrintLotterys.stream().map(print->print.getTicketId()).collect(Collectors.toList());
-		String[] ticketsArr = tickets.toArray(new String[tickets.size()]);
-		DlQueryStakeParam queryStakeParam = new DlQueryStakeParam();
-		queryStakeParam.setMerchant(xianMerchant);
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		queryStakeParam.setTimestamp(sdf.format(new Date()));
-		queryStakeParam.setVersion("1.0");
-		queryStakeParam.setOrders(ticketsArr);
-		XianDlQueryStakeDTO dlQueryStakeDTO = this.queryStakeXian(queryStakeParam);
-		String retCode = dlQueryStakeDTO.getRetCode();
-		if("0".equals(retCode)) {
-			List<XianBackQueryStake> queryStakes = dlQueryStakeDTO.getOrders();
-			for(XianBackQueryStake stake: queryStakes) {
-				Integer prizeStatus = stake.getPrizeStatus();
-				if(Integer.valueOf(1).equals(prizeStatus) || Integer.valueOf(2).equals(prizeStatus)){
-					String ticketId = stake.getTicketId();
-					Integer money = stake.getPrizeMoney();
-					if(money==null){
-						money=Integer.valueOf(0);
-					}
-					BigDecimal thirdRewardMoney = BigDecimal.valueOf(money);
-					DlPrintLottery updateDlPrint = new DlPrintLottery();
-					updateDlPrint.setThirdPartRewardMoney(thirdRewardMoney);
-					updateDlPrint.setTicketId(ticketId);
-					log.info("西安 更新第三方奖金信息 ticketId={},thirdRewardMoney={}",updateDlPrint.getTicketId(),updateDlPrint.getThirdPartRewardMoney());
-					dlPrintLotteryMapper.updatePrintThirdRewardRewardStatus1To3(updateDlPrint);
-				}
-			}
-		}
-	}
-	/**
-	 * 期次中奖文件查询
-	 * @return
-	 */
-	private DlQueryPrizeFileDTO queryPrizeFile(DlQueryPrizeFileParam param) {
-		param.setTimestamp(DateUtil.getCurrentTimeString(DateUtil.getCurrentTimeLong().longValue(), DateUtil.datetimeFormat));
-		JSONObject jo = JSONObject.fromObject(param);
-		String backStr = getBackDateByJsonDataHenan(jo, "/prize_file");
-		JSONObject backJo = JSONObject.fromObject(backStr);
-		DlQueryPrizeFileDTO dlQueryPrizeFileDTO = (DlQueryPrizeFileDTO) JSONObject.toBean(backJo, DlQueryPrizeFileDTO.class); 
-		return dlQueryPrizeFileDTO;
-	}
-
 	/**
 	 * 出票 版本2.0
 	 */
@@ -2056,6 +1097,16 @@ public class DlPrintLotteryService {
 		}).collect(Collectors.toList());
 		dlPrintLotteryMapper.batchInsertDlPrintLottery(models);
 		return;
+	}
+
+	public void toRewardPrintLotteryVersion2(PrintComEnums caixiaomi) {
+		DlTicketChannel dlTicketChannel = printLotteryAdapter.selectChannelByChannelId(caixiaomi);
+		List<DlPrintLottery> lotteryLists = printLotteryAdapter.getReWardLotteryList(caixiaomi,ThirdRewardStatusEnum.REWARD_INIT);
+		log.info("渠道channelId={},channelName={},兑奖票个数={}",caixiaomi.getPrintChannelId(),caixiaomi.getPrintChannelName(),lotteryLists.size());
+		if(CollectionUtils.isEmpty(lotteryLists)){
+			printLotteryAdapter.award(caixiaomi);
+		}
+		log.info("渠道channelId={},channelName={}兑奖结束",caixiaomi.getPrintChannelId(),caixiaomi.getPrintChannelName());
 	}
 
 	
