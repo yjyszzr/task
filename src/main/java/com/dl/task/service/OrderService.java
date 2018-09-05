@@ -1334,16 +1334,16 @@ public class OrderService extends AbstractService<Order> {
 					BigDecimal minAmountLottery = null;
 					BigDecimal maxAmountLottery = null;
 					for(LotteryPrintDTO print:lotteryPrints){
-						if(minAmountLottery==null){
-							minAmountLottery=BigDecimal.valueOf(print.getMoney()*100);
-							maxAmountLottery=BigDecimal.valueOf(print.getMoney()*100);
+						if(minAmountLottery==null||maxAmountLottery==null){
+							minAmountLottery=BigDecimal.valueOf(print.getMoney());
+							maxAmountLottery=BigDecimal.valueOf(print.getMoney());
 							continue;
 						}
-						if(BigDecimal.valueOf(print.getMoney()*100).subtract(minAmountLottery).compareTo(BigDecimal.ZERO)<0){
-							minAmountLottery = BigDecimal.valueOf(print.getMoney()*100);
+						if(BigDecimal.valueOf(print.getMoney()).subtract(minAmountLottery).compareTo(BigDecimal.ZERO)<0){
+							minAmountLottery = BigDecimal.valueOf(print.getMoney());
 						}
-						if(BigDecimal.valueOf(print.getMoney()*100).subtract(maxAmountLottery).compareTo(BigDecimal.ZERO)>0){
-							maxAmountLottery = BigDecimal.valueOf(print.getMoney()*100);
+						if(BigDecimal.valueOf(print.getMoney()).subtract(maxAmountLottery).compareTo(BigDecimal.ZERO)>0){
+							maxAmountLottery = BigDecimal.valueOf(print.getMoney());
 						}
 					}
 					String playType=orderDetail.getOrderInfoDTO().getPlayType();
