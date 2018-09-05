@@ -233,7 +233,8 @@ public class TaskSchedule {
 			try {
 				orderService.doPaySuccessOrder(order);
 			} catch (Exception e) {
-				log.error("处理订单支付order_sn={}", order.getOrderSn(), e);
+				log.error("处理订单支付成功order_sn={}", order.getOrderSn(), e);
+				log.error("处理订单支付成功",e);
 			}
 		}
 	}
@@ -249,7 +250,8 @@ public class TaskSchedule {
 			try {
 				paymentService.dealBeyondPayTimeOrder(order);
 			} catch (Exception e) {
-				log.error("处理订单支付order_sn={}", order.getOrderSn(), e);
+				log.error("处理订单支付失败order_sn={}", order.getOrderSn(), e);
+				log.error("处理订单支付失败order_sn=",e);
 			}
 		}
 	}
@@ -286,6 +288,7 @@ public class TaskSchedule {
 				withdrawService.userWithdrawFailRefund(userWithdraw);
 			} catch (Exception e) {
 				log.error("withdrawsn={},提现失败回滚用户账户金额异常", userWithdraw.getWithdrawalSn(), e);
+				log.error("提现失败回滚用户账户金额异常",e);
 			}
 		}
 	}
