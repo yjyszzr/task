@@ -162,8 +162,8 @@ public class PrintChannelSendeServiceImp implements IPrintChannelService {
 				if(querySuccess) {
 					queryStakeOrderResponse.setStatusEnum(statusEnum);
 					queryStakeOrderResponse.setPrintStatus(printStatus);
-					queryStakeOrderResponse.setPlatformId("");
-					queryStakeOrderResponse.setPrintNo(queryMessage.getOrderNumber());
+					queryStakeOrderResponse.setPlatformId(queryMessage.getOrderNumber());
+					queryStakeOrderResponse.setPrintNo("");
 					queryStakeOrderResponse.setTicketId(queryMessage.getTicketId());
 					queryStakeOrderResponse.setPrintTime(queryMessage.getSuccessTime());
 					Date printTime = new Date();
@@ -292,7 +292,7 @@ public class PrintChannelSendeServiceImp implements IPrintChannelService {
 				MatchContentSDParam content = new MatchContentSDParam();
 				content.setMatchKey("");
 				content.setValue(RelationSDUtil.getValueMap(sk[0], sk[2]));
-				content.setMatchNumber(removeIssueWeekDay(item.getIssue())); //去除第九位
+				content.setMatchNumber(removeIssueWeekDay(sk[1])); //去除第九位
 				matchContents.add(content);
 			});
 			param.setMatchContent(matchContents);
