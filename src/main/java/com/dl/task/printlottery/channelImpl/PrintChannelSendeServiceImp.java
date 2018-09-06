@@ -27,6 +27,7 @@ import org.springframework.stereotype.Service;
 
 import com.dl.base.enums.ThirdApiEnum;
 import com.dl.base.util.DateUtilNew;
+import com.dl.base.util.JSONHelper;
 import com.dl.base.util.MD5Utils;
 import com.dl.task.dao.DlPrintLotteryMapper;
 import com.dl.task.enums.PrintLotteryStatusEnum;
@@ -359,6 +360,7 @@ public class PrintChannelSendeServiceImp implements IPrintChannelService {
 	                params.add(new BasicNameValuePair((String) entry.getKey(), entry.getValue().toString()));
 	            }
 	            log.info("森德httpPostUrl={}",url);
+	            log.info("森德httpPostRequestParams={}",JSONHelper.bean2json(requestParams));
 	            httpPost = new HttpPost(url);
 	            httpPost.setEntity(new UrlEncodedFormEntity(params, urlEncode));
 	            HttpResponse response = httpClient.execute(httpPost);
