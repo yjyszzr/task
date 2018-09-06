@@ -40,6 +40,6 @@
   and channelClassify.matchine_close_time &gt;= DATE_FORMAT(now(),'%H:%i:%S')
   and channelClassify.min_bet_amount_lottery &lt;= #{minBetAmountLottery}
   and channelClassify.max_bet_amount_lottery &gt;= #{maxBetAmountLottery}
-  and channelClassify.exclude_play_type not like #{excludePlayType}
+  and (channelClassify.exclude_play_type is null or channelClassify.exclude_play_type='' or channelClassify.exclude_play_type not like #{excludePlayType})
   </select>
 </mapper>
