@@ -58,6 +58,10 @@ import com.dl.task.printlottery.responseDto.sende.SendeResultMessageDTO.MatchNum
 import com.dl.task.printlottery.responseDto.sende.SendeResultMessageDTO.OddsDTO;
 import com.dl.task.printlottery.responseDto.sende.SendeResultMessageDTO.SpMap;
 import com.dl.task.printlottery.responseDto.sende.SendeResultToStakeDTO;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 @Service
 @Slf4j
 public class PrintChannelSendeServiceImp implements IPrintChannelService {
@@ -119,13 +123,14 @@ public class PrintChannelSendeServiceImp implements IPrintChannelService {
 		param.setMessage(message.substring(1));
 		Map<String,Object> map = this.creatPostMap(dlTicketChannel, QUERY_MASSAGE_TYPE, param.getMessage());
 		String backStr = this.httpPost(dlTicketChannel.getTicketUrl()+QUERY_MASSAGE_TYPE,map,"UTF-8",dlPrintLotteryMapper);
-		JSONObject backJo = JSONObject.fromObject(backStr);
-		Map<String,Class> mapClass = new HashMap<String,Class>();
-		mapClass.put("message", SendeResultMessageDTO.class);
-		mapClass.put("odds", SpMap.class);
-		mapClass.put("spMap", OddsDTO.class);
-		mapClass.put("matchNumber", MatchNumber.class);
-		SendeResultToStakeDTO dlQueryStakeDTO = (SendeResultToStakeDTO) JSONObject.toBean(backJo, SendeResultToStakeDTO.class, mapClass); 
+		ObjectMapper objectMapper = new ObjectMapper();
+		objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+		SendeResultToStakeDTO dlQueryStakeDTO = null;
+		try {
+			dlQueryStakeDTO = objectMapper.readValue(backStr, SendeResultToStakeDTO.class);
+		} catch (Exception e1) {
+			log.error("森德出票查询结果转换异常backStr={}",backStr,e1);
+		}
 		QueryStakeResponseDTO queryStakeResponseDto = new QueryStakeResponseDTO();
 		queryStakeResponseDto.setQuerySuccess(Boolean.FALSE);
 		if(dlQueryStakeDTO==null){
@@ -176,18 +181,21 @@ public class PrintChannelSendeServiceImp implements IPrintChannelService {
 						log.error("森德出票时间转化出错 ticketId={},printTimeStr={}",queryMessage.getTicketId(),queryMessage.getSuccessTime());
 					}
 					queryStakeOrderResponse.setPrintTimeDate(printTime);	
-					List<MatchNumber> marchNumbers = queryMessage.getOdds().getSpMap().getMatchNumber();
-					StringBuffer numBuff = new StringBuffer();
-					marchNumbers.forEach(item->{
-						numBuff.append(";"+addIssueWeekDay(item.getMatchNumber())+"|");//添加第九位
-						Map<String,String> val = item.getValue();
-						String str ="";
-						for(String key:val.keySet()) {
-							str = str +","+key+"@"+val.get(key);
-						}
-						numBuff.append(str.substring(1));
-					});
-					queryStakeOrderResponse.setSp(numBuff.substring(1));
+					SpMap spMap = queryMessage.getOdds();
+					if(spMap!=null) {
+						List<MatchNumber> marchNumbers = spMap.getSpMap().getMatchNumber();
+						StringBuffer numBuff = new StringBuffer();
+						marchNumbers.forEach(item->{
+							numBuff.append(";"+addIssueWeekDay(item.getMatchNumber())+"|");//添加第九位
+							Map<String,String> val = item.getValue();
+							String str ="";
+							for(String key:val.keySet()) {
+								str = str +","+key+"@"+val.get(key);
+							}
+							numBuff.append(str.substring(1));
+						});
+						queryStakeOrderResponse.setSp(numBuff.substring(1));
+					}
 				}
 				orders.add(queryStakeOrderResponse);
 			}
@@ -404,5 +412,11 @@ public class PrintChannelSendeServiceImp implements IPrintChannelService {
 			DlTicketChannel dlTicketChannel, DlPrintLotteryMapper dlPrintLotteryMapper) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+	
+	public static void main(String[] args) throws JsonParseException, JsonMappingException, IOException {
+		ObjectMapper objectMapper = new ObjectMapper();
+		objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+		 
 	}
 }
