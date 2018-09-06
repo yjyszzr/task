@@ -44,7 +44,7 @@ public class SendeResultMessageDTO {
 		@ApiModelProperty(value = "", required = true)
 		public String matchNumber;
 		@ApiModelProperty(value = "", required = true)
-		public Map<String,String> value;
+		public Map<String,String> valueMap;
 		
 	}
 	

@@ -187,7 +187,7 @@ public class PrintChannelSendeServiceImp implements IPrintChannelService {
 						StringBuffer numBuff = new StringBuffer();
 						marchNumbers.forEach(item->{
 							numBuff.append(";"+addIssueWeekDay(item.getMatchNumber())+"|");//添加第九位
-							Map<String,String> val = item.getValue();
+							Map<String,String> val = item.getValueMap();
 							String str ="";
 							for(String key:val.keySet()) {
 								str = str +","+key+"@"+val.get(key);
