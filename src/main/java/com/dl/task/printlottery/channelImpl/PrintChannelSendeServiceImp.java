@@ -23,6 +23,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.dl.base.enums.ThirdApiEnum;
@@ -68,7 +69,8 @@ public class PrintChannelSendeServiceImp implements IPrintChannelService {
 	/*
 	 * 出票公司提供的常量数据
 	 */
-	private static String PUBLIC_KEY = "T03209Z480T2SJQ34S3V8SNG";
+	@Value("${print.ticket.sengde.publickey}")
+	private String PUBLIC_KEY;
 	private static String TO_MASSAGE_TYPE = "pushTicketList";
 	private static String QUERY_MASSAGE_TYPE = "queryTicketsOrderStatusList";
 	private static String BONUS_MASSAGE_TYPE = "queryTicketsOrderBonusList";

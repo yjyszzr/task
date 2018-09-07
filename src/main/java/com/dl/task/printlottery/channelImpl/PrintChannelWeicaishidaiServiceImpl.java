@@ -398,7 +398,7 @@ public class PrintChannelWeicaishidaiServiceImpl implements IPrintChannelService
 				String[] stakesArr = issueStake.split("\\|");
 				weicaishidaiStake.append(removeIssueWeekDay(stakesArr[1]));
 				weicaishidaiStake.append(":");
-				weicaishidaiStake.append(playTypeRelationMap.get(playTypeCTW + stakesArr[0]));
+				weicaishidaiStake.append(playTypeRelationMap.get(playTypeCTW +game+stakesArr[0]));
 				weicaishidaiStake.append(":");
 				weicaishidaiStake.append(stakesArr[2]);
 				weicaishidaiStake.append(";");
