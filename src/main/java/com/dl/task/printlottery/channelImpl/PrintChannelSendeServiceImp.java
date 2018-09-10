@@ -2,6 +2,7 @@ package com.dl.task.printlottery.channelImpl;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -269,7 +270,8 @@ public class PrintChannelSendeServiceImp implements IPrintChannelService {
 			dlQueryStakeDTO.setQuerySuccess(Boolean.FALSE);
 			return dlQueryStakeDTO;
 		}
-		dlQueryStakeDTO.setBalance(dlToStakeDTO.getMessage().getBalance().longValue());
+		BigDecimal balance = BigDecimal.valueOf(dlToStakeDTO.getMessage().getBalance());
+		dlQueryStakeDTO.setBalance(balance.multiply(new BigDecimal("100")).longValue());
 		dlQueryStakeDTO.setQuerySuccess(Boolean.TRUE);
 		return dlQueryStakeDTO;
 	}
