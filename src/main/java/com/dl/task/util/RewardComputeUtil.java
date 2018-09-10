@@ -10,19 +10,12 @@ import com.sun.tools.classfile.StackMapTable_attribute.append_frame;
 
 public class RewardComputeUtil {
 	public static void main(String[] args) {
+//		select concat('tickesList.add("',times,'=',reward_stakes,'");') from dl_print_lottery where order_sn='2018090709180471620363' and real_reward_money>0;
 		List<String> tickesList = new ArrayList<String>();
-		tickesList.add("1=02|201808212017|1@4.100;02|201808212010|1@3.120;02|201808212007|3@2.300;02|201808212001|3@1.590");
-		tickesList.add("1=02|201808212017|1@4.100;05|201808212010|11@4.400;02|201808212007|3@2.300;02|201808212001|3@1.590");
-		tickesList.add("1=03|201808212017|11@7.200;02|201808212010|1@3.120;02|201808212007|3@2.300;02|201808212001|3@1.590");
-		tickesList.add("1=03|201808212017|11@7.200;05|201808212010|11@4.400;02|201808212007|3@2.300;02|201808212001|3@1.590");
-		tickesList.add("1=04|201808212017|2@3.200;02|201808212010|1@3.120;02|201808212007|3@2.300;02|201808212001|3@1.590");
-		tickesList.add("1=04|201808212017|2@3.200;05|201808212010|11@4.400;02|201808212007|3@2.300;02|201808212001|3@1.590");
-		tickesList.add("1=02|201808212017|1@4.100;02|201808212010|1@3.120;02|201808212007|3@2.300;04|201808212001|2@3.050");
-		tickesList.add("1=02|201808212017|1@4.100;05|201808212010|11@4.400;02|201808212007|3@2.300;04|201808212001|2@3.050");
-		tickesList.add("1=03|201808212017|11@7.200;02|201808212010|1@3.120;02|201808212007|3@2.300;04|201808212001|2@3.050");
-		tickesList.add("1=03|201808212017|11@7.200;05|201808212010|11@4.400;02|201808212007|3@2.300;04|201808212001|2@3.050");
-		tickesList.add("1=04|201808212017|2@3.200;02|201808212010|1@3.120;02|201808212007|3@2.300;04|201808212001|2@3.050");
-		tickesList.add("1=04|201808212017|2@3.200;05|201808212010|11@4.400;02|201808212007|3@2.300;04|201808212001|2@3.050");
+		tickesList.add("2=02|201809075002|3@1.650;02|201809075003|3@1.380;01|201809075004|0@1.810;02|201809075016|0@1.220;01|201809075007|3@1.770;02|201809075006|3@1.650;02|201809075009|3@1.560;02|201809075008|3@1.280");
+		tickesList.add("2=02|201809075002|3@1.650;02|201809075003|3@1.380;01|201809075004|0@1.810;02|201809075016|0@1.220;02|201809075006|3@1.650;02|201809075009|3@1.560;02|201809075008|3@1.280;02|201809075017|0@1.510");
+		tickesList.add("2=02|201809075002|3@1.650;02|201809075003|3@1.380;02|201809075006|3@1.650;02|201809075016|0@1.220;01|201809075007|3@1.770;02|201809075009|3@1.560;02|201809075008|3@1.280;02|201809075017|0@1.510");
+		tickesList.add("2=02|201809075003|3@1.380;01|201809075004|0@1.810;02|201809075016|0@1.200;01|201809075007|3@1.770;02|201809075006|3@1.570;02|201809075009|3@1.540;02|201809075008|3@1.270;02|201809075017|0@1.480");
 		StringBuffer orderRewardStr = new StringBuffer();
 		BigDecimal orderReward = new BigDecimal("0.0");
 		BigDecimal two = new BigDecimal(2.0);
@@ -30,8 +23,8 @@ public class RewardComputeUtil {
 			String[] timeArr = temp.split("=");
 			StringBuffer oneReward = new StringBuffer();
 			BigDecimal times = new BigDecimal(timeArr[0]);
-			oneReward.append(times);
-			BigDecimal reward = two.multiply(times);
+			BigDecimal reward = new BigDecimal("1.0").multiply(two);
+			oneReward.append(two);
 			String[] cellSpArr = timeArr[1].split(";");
 			for(String cellSp:cellSpArr){
 				String[] spArr = cellSp.split("@");
@@ -40,15 +33,15 @@ public class RewardComputeUtil {
 				oneReward.append(sp);
 				reward = reward.multiply(sp);
 			}
+	    	reward=reward.setScale(2,RoundingMode.HALF_EVEN);
+			reward=reward.multiply(times);
 			oneReward.append("*");
 			oneReward.append(times);
-			oneReward.append("*");
-			oneReward.append(two);
 			oneReward.append("=");
-			oneReward.append(reward.setScale(2,RoundingMode.HALF_EVEN));
-			orderRewardStr.append(reward.setScale(2,RoundingMode.HALF_EVEN));
+			oneReward.append(reward);
+			orderRewardStr.append(reward);
 			orderRewardStr.append("+");
-			orderReward=orderReward.add(reward.setScale(2,RoundingMode.HALF_EVEN));
+			orderReward=orderReward.add(reward);
 			System.out.println(oneReward.toString());
 		}
 		orderRewardStr.deleteCharAt(orderRewardStr.length()-1);
