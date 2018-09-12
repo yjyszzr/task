@@ -285,7 +285,7 @@ public class DlPrintLotteryService {
 							// 2018-06-04计算税
 							this.groupByRewardList(2.0, Integer.valueOf(print.getBetType()) / 10, winSPList, rewardList);
 							Double oneTimeReward = rewardList.stream().reduce(0.00, Double::sum);
-							BigDecimal allTimesReward = new BigDecimal(oneTimeReward).setScale(2, RoundingMode.HALF_EVEN).multiply(new BigDecimal(print.getTimes()));
+							BigDecimal allTimesReward = new BigDecimal(oneTimeReward).setScale(3,RoundingMode.DOWN).setScale(2, RoundingMode.HALF_EVEN).multiply(new BigDecimal(print.getTimes()));
 							updatePrint.setRealRewardMoney(allTimesReward);
 							// 保存第三方给计算的单张彩票的价格
 							/*
