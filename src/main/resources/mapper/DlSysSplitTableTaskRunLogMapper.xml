@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dl.task.dao.DlSysSplitTableTaskRunLogMapper">
+  <resultMap id="BaseResultMap" type="com.dl.task.model.DlSysSplitTableTaskRunLog">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="task_code" jdbcType="VARCHAR" property="taskCode" />
+    <result column="start_time" jdbcType="INTEGER" property="startTime" />
+    <result column="end_time" jdbcType="INTEGER" property="endTime" />
+    <result column="run_result" jdbcType="VARCHAR" property="runResult" />
+    <result column="run_result_desc" jdbcType="VARCHAR" property="runResultDesc" />
+    <result column="run_fail_step" jdbcType="VARCHAR" property="runFailStep" />
+    <result column="run_params" jdbcType="VARCHAR" property="runParams" />
+  </resultMap>
+</mapper>
