@@ -12,7 +12,10 @@ public class RewardComputeUtil {
 	public static void main(String[] args) {
 //		select concat('tickesList.add("',times,'=',reward_stakes,'");') from dl_print_lottery where order_sn='2018090709180471620363' and real_reward_money>0;
 		List<String> tickesList = new ArrayList<String>();
-		tickesList.add("10=02|201809112011|3@1.42;01|201809112016|3@1.53");
+		tickesList.add("2=01|201809167053|0@2.260;01|201809167048|3@2.630;01|201809167047|3@1.460");
+		tickesList.add("2=02|201809167054|3@1.160;01|201809167048|3@2.630;01|201809167047|3@1.460");
+		tickesList.add("2=02|201809167054|3@1.160;01|201809167053|0@2.260;01|201809167047|3@1.460");
+		tickesList.add("2=02|201809167054|3@1.160;01|201809167053|0@2.260;01|201809167048|3@2.630");
 		StringBuffer orderRewardStr = new StringBuffer();
 		BigDecimal orderReward = new BigDecimal("0.0");
 		BigDecimal two = new BigDecimal(2.0);
