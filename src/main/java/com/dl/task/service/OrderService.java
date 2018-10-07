@@ -358,7 +358,7 @@ public class OrderService extends AbstractService<Order> {
 		Integer acceptTime = 0;
 		Integer ticketTime = 0;
 		for(DlPrintLottery printLottery: succPrintLotterys) {
-			if("T51".equals(printLottery.getGame())){
+			if("T51".equals(printLottery.getGame()) || "T52".equals(printLottery.getGame())){
 				
 				String stakes = printLottery.getStakes();
 				String printSp = printLottery.getPrintSp();
@@ -483,6 +483,8 @@ public class OrderService extends AbstractService<Order> {
 			String gameDesc="竞彩足球";
 			if(Integer.valueOf(2).equals(order.getLotteryClassifyId())){
 				gameDesc="大乐透";
+			}else if(Integer.valueOf(3).equals(order.getLotteryClassifyId())) {
+				gameDesc="竞彩篮球";
 			}
 			lotteryFailUserIds.add(order.getUserId());
 			User user = userMapper.queryUserByUserId(order.getUserId());
@@ -1306,7 +1308,7 @@ public class OrderService extends AbstractService<Order> {
 		String orderSn = order.getOrderSn();
 //		更新order_status=1
 		int updateRow = orderMapper.updateOrderStatus0To1(orderSn);
-		if(updateRow==1){
+//		if(updateRow==1){
 			if(order.getThirdPartyPaid().compareTo(BigDecimal.ZERO)>0){
 				insertThirdPayAccount(order);
 			}
@@ -1357,9 +1359,9 @@ public class OrderService extends AbstractService<Order> {
 			        return;
 				}
 			}
-		}else{
-			log.info("order_sn={},支付成功,更新状态1失败 where 0 ",orderSn);
-		}
+//		}else{
+//			log.info("order_sn={},支付成功,更新状态1失败 where 0 ",orderSn);
+//		}
 	}
 	/**
 	 * 插入第三方支付流水

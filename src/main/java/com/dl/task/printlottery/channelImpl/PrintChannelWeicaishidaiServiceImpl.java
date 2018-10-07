@@ -66,6 +66,7 @@ public class PrintChannelWeicaishidaiServiceImpl implements IPrintChannelService
 	private static Map<String, String> playTypeRelationMap = new HashMap<String, String>();
 	private static Map<String, String> betTypeRelationMap = new HashMap<String, String>();
 	private static String CAIXIAOMI_GAME_JZ = "T51";
+	private static String CAIXIAOMI_GAME_JL = "T52";
 	private static String CAIXIAOMI_GAME_LETTO = "T01";
 	private static String CMDSTAKE = "CT01";
 	private static String CMDQUERYSTAKE = "CT03";
@@ -216,7 +217,7 @@ public class PrintChannelWeicaishidaiServiceImpl implements IPrintChannelService
 					queryStakeOrderResponse.setPlatformId(weicaishidaiQueryResponse.getTicketId());
 					queryStakeOrderResponse.setPrintNo(weicaishidaiQueryResponse.getNumber());
 					String game = ticketsAndGameMap.get(ticketId);
-					if (CAIXIAOMI_GAME_JZ.equals(game)) {
+					if (CAIXIAOMI_GAME_JZ.equals(game) || CAIXIAOMI_GAME_JL.equals(game)) {
 						queryStakeOrderResponse.setSp(getCaiXiaoMiSpFromTicketNumber(weicaishidaiQueryResponse.getNumber()));
 					} else {// 不需要赔率设置为""
 						queryStakeOrderResponse.setSp("");

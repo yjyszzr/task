@@ -25,6 +25,8 @@ public interface DlPrintLotteryMapper extends Mapper<DlPrintLottery> {
 	public int beatchUpdateLotteryPrintByCallBack(@Param("lotteryPrints")List<DlPrintLottery> lotteryPrints);
 	//获取已出票还没有兑奖比对的记录
 	public List<DlPrintLottery> lotteryPrintsByUnCompareJz();
+	//获取篮彩已出票还没有兑奖比对的记录
+	public List<DlPrintLottery> lotteryPrintsByUnCompareJl();
 	//获取已出票还没有兑奖比对的记录
 	public List<DlPrintLottery> lotteryPrintsByUnCompare();
 	//更新彩票兑奖结果

@@ -173,6 +173,15 @@
   	and (compare_status = 0 or compare_status is null or compare_status = '')
   	and stakes is not null and stakes != ''
   </select>
+  
+   <select id="lotteryPrintsByUnCompareJl" resultMap="BaseResultMap">
+  	select 
+  	<include refid="allFields"></include>
+  	from dl_print_lottery 
+  	where game='T52' and status=1 
+  	and (compare_status = 0 or compare_status is null or compare_status = '')
+  	and stakes is not null and stakes != ''
+  </select>
   <select id="lotteryPrintsByUnCompare" resultMap="BaseResultMap">
   	select 
   	<include refid="allFields"></include>
