@@ -182,6 +182,7 @@ public class TaskSchedule {
 	public void updateOrderMatchResult() {
 		log.info("开始执行更新订单详情赛果任务");
 		orderService.updateOrderMatchResult();
+		orderService.updateOrderBasketMatchResult();
 		log.info("结束执行更新订单详情赛果任务");
 	}
 

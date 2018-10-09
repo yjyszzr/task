@@ -29,6 +29,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.dl.base.enums.BasketBallHILOLeverlEnum;
 import com.dl.base.enums.MatchBasketBallResultHDCEnum;
+import com.dl.base.enums.MatchBasketBallResultHILOEnum;
 import com.dl.base.enums.MatchBasketPlayTypeEnum;
 import com.dl.base.enums.MatchBasketResultHdEnum;
 import com.dl.base.enums.MatchPlayTypeEnum;
@@ -210,24 +211,27 @@ public class DlPrintLotteryService {
 			String mnl_result = dataOdj.getString("mnl_result");
 			String wnm_result = dataOdj.getString("wnm_result");
 			BasketMatchOneResultDTO dto1 = new BasketMatchOneResultDTO();
-			dto1.setPlayType(String.valueOf(MatchBasketPlayTypeEnum.PLAY_TYPE_MNL.getcode()));
+			dto1.setPlayType("0"+String.valueOf(MatchBasketPlayTypeEnum.PLAY_TYPE_MNL.getcode()));
 			dto1.setPlayCode(playCode);
 			dto1.setCellCode(String.valueOf(MatchBasketResultHdEnum.getCode(mnl_result)));
 			dto1.setCellName(mnl_result);			
 			
 			BasketMatchOneResultDTO dto2 = new BasketMatchOneResultDTO();
-			dto2.setPlayType(String.valueOf(MatchBasketPlayTypeEnum.PLAY_TYPE_HDC.getcode()));
+			dto2.setPlayType("0"+String.valueOf(MatchBasketPlayTypeEnum.PLAY_TYPE_HDC.getcode()));
+			dto2.setPlayCode(playCode);
 			dto2.setCellCode(String.valueOf(MatchBasketBallResultHDCEnum.getCode(hdc_result)));
 			dto2.setCellName(hdc_result);
 			
 			BasketMatchOneResultDTO dto3 = new BasketMatchOneResultDTO();
-			dto3.setPlayType(String.valueOf(MatchBasketPlayTypeEnum.PLAY_TYPE_WNM.getcode()));
-			dto3.setCellCode(BasketBallHILOLeverlEnum.getCode(wnm_result));
+			dto3.setPlayType("0"+String.valueOf(MatchBasketPlayTypeEnum.PLAY_TYPE_WNM.getcode()));
+			dto3.setPlayCode(playCode);
+			dto3.setCellCode(BasketBallHILOLeverlEnum.getCode(wnm_result.substring(2)+"分"));
 			dto3.setCellName(wnm_result);			
 			
 			BasketMatchOneResultDTO dto4 = new BasketMatchOneResultDTO();
-			dto4.setPlayType(String.valueOf(MatchBasketPlayTypeEnum.PLAY_TYPE_HILO.getcode()));
-			dto4.setCellCode(BasketBallHILOLeverlEnum.getCode(hilo_result));
+			dto4.setPlayType("0"+String.valueOf(MatchBasketPlayTypeEnum.PLAY_TYPE_HILO.getcode()));
+			dto4.setPlayCode(playCode);
+			dto4.setCellCode(MatchBasketBallResultHILOEnum.getCode(hilo_result+"分"));
 			dto4.setCellName(hdc_result);
 			
 			matchOneResult.add(dto1);
@@ -284,7 +288,7 @@ public class DlPrintLotteryService {
 							} else {
 								// 比赛结果获取中奖信息
 								for (BasketMatchOneResultDTO rst : matchResultList) {
-									if (rst.getPlayType().equals(Integer.valueOf(playTypeStr))) {
+									if (rst.getPlayType().equals(playTypeStr)) {
 										playTypehaveResult = Boolean.TRUE;
 										String cellCode = rst.getCellCode();
 										if (cellCodes.contains(cellCode)) {

@@ -30,7 +30,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.dl.base.constant.CommonConstants;
+import com.dl.base.enums.BasketBallHILOLeverlEnum;
+import com.dl.base.enums.MatchBasketBallResultHDCEnum;
+import com.dl.base.enums.MatchBasketBallResultHILOEnum;
+import com.dl.base.enums.MatchBasketPlayTypeEnum;
+import com.dl.base.enums.MatchBasketResultHdEnum;
 import com.dl.base.enums.MatchPlayTypeEnum;
 import com.dl.base.enums.MatchResultCrsEnum;
 import com.dl.base.enums.MatchResultHadEnum;
@@ -55,7 +61,10 @@ import com.dl.task.dao.UserBonusMapper;
 import com.dl.task.dao.UserMapper;
 import com.dl.task.dao.UserMatchCollectMapper;
 import com.dl.task.dao2.DlLeagueMatchResultMapper;
+import com.dl.task.dao2.DlMatchBasketballMapper;
+import com.dl.task.dao2.DlResultBasketballMapper;
 import com.dl.task.dao2.LotteryMatchMapper;
+import com.dl.task.dto.BasketMatchOneResultDTO;
 import com.dl.task.dto.CellInfo;
 import com.dl.task.dto.LotteryPrintDTO;
 import com.dl.task.dto.OrderDTO;
@@ -72,7 +81,9 @@ import com.dl.task.model.ChannelOperationLog;
 import com.dl.task.model.DlChannelConsumer;
 import com.dl.task.model.DlChannelDistributor;
 import com.dl.task.model.DlLeagueMatchResult;
+import com.dl.task.model.DlMatchBasketball;
 import com.dl.task.model.DlPrintLottery;
+import com.dl.task.model.DlResultBasketball;
 import com.dl.task.model.DlTicketChannelLotteryClassify;
 import com.dl.task.model.Order;
 import com.dl.task.model.OrderDetail;
@@ -133,6 +144,12 @@ public class OrderService extends AbstractService<Order> {
     private UserMatchCollectMapper userMatchCollectMapper;
     @Resource
     private PrintLotteryAdapter printLotteryAdapter;
+    
+    @Resource
+    private DlMatchBasketballMapper dlMatchBasketballMapper;
+    
+    @Resource
+    private DlResultBasketballMapper dlResultBasketballMapper;
     
     @Resource
     private GeTuiUtil geTuiUtil;
@@ -620,6 +637,126 @@ public class OrderService extends AbstractService<Order> {
 		}
 	}
 
+	//更新订单的比赛结果
+	public void updateOrderBasketMatchResult() {
+		List<OrderDetail> orderDetails = orderDetailMapper.unBasketMatchResultOrderDetails();
+		if (CollectionUtils.isEmpty(orderDetails)) {
+			return;
+		}
+		Set<String> playCodesSet = orderDetails.stream().map(detail -> detail.getIssue()).collect(Collectors.toSet());
+		List<String> playCodes = new ArrayList<String>(playCodesSet.size());
+		playCodes.addAll(playCodesSet);
+		log.info("updateOrderMatchResult 准备获取赛事结果的场次数：" + playCodes.size());
+		List<String> cancelMatches = dlMatchBasketballMapper.getCancelMatches(playCodes);
+		List<DlMatchBasketball> matchBasketBallList = dlMatchBasketballMapper.getChangciIdsFromBasketMatchByPlayCodes(playCodes);
+		Map<Integer,String> pcodeAndCIdMap = matchBasketBallList.stream().collect(Collectors.toMap(DlMatchBasketball::getChangciId,DlMatchBasketball::getMatchSn));
+		List<Integer> changciIds = matchBasketBallList.stream().map(s->s.getChangciId()).collect(Collectors.toList());
+		List<DlResultBasketball> matchResults = dlResultBasketballMapper.queryMatchResultsByChangciIds(changciIds);
+		if (CollectionUtils.isEmpty(matchResults) && CollectionUtils.isEmpty(cancelMatches)) {
+			log.info("updateOrderMatchResult 准备获取赛事结果的场次数：" + playCodes.size() + " 没有获取到相应的赛事结果信息及没有取消赛事");
+			return;
+		}
+		log.info("updateOrderMatchResult 准备获取赛事结果的场次数：" + playCodes.size() + " 获取到相应的赛事结果信息数：" + matchResults.size() + " 取消赛事数：" + cancelMatches.size());
+		Map<String, List<OrderDetail>> detailMap = new HashMap<String, List<OrderDetail>>();
+		List<OrderDetail> cancelList = new ArrayList<OrderDetail>(orderDetails.size());
+		for (OrderDetail orderDetail : orderDetails) {
+			String playCode = orderDetail.getIssue();
+			if (cancelMatches.contains(playCode)) {
+				orderDetail.setMatchResult(ProjectConstant.ORDER_MATCH_RESULT_CANCEL);
+				cancelList.add(orderDetail);
+			} else {
+				List<OrderDetail> list = detailMap.get(playCode);
+				if (list == null) {
+					list = new ArrayList<OrderDetail>();
+					detailMap.put(playCode, list);
+				}
+				list.add(orderDetail);
+			}
+		}
+		log.info("取消赛事对应订单详情数：cancelList。si'ze" + cancelList.size() + "  detailMap.size=" + detailMap.size());
+		Map<String,List<BasketMatchOneResultDTO>> resultMap = new HashMap<>();
+		List<BasketMatchOneResultDTO> matchOneResult = new ArrayList<>();
+		for(DlResultBasketball basketBallResult:matchResults) {
+			String jsonData = basketBallResult.getDataJson();
+			JSONObject dataOdj = JSON.parseObject(jsonData);
+			Integer changciId = basketBallResult.getChangciId();
+			String playCode = pcodeAndCIdMap.get(changciId);
+			String hdc_result = dataOdj.getString("hdc_result");
+			String hilo_result = dataOdj.getString("hilo_result");
+			String mnl_result = dataOdj.getString("mnl_result");
+			String wnm_result = dataOdj.getString("wnm_result");
+			BasketMatchOneResultDTO dto1 = new BasketMatchOneResultDTO();
+			dto1.setPlayType(String.valueOf(MatchBasketPlayTypeEnum.PLAY_TYPE_MNL.getcode()));
+			dto1.setPlayCode(playCode);
+			dto1.setCellCode(String.valueOf(MatchBasketResultHdEnum.getCode(mnl_result)));
+			dto1.setCellName(mnl_result);			
+			
+			BasketMatchOneResultDTO dto2 = new BasketMatchOneResultDTO();
+			dto2.setPlayType(String.valueOf(MatchBasketPlayTypeEnum.PLAY_TYPE_HDC.getcode()));
+			dto2.setPlayCode(playCode);
+			dto2.setCellCode(String.valueOf(MatchBasketBallResultHDCEnum.getCode(hdc_result)));
+			dto2.setCellName(hdc_result);
+			
+			BasketMatchOneResultDTO dto3 = new BasketMatchOneResultDTO();
+			dto3.setPlayType(String.valueOf(MatchBasketPlayTypeEnum.PLAY_TYPE_WNM.getcode()));
+			dto3.setPlayCode(playCode);
+			dto3.setCellCode(BasketBallHILOLeverlEnum.getCode(wnm_result.substring(2)+"分"));
+			dto3.setCellName(wnm_result);			
+			
+			BasketMatchOneResultDTO dto4 = new BasketMatchOneResultDTO();
+			dto4.setPlayType(String.valueOf(MatchBasketPlayTypeEnum.PLAY_TYPE_HILO.getcode()));
+			dto4.setPlayCode(playCode);
+			dto4.setCellCode(MatchBasketBallResultHILOEnum.getCode(hilo_result+"分"));
+			dto4.setCellName(hdc_result);
+			
+			matchOneResult.add(dto1);
+			matchOneResult.add(dto2);
+			matchOneResult.add(dto3);
+			matchOneResult.add(dto4);
+			
+			resultMap.put(playCode, matchOneResult);
+		}
+		
+		
+		log.info("resultMap size=" + resultMap.size());
+		List<OrderDetail> orderDetailList = new ArrayList<OrderDetail>(orderDetails.size());
+		for (String playCode : resultMap.keySet()) {
+			List<BasketMatchOneResultDTO> resultDTOs = resultMap.get(playCode);
+			List<OrderDetail> details = detailMap.get(playCode);
+			for (OrderDetail orderDetail : details) {
+				String ticketDataStr = orderDetail.getTicketData();
+				String[] split = ticketDataStr.split(";");
+				OrderDetail od = new OrderDetail();
+				od.setOrderDetailId(orderDetail.getOrderDetailId());
+				StringBuffer sbuf = new StringBuffer();
+				for (String ticketData : split) {
+					if (StringUtils.isBlank(ticketData) || !ticketData.contains("|")) {
+						continue;
+					}
+					Integer playType = Integer.valueOf(ticketData.substring(0, ticketData.indexOf("|")));
+					for (BasketMatchOneResultDTO dto : resultDTOs) {
+						if (playType.equals(Integer.valueOf(dto.getPlayType()))) {
+							sbuf.append("0").append(dto.getPlayType()).append("|").append(playCode).append("|").append(dto.getCellCode()).append(";");
+						}
+					}
+				}
+				if (sbuf.length() > 0) {
+					od.setMatchResult(sbuf.substring(0, sbuf.length() - 1));
+					orderDetailList.add(od);
+				}
+			}
+		}
+		log.info("updateOrderMatchResult 准备去执行数据库更新操作：size=" + orderDetailList.size());
+		for(OrderDetail detail: orderDetailList) {
+			orderDetailMapper.updateMatchResult(detail);
+		}
+		log.info("updateOrderMatchResult 准备去执行数据库更新取消赛事结果操作：size=" + cancelList.size());
+		for(OrderDetail detail: cancelList) {
+			orderDetailMapper.updateMatchResult(detail);
+		}
+	}
+	
+	
 	/*
 	 * 需求：购买并成功出票，就收藏赛事
 	 */

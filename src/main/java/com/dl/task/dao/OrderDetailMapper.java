@@ -14,6 +14,10 @@ public interface OrderDetailMapper extends Mapper<OrderDetail> {
 	
 	//获取 没有赛事结果 的订单详情
 	public List<OrderDetail> unMatchResultOrderDetails();
+	
+	//获取 没有赛事结果 的篮彩订单详情
+	public List<OrderDetail> unBasketMatchResultOrderDetails();
+	
 	//更新订单详情的比赛结果
 	public int updateMatchResult(OrderDetail detail);
 	//获取订单下的所有详情记录
