@@ -675,8 +675,8 @@ public class OrderService extends AbstractService<Order> {
 		}
 		log.info("取消赛事对应订单详情数：cancelList。si'ze" + cancelList.size() + "  detailMap.size=" + detailMap.size());
 		Map<String,List<BasketMatchOneResultDTO>> resultMap = new HashMap<>();
-		List<BasketMatchOneResultDTO> matchOneResult = new ArrayList<>();
 		for(DlResultBasketball basketBallResult:matchResults) {
+			List<BasketMatchOneResultDTO> matchOneResult = new ArrayList<>();
 			String jsonData = basketBallResult.getDataJson();
 			JSONObject dataOdj = JSON.parseObject(jsonData);
 			Integer changciId = basketBallResult.getChangciId();
