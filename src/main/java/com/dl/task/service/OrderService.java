@@ -435,7 +435,13 @@ public class OrderService extends AbstractService<Order> {
 			orderDetailMapper.updateTicketData(orderDetail);
 		}
 		// 计算预测奖金
-		String forecastMoney = this.betMaxAndMinMoney(ticketInfos, order);
+		String forecastMoney = "";
+		Integer lotteryClassifyId = order.getLotteryClassifyId();
+		if( 3  == lotteryClassifyId) {//篮彩
+			forecastMoney = this.betMaxAndMinMoneyForBasket(ticketInfos, order);
+		}else {
+			forecastMoney = this.betMaxAndMinMoney(ticketInfos, order);
+		}		
 		order.setForecastMoney(forecastMoney);
 		
 		//购买并成功出票后就收藏赛事
@@ -834,6 +840,40 @@ public class OrderService extends AbstractService<Order> {
 		}
 		return ticketInfo;
 	}
+	
+	/**
+	 * 计算预测试奖金
+	 */
+	private String betMaxAndMinMoneyForBasket(List<TicketInfo> ticketInfos, Order orderInfoByOrderSn) {
+		Integer times = orderInfoByOrderSn.getCathectic();
+		String betTypes = orderInfoByOrderSn.getPassType();
+		Map<String, List<String>> indexMap = this.getBetIndexList(ticketInfos, betTypes);
+		TMatchBetMaxAndMinOddsList maxMoneyBetPlayCellsForLottery = this.maxMoneyBetPlayCellsForLotteryForBasket(ticketInfos);
+		List<Double> maxOddsList = maxMoneyBetPlayCellsForLottery.getMaxOddsList();
+		List<Double> minOddsList = maxMoneyBetPlayCellsForLottery.getMinOddsList();
+		Double totalMaxMoney = 0.0;
+		Double totalMinMoney = Double.MAX_VALUE;
+		for (String betType : indexMap.keySet()) {
+			List<String> betIndexList = indexMap.get(betType);
+			for (String str : betIndexList) {// 所有注组合
+				String[] strArr = str.split(",");
+				Double maxMoney = 2.0 * times;
+				Double minMoney = 2.0 * times;
+				for (String item : strArr) {// 单注组合
+					Double double1 = maxOddsList.get(Integer.valueOf(item));
+					maxMoney = maxMoney * double1;
+					Double double2 = minOddsList.get(Integer.valueOf(item));
+					minMoney = minMoney * double2;
+				}
+				totalMaxMoney += maxMoney;
+				totalMinMoney = Double.min(totalMinMoney, minMoney);
+			}
+		}
+		String forecastMoney = String.format("%.2f", totalMinMoney) + "~" + String.format("%.2f", totalMaxMoney);
+		return forecastMoney;
+	}
+	
+	
 	/**
 	 * 计算预测试奖金
 	 */
@@ -928,6 +968,36 @@ public class OrderService extends AbstractService<Order> {
 		}
 	}
 
+	private TMatchBetMaxAndMinOddsList maxMoneyBetPlayCellsForLotteryForBasket(List<TicketInfo> ticketInfos) {
+		TMatchBetMaxAndMinOddsList tem = new TMatchBetMaxAndMinOddsList();
+		List<Double> maxOdds = new ArrayList<Double>(ticketInfos.size());
+		List<Double> minOdds = new ArrayList<Double>(ticketInfos.size());
+		for (TicketInfo ticketInfo : ticketInfos) {
+			List<TicketPlayInfo> ticketPlayInfos = ticketInfo.getTicketPlayInfos();
+			List<Double> allbetComOdds = new ArrayList<>();//this.allbetComOdds(ticketPlayInfos);
+			allbetComOdds.add(1.32);
+			allbetComOdds.add(1.32);
+			allbetComOdds.add(2.32);
+			if (CollectionUtils.isEmpty(allbetComOdds)) {
+				continue;
+			}
+			if (allbetComOdds.size() == 1) {
+				Double maxOrMinOdds = allbetComOdds.get(0);
+				maxOdds.add(maxOrMinOdds);
+				minOdds.add(maxOrMinOdds);
+			} else {
+				Double max = allbetComOdds.stream().max((item1, item2) -> item1.compareTo(item2)).get();
+				maxOdds.add(max);
+				Double min = allbetComOdds.stream().min((item1, item2) -> item1.compareTo(item2)).get();
+				minOdds.add(min);
+			}
+		}
+		tem.setMaxOddsList(maxOdds);
+		tem.setMinOddsList(minOdds);
+		return tem;
+	}
+	
+	
 	private TMatchBetMaxAndMinOddsList maxMoneyBetPlayCellsForLottery(List<TicketInfo> ticketInfos) {
 		TMatchBetMaxAndMinOddsList tem = new TMatchBetMaxAndMinOddsList();
 		List<Double> maxOdds = new ArrayList<Double>(ticketInfos.size());
