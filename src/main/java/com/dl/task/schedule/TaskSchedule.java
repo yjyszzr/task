@@ -1,15 +1,11 @@
 package com.dl.task.schedule;
 
-import java.time.LocalTime;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
-
-import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -28,7 +24,6 @@ import com.dl.task.model.Order;
 import com.dl.task.model.ReqOrdeEntity;
 import com.dl.task.model.ReqOrdeEntityForUserAccount;
 import com.dl.task.model.UserWithdraw;
-import com.dl.task.printlottery.PrintComEnums;
 import com.dl.task.service.DlMatchResultService;
 import com.dl.task.service.DlOldBeltNewService;
 import com.dl.task.service.DlPrintLotteryService;
@@ -38,6 +33,8 @@ import com.dl.task.service.PayMentService;
 import com.dl.task.service.UserBonusService;
 import com.dl.task.service.WithdrawService;
 import com.dl.task.util.ManualAuditUtil;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Configuration
@@ -72,7 +69,7 @@ public class TaskSchedule {
 	private URLConfig urlConfig;
 	@Resource
 	private DlMatchResultService dlMatchResultService;
-//  TODO 暂时不使用
+
 //	/**
 //	 * 第一步： 出票任务 （每5分钟执行一次） 调用第三方接口出票定时任务 定时的对出票中的进行查询结果
 //	 */
@@ -85,59 +82,62 @@ public class TaskSchedule {
 
 	/**
 	 * 第一步： 出票任务 （每5分钟执行一次） 调用第三方接口出票定时任务 定时的对出票中的进行查询结果
+	 * 2018-10-12 暂停对接第三方出票公司
 	 */
-	@Scheduled(cron = "${task.schedule.lottery.print.lottery}")
-	public void printLottery() {
-		dlPrintLotteryService.goPrintLotteryVersion2();
-	}
+//	@Scheduled(cron = "${task.schedule.lottery.print.lottery}")
+//	public void printLottery() {
+//		dlPrintLotteryService.goPrintLotteryVersion2();
+//	}
 
 	/**
 	 * 查询出票信息任务 （每12分钟执行一次） 调用第三方接口出票定时任务 定时的对出票中的进行查询结果
+	 * 2018-10-12 暂停对接第三方出票公司
 	 */
-	@Scheduled(cron = "${task.schedule.lottery.print.querylottery}")
-	public void quereyPrintLottery() {
-		LocalTime localTime = LocalTime.now(ZoneId.systemDefault());
-		int hour = localTime.getHour();
-		if (hour < 1 || hour >= 9) {
-			log.info("彩票出票状态查询定时任务启动");
-			for(PrintComEnums printComEnums:PrintComEnums.values()){
-				if(PrintComEnums.WEICAISHIDAI==printComEnums){
-					continue;
-				}
-				dlPrintLotteryService.queryPrintLotteryVersion2(printComEnums);
-			}
-			log.info("彩票出票状态查询定时任务结束");
-		}
-	}
+//	@Scheduled(cron = "${task.schedule.lottery.print.querylottery}")
+//	public void quereyPrintLottery() {
+//		LocalTime localTime = LocalTime.now(ZoneId.systemDefault());
+//		int hour = localTime.getHour();
+//		if (hour < 1 || hour >= 9) {
+//			log.info("彩票出票状态查询定时任务启动");
+//			for(PrintComEnums printComEnums:PrintComEnums.values()){
+//				if(PrintComEnums.WEICAISHIDAI==printComEnums){
+//					continue;
+//				}
+//				dlPrintLotteryService.queryPrintLotteryVersion2(printComEnums);
+//			}
+//			log.info("彩票出票状态查询定时任务结束");
+//		}
+//	}
 
 	/**
 	 *查询出票信息任务 （每12分钟执行一次） 调用第三方接口出票定时任务 定时的对出票中的进行查询结果
+	 *2018-10-12 暂停对接第三方出票公司
 	 */
-	@Scheduled(cron = "${task.schedule.lottery.print.querylottery.weicai}")
-	public void quereyPrintLotteryWeiCai() {
-		LocalTime localTime = LocalTime.now(ZoneId.systemDefault());
-		int hour = localTime.getHour();
-		if (hour < 1 || hour >= 9) {
-			log.info("彩票出票状态微彩时代查询定时任务启动");
-			dlPrintLotteryService.queryPrintLotteryVersion2(PrintComEnums.WEICAISHIDAI);
-			log.info("彩票出票状态微彩时代查询定时任务结束");
-		}
-	}
+//	@Scheduled(cron = "${task.schedule.lottery.print.querylottery.weicai}")
+//	public void quereyPrintLotteryWeiCai() {
+//		LocalTime localTime = LocalTime.now(ZoneId.systemDefault());
+//		int hour = localTime.getHour();
+//		if (hour < 1 || hour >= 9) {
+//			log.info("彩票出票状态微彩时代查询定时任务启动");
+//			dlPrintLotteryService.queryPrintLotteryVersion2(PrintComEnums.WEICAISHIDAI);
+//			log.info("彩票出票状态微彩时代查询定时任务结束");
+//		}
+//	}
 	
 	/**
 	 * 去兑奖
 	 */
-	@Scheduled(cron = "${task.schedule.lottery.print.caixaiomi.toreward}")
+/*	@Scheduled(cron = "${task.schedule.lottery.print.caixaiomi.toreward}")
 	public void updatePrintLotteryCaiXiaoMiToRewardInfo() {
 		dlPrintLotteryService.toRewardPrintLotteryVersion2(PrintComEnums.CAIXIAOMI);
-	}
+	}*/
 	/**
 	 * 更新出票的中奖信息
 	 */
-	@Scheduled(cron = "${task.schedule.lottery.print.third.reward}")
+/*	@Scheduled(cron = "${task.schedule.lottery.print.third.reward}")
 	public void updatePrintLotteryThirdRewardInfo() {
 		dlPrintLotteryService.rewardPrintLotteryVersion2();
-	}
+	}*/
 
 	/**
 	 * 第二步： 对出票数据进行兑奖，更新彩票信息
@@ -147,7 +147,7 @@ public class TaskSchedule {
 		log.info("更新彩票信息，彩票对奖开始");
 		dlPrintLotteryService.updatePrintLotteryCompareStatus();
 		dlPrintLotteryService.updatePrintLotteryCompareStatusJz();
-		dlPrintLotteryService.updatePrintLotteryCompareStatusJl();
+/*		dlPrintLotteryService.updatePrintLotteryCompareStatusJl();*/
 		log.info("更新彩票信息，彩票对奖结束");
 
 	}
