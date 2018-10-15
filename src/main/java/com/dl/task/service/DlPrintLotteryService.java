@@ -44,6 +44,7 @@ import com.dl.base.util.DateUtil;
 import com.dl.base.util.JSONHelper;
 import com.dl.base.util.SNGenerator;
 import com.dl.task.core.ProjectConstant;
+import com.dl.task.dao.DlArtifiPrintLotteryMapper;
 import com.dl.task.dao.DlPrintLotteryMapper;
 import com.dl.task.dao.OrderDetailMapper;
 import com.dl.task.dao.PeriodRewardDetailMapper;
@@ -65,6 +66,7 @@ import com.dl.task.dto.PrintChannelInfo;
 import com.dl.task.enums.PrintLotteryStatusEnum;
 import com.dl.task.enums.ThirdRewardStatusEnum;
 import com.dl.task.model.BetResultInfo;
+import com.dl.task.model.DlArtifiPrintLottery;
 import com.dl.task.model.DlLeagueMatchResult;
 import com.dl.task.model.DlMatchBasketball;
 import com.dl.task.model.DlPrintLottery;
@@ -116,6 +118,9 @@ public class DlPrintLotteryService {
     
     @Resource
     private DlResultBasketballMapper dlResultBasketballMapper;
+    
+    @Resource
+    private DlArtifiPrintLotteryMapper dlArtifiPrintLotteryMapper;
 
 	@Value("${print.ticket.merchant}")
 	private String merchant;
@@ -1354,6 +1359,15 @@ public class DlPrintLotteryService {
 			return lotteryPrint;
 		}).collect(Collectors.toList());
 		dlPrintLotteryMapper.batchInsertDlPrintLottery(models);
+		
+		//保存手工出票的信息
+		List<DlArtifiPrintLottery> artifiPrintLotterys = models.stream().map(s->{
+			DlArtifiPrintLottery dlArtifiPrintLottery = new DlArtifiPrintLottery();
+			dlArtifiPrintLottery.setOrderSn(s.getOrderSn());
+			dlArtifiPrintLottery.setAddTime(DateUtil.getCurrentTimeLong());
+			return dlArtifiPrintLottery;
+		}).collect(Collectors.toList());
+		dlArtifiPrintLotteryMapper.batchInsert(artifiPrintLotterys);
 		return;
 	}
 	
