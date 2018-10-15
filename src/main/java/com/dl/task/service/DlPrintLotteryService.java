@@ -793,6 +793,27 @@ public class DlPrintLotteryService {
 					}).collect(Collectors.joining(","));
 					return playType1 + "|" + playCode + "|" + cellCodes;
 				}).collect(Collectors.joining(";"));
+				
+//				List<DlJcZqMatchCellDTO> betCells = (List<DlJcZqMatchCellDTO>) subList.stream().map(s->s.getBetCells());
+//				Map<String,String> cellMap = betCells.stream().collect(Collectors.toMap(DlJcZqMatchCellDTO::getCellCode, DlJcZqMatchCellDTO::getCellOdds));
+				
+				String printSpWithData = subList.stream().map(cdto->{
+					String playCode = cdto.getPlayCode();
+					String playType1 = cdto.getPlayType();
+					String cellCodes = cdto.getBetCells().stream().map(cell->{
+						return cell.getCellCode();
+					}).collect(Collectors.joining(","));
+					return playType1 + "|" + playCode + "|" + cellCodes;
+				}).collect(Collectors.joining(";"));
+						
+				String orderTimePrintSp = subList.stream().map(cdto->{
+					String playCode = cdto.getPlayCode();
+					String cellCodes = cdto.getBetCells().stream().map(cell->{
+						return cell.getCellCode()+"@"+cell.getCellOdds();
+					}).collect(Collectors.joining(","));
+					return  playCode + "|" + cellCodes;
+				}).collect(Collectors.joining(";"));
+				
 				Set<Integer> collect = subList.stream().map(cdto->Integer.parseInt(cdto.getPlayType())).collect(Collectors.toSet());
 				String playType = param.getPlayType();
 				if(Integer.parseInt(playType) == 6 && collect.size() == 1) {
@@ -815,10 +836,12 @@ public class DlPrintLotteryService {
 						lotteryPrintDTO.setIssue(issue);
 						lotteryPrintDTO.setMoney(money);
 						lotteryPrintDTO.setPlayType(playType);
+						lotteryPrintDTO.setPrintSp(orderTimePrintSp);
 						lotteryPrintDTO.setStakes(stakes);
 						String ticketId = SNGenerator.nextSN(SNBusinessCodeEnum.TICKET_SN.getCode());
 						lotteryPrintDTO.setTicketId(ticketId);
 						lotteryPrintDTO.setTimes(maxTime);
+						lotteryPrintDTO.setPrintSp(orderTimePrintSp);
 						lotteryPrints.add(lotteryPrintDTO);
 					}
 				}
@@ -831,9 +854,11 @@ public class DlPrintLotteryService {
 					lotteryPrintDTO.setMoney(money);
 					lotteryPrintDTO.setPlayType(playType);
 					lotteryPrintDTO.setStakes(stakes);
+					lotteryPrintDTO.setPrintSp(orderTimePrintSp);
 					String ticketId = SNGenerator.nextSN(SNBusinessCodeEnum.TICKET_SN.getCode());
 					lotteryPrintDTO.setTicketId(ticketId);
 					lotteryPrintDTO.setTimes(m);
+					lotteryPrintDTO.setPrintSp(orderTimePrintSp);
 					lotteryPrints.add(lotteryPrintDTO);
 				}
 			}
@@ -1101,6 +1126,7 @@ public class DlPrintLotteryService {
 			log.info("渠道channelId={},channelName={}出票结束",printComEnums.getPrintChannelId(),printComEnums.getPrintChannelName());
 		}
 	}
+	
 	public void queryPrintLotteryVersion2(PrintComEnums printComEnums) {
 			try{
 				DlTicketChannel dlTicketChannel = printLotteryAdapter.selectChannelByChannelId(printComEnums);
@@ -1154,6 +1180,7 @@ public class DlPrintLotteryService {
 			}
 			log.info("渠道channelId={},channelName={},查询出票状态结束",printComEnums.getPrintChannelId(),printComEnums.getPrintChannelName());
 	}
+	
 	public void rewardPrintLotteryVersion2() {
 		log.info("出奖奖金查询版本2.0奖金查询开始");
 		for(PrintComEnums printComEnums:PrintComEnums.values()){
@@ -1225,6 +1252,7 @@ public class DlPrintLotteryService {
 		}
 		log.info("渠道channelId={},channelName={}兑奖结束",printComEnum.getPrintChannelId(),printComEnum.getPrintChannelName());
 	}
+	
 	/**
 	 * 查询出奖信息，更新第三方出奖信息
 	 * @param queryRewardResponseDTO
@@ -1340,6 +1368,7 @@ public class DlPrintLotteryService {
 			lotteryPrint.setBetType(dto.getBetType());
 			lotteryPrint.setMoney(BigDecimal.valueOf(dto.getMoney()*100));
 			lotteryPrint.setIssue(dto.getIssue());
+			lotteryPrint.setPrintSp(dto.getPrintSp());
 			lotteryPrint.setPlayType(dto.getPlayType());
 			lotteryPrint.setTimes(dto.getTimes());
 			lotteryPrint.setStakes(dto.getStakes());
@@ -1349,7 +1378,8 @@ public class DlPrintLotteryService {
 			lotteryPrint.setCompareStatus("0");
 			lotteryPrint.setComparedStakes("");
 			lotteryPrint.setRewardStakes("");
-			lotteryPrint.setStatus(0);
+			lotteryPrint.setStatus(1);
+			lotteryPrint.setPrintStatus(16);
 			lotteryPrint.setPrintLotteryCom(classify.getTicketChannelId());
 			return lotteryPrint;
 		}).collect(Collectors.toList());

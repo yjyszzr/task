@@ -1519,9 +1519,9 @@ public class OrderService extends AbstractService<Order> {
 			if(order.getThirdPartyPaid().compareTo(BigDecimal.ZERO)>0){
 				insertThirdPayAccount(order);
 			}
-//		进行预出票
+//			进行预出票
 			List<DlPrintLottery> dlPrints = dlPrintLotteryMapper.printLotterysByOrderSn(orderSn);
-			if(CollectionUtils.isEmpty(dlPrints)){
+			if(dlPrints.size() > 0){
 				Integer lotteryClassifyId = order.getLotteryClassifyId();
 				BigDecimal orderAmount = order.getTicketAmount();
 				Integer lotteryPlayClassifyId = order.getLotteryPlayClassifyId();

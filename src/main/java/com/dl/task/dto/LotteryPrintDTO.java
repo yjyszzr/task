@@ -20,4 +20,7 @@ public class LotteryPrintDTO {
 	private String stakes;
 	@ApiModelProperty("彩票编号")
 	private String ticketId;
+	
+	@ApiModelProperty("投注信息附带赔率的数据，格式如201805023003|3@9.140,0@3.720;201805023004|3@7.860,0@5.390;201805023005|3@1.130,0@5.190")
+	private String printSp;
 }
