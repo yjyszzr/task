@@ -464,7 +464,9 @@ public class TaskSchedule {
 	 */
 	@Scheduled(cron = "${task.schedule.lottery.artifi.schedualed}")
 	public void artifiPrintLotteryTaskScheduled() {
+		log.info("======================^_^===============================");
 		log.info("[artifiPrintLotteryTaskScheduled]" + "人工出票分单系统");
+		log.info("=====================================================");
 		EmptyParam emptyParam = new EmptyParam();
 		ipaymentService.timerRechargeQueryScheduled(emptyParam);
 	}
