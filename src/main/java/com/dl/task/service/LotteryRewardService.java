@@ -75,7 +75,6 @@ public class LotteryRewardService {
 						caiXiaoMiIsNotRewardEnd = caiXiaoMiIsNotRewardEnd||!Integer.valueOf(3).equals(thirdRewardStatus);
 					}
 					if(caiXiaoMiIsNotRewardEnd) {
-//					if(StringUtils.isBlank(compareStatus) || !"1".equals(compareStatus)){
 						unOrderSns.add(orderSn);
 					}
 					if(unOrderSns.contains(orderSn)) {
@@ -85,11 +84,6 @@ public class LotteryRewardService {
 					Double double1 = map.get(orderSn);
 					BigDecimal realRewardMoney = dto.getRealRewardMoney();
 					double realReward = 0;
-////						TODO 胡贺东 20180725 先获取第三方奖金不作为开奖奖金  暂时取我们和第三放开奖奖金最低那个金额 后期根据产品定
-//					BigDecimal thirdRewardMoney = dto.getThirdPartRewardMoney().divide(new BigDecimal("100"), 0, RoundingMode.HALF_EVEN);
-//					if(realRewardMoney != null&&realRewardMoney.subtract(thirdRewardMoney).compareTo(BigDecimal.ZERO)>0){
-//						realReward = thirdRewardMoney.doubleValue();
-//					}else 
 					if(realRewardMoney!=null){
 						realReward = realRewardMoney.doubleValue();
 					}

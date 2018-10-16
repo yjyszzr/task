@@ -145,7 +145,7 @@ public class TaskSchedule {
 	@Scheduled(cron = "${task.schedule.lottery.print.comparestatus}")
 	public void updatePrintLotteryCompareStatus() {
 		log.info("更新彩票信息，彩票对奖开始");
-		dlPrintLotteryService.updatePrintLotteryCompareStatus();
+//		dlPrintLotteryService.updatePrintLotteryCompareStatus();
 		dlPrintLotteryService.updatePrintLotteryCompareStatusJz();
 /*		dlPrintLotteryService.updatePrintLotteryCompareStatusJl();*/
 		log.info("更新彩票信息，彩票对奖结束");
@@ -156,12 +156,12 @@ public class TaskSchedule {
 	 * 第三步： 订单出票结果更新 将出票信息回写到订单
 	 * 
 	 */
-	@Scheduled(cron = "${task.schedule.order.print.lottery.status}")
-	public void refreshOrderPrintStatus() {
-		log.info("开始执行更新订单出票结果任务");
-		orderService.refreshOrderPrintStatus();
-		log.info("结束执行更新订单出票结果任务");
-	}
+//	@Scheduled(cron = "${task.schedule.order.print.lottery.status}")
+//	public void refreshOrderPrintStatus() {
+//		log.info("开始执行更新订单出票结果任务");
+//		orderService.refreshOrderPrintStatus();
+//		log.info("结束执行更新订单出票结果任务");
+//	}
 
 	/**
 	 * 第四步： 更新待开奖的订单状态及中奖金额
@@ -182,7 +182,7 @@ public class TaskSchedule {
 	public void updateOrderMatchResult() {
 		log.info("开始执行更新订单详情赛果任务");
 		orderService.updateOrderMatchResult();
-		orderService.updateOrderBasketMatchResult();
+//		orderService.updateOrderBasketMatchResult();
 		log.info("结束执行更新订单详情赛果任务");
 	}
 

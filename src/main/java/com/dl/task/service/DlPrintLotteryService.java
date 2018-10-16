@@ -1352,23 +1352,17 @@ public class DlPrintLotteryService {
 	 * @param orderSn
 	 * @param printChannelInfo
 	 */
-	public void saveLotteryPrintInfo(List<LotteryPrintDTO> lotteryPrints,String orderSn, PrintChannelInfo printChannelInfo) {
+	public void saveLotteryPrintInfo(List<LotteryPrintDTO> lotteryPrints,String orderSn) {
 		List<DlPrintLottery> printLotterysByOrderSn = dlPrintLotteryMapper.printLotterysByOrderSn(orderSn);
 		if(CollectionUtils.isNotEmpty(printLotterysByOrderSn)) {
 			log.info("订单orderSn={},已经出票",orderSn);
 			return ;
 		}
-		DlTicketChannelLotteryClassify classify = printChannelInfo.getClassify();
-		DlTicketChannel channel = printChannelInfo.getChannel();
 		List<DlPrintLottery> models = lotteryPrints.stream().map(dto->{
 			DlPrintLottery lotteryPrint = new DlPrintLottery();
-			lotteryPrint.setGame(classify.getGame());
-			lotteryPrint.setMerchant(channel.getTicketMerchant());//当初为啥存储这个？？？用户名？有何意义？？
-			if(PrintComEnums.WEICAISHIDAI.getPrintChannelId().equals(channel.getId())){
-				lotteryPrint.setTicketId(channel.getTicketMerchant()+""+dto.getTicketId());	
-			}else{
-				lotteryPrint.setTicketId(dto.getTicketId());
-			}
+			lotteryPrint.setGame("T51");//足彩
+			lotteryPrint.setMerchant("");
+			lotteryPrint.setTicketId(dto.getTicketId());
 			lotteryPrint.setAcceptTime(DateUtil.getCurrentTimeLong());
 			lotteryPrint.setBetType(dto.getBetType());
 			lotteryPrint.setMoney(BigDecimal.valueOf(dto.getMoney()*100));
@@ -1385,7 +1379,7 @@ public class DlPrintLotteryService {
 			lotteryPrint.setRewardStakes("");
 			lotteryPrint.setStatus(1);
 			lotteryPrint.setPrintStatus(16);
-			lotteryPrint.setPrintLotteryCom(classify.getTicketChannelId());
+			lotteryPrint.setPrintLotteryCom(0);
 			return lotteryPrint;
 		}).collect(Collectors.toList());
 		dlPrintLotteryMapper.batchInsertDlPrintLottery(models);
@@ -1397,6 +1391,7 @@ public class DlPrintLotteryService {
 			dlArtifiPrintLottery.setAddTime(DateUtil.getCurrentTimeLong());
 			return dlArtifiPrintLottery;
 		}).collect(Collectors.toList());
+		
 		dlArtifiPrintLotteryMapper.batchInsert(artifiPrintLotterys);
 		return;
 	}

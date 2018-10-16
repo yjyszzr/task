@@ -1513,15 +1513,15 @@ public class OrderService extends AbstractService<Order> {
 	@Transactional(value="transactionManager1")
 	public void doPaySuccessOrder(Order order) {
 		String orderSn = order.getOrderSn();
-//		更新order_status=1
+		//更新order_status=3 为待开奖
 		int updateRow = orderMapper.updateOrderStatus0To3(orderSn);
-//		if(updateRow==1){
+		if(updateRow==1){
 			if(order.getThirdPartyPaid().compareTo(BigDecimal.ZERO)>0){
 				insertThirdPayAccount(order);
 			}
-//			进行预出票
+			//进行预出票
 			List<DlPrintLottery> dlPrints = dlPrintLotteryMapper.printLotterysByOrderSn(orderSn);
-			if(dlPrints.size() > 0){
+			if(dlPrints.size() == 0){
 				Integer lotteryClassifyId = order.getLotteryClassifyId();
 				BigDecimal orderAmount = order.getTicketAmount();
 				Integer lotteryPlayClassifyId = order.getLotteryPlayClassifyId();
@@ -1532,14 +1532,6 @@ public class OrderService extends AbstractService<Order> {
 				}
 				List<LotteryPrintDTO> lotteryPrints = dlPrintLotteryService.getPrintLotteryListByOrderInfo(orderDetail,orderSn);
 				if(CollectionUtils.isNotEmpty(lotteryPrints)) {
-//					Double printLotteryRoutAmount = dlPrintLotteryMapper.printLotteryRoutAmount();
-//			        int printLotteryCom = 1 ;//河南出票公司
-//			        log.info("save printLotteryCom orderSn={},ticketAmount={},canBetMoney={}",order.getOrderSn(),order.getTicketAmount(),printLotteryRoutAmount);
-//			        if(order.getTicketAmount().subtract(new BigDecimal(printLotteryRoutAmount)).compareTo(BigDecimal.ZERO)<0){
-//			            log.info("orderSn={},设置出票公司为西安出票公司",order.getOrderSn());
-//			            printLotteryCom = 4;//西安出票公司
-//			        }
-//					dlPrintLotteryService.saveLotteryPrintInfo(lotteryPrints, order.getOrderSn(),printLotteryCom);
 					BigDecimal minAmountLottery = null;
 					BigDecimal maxAmountLottery = null;
 					for(LotteryPrintDTO print:lotteryPrints){
@@ -1555,20 +1547,13 @@ public class OrderService extends AbstractService<Order> {
 							maxAmountLottery = BigDecimal.valueOf(print.getMoney());
 						}
 					}
-					String playType=orderDetail.getOrderInfoDTO().getPlayType();
-					Date minMatchStartTime = orderDetail.getOrderInfoDTO().getMinMatchStartTime();
-					PrintChannelInfo isOkChannels = printLotteryAdapter.getPrintChannelId(lotteryClassifyId,orderSn,minMatchStartTime,orderAmount,playType,minAmountLottery,maxAmountLottery);
-					if(isOkChannels!=null){
-						dlPrintLotteryService.saveLotteryPrintInfo(lotteryPrints, order.getOrderSn(),isOkChannels);
-					}else{
-						log.error("严重：order_sn={},出票失败，未找到对应的出票公司classfyId={},ticketAmount={}",order.getOrderSn(),order.getLotteryClassifyId(),order.getTicketAmount());
-					}
+					dlPrintLotteryService.saveLotteryPrintInfo(lotteryPrints, order.getOrderSn());
 			        return;
 				}
 			}
-//		}else{
-//			log.info("order_sn={},支付成功,更新状态1失败 where 0 ",orderSn);
-//		}
+		}else{
+			log.info("order_sn={},支付成功,更新状态3失败 where 0 ",orderSn);
+		}
 	}
 	/**
 	 * 插入第三方支付流水
