@@ -146,7 +146,7 @@ public class TaskSchedule {
 	/**
 	 * 第二步： 对出票数据进行兑奖，更新彩票信息
 	 */
-	@Scheduled(cron = "${task.schedule.lottery.print.comparestatus}")
+//	@Scheduled(cron = "${task.schedule.lottery.print.comparestatus}")
 	public void updatePrintLotteryCompareStatus() {
 		log.info("更新彩票信息，彩票对奖开始");
 //		dlPrintLotteryService.updatePrintLotteryCompareStatus();
@@ -171,7 +171,7 @@ public class TaskSchedule {
 	 * 第四步： 更新待开奖的订单状态及中奖金额
 	 * 
 	 */
-	@Scheduled(cron = "${task.schedule.order.open.reward}")
+//	@Scheduled(cron = "${task.schedule.order.open.reward}")
 	public void updateOrderAfterOpenReward() {
 		log.info("更新待开奖的订单开始");
 		lotteryRewardService.updateOrderAfterOpenReward();
@@ -182,7 +182,7 @@ public class TaskSchedule {
 	/**
 	 * 订单详情赛果 （每5分钟执行一次）
 	 */
-	@Scheduled(cron = "${task.schedule.order.match.result}")
+//	@Scheduled(cron = "${task.schedule.order.match.result}")
 	public void updateOrderMatchResult() {
 		log.info("开始执行更新订单详情赛果任务");
 		orderService.updateOrderMatchResult();
@@ -193,7 +193,7 @@ public class TaskSchedule {
 	/**
 	 * 更新中奖用户的账户
 	 */
-	@Scheduled(cron = "${task.schedule.member.reward.money}")
+//	@Scheduled(cron = "${task.schedule.member.reward.money}")
 	public void addRewardMoneyToUsers() {
 		log.info("更新中奖用户的账户，派奖开始");
 		orderService.addRewardMoneyToUsers();
@@ -204,7 +204,7 @@ public class TaskSchedule {
 	/**
 	 * 更新过期的红包
 	 */
-	@Scheduled(cron = "${task.schedule.member.bonus.expire}")
+//	@Scheduled(cron = "${task.schedule.member.bonus.expire}")
 	public void updateBonusExpire() {
 		log.info("更新过期的红包定时任务开始");
 		userBonusService.updateBonusExpire();
@@ -212,7 +212,7 @@ public class TaskSchedule {
 	}
 
 	/**************** 支付的定时任务,调用支付模块 **************/
-	@Scheduled(cron = "${task.schedule.payment.time.out}")
+//	@Scheduled(cron = "${task.schedule.payment.time.out}")
 	public void dealBeyondPayTimeOrderOut() {
 		log.info("开始执行混合支付超时订单任务");
 		paymentService.dealBeyondPayTimeOrderOut();
@@ -222,7 +222,7 @@ public class TaskSchedule {
 	/**
 	 * 第三方支付的query 订单
 	 */
-	@Scheduled(cron = "${task.schedule.order.pay.timeout}")
+//	@Scheduled(cron = "${task.schedule.order.pay.timeout}")
 	public void timerOrderQueryScheduled() {
 		log.info("第三方支付定时任务开始");
 		EmptyParam emptyParam = new EmptyParam();
@@ -232,7 +232,7 @@ public class TaskSchedule {
 	/**
 	 * 订单支付成功逻辑处理
 	 */
-	@Scheduled(cron = "${task.schedule.order.pay.success}")
+//	@Scheduled(cron = "${task.schedule.order.pay.success}")
 	public void orderPaySuccessScheduled() {
 		log.info("订单支付完成后的逻辑处理");
 		List<Order> orderList = orderService.getPaySuccessOrdersList();
@@ -249,7 +249,7 @@ public class TaskSchedule {
 	/**
 	 * 订单支付失败逻辑处理
 	 */
-	@Scheduled(cron = "${task.schedule.order.pay.fail}")
+//	@Scheduled(cron = "${task.schedule.order.pay.fail}")
 	public void orderPayFailScheduled() {
 		log.info("订单支付失败后的逻辑处理");
 		List<Order> orderList = orderService.getPayFailOrdersList();
@@ -266,7 +266,7 @@ public class TaskSchedule {
 	/**
 	 * 第三方支付的query 充值
 	 */
-	@Scheduled(cron = "${task.schedule.recharge.pay.timeout}")
+//	@Scheduled(cron = "${task.schedule.recharge.pay.timeout}")
 	public void timerRechargeQueryScheduled() {
 		log.info("第三方支付定时任务开始");
 		EmptyParam emptyParam = new EmptyParam();
@@ -276,7 +276,7 @@ public class TaskSchedule {
 	/**
 	 * 提现状态轮询
 	 */
-	@Scheduled(cron = "${task.schedule.payment.check.cash}")
+//	@Scheduled(cron = "${task.schedule.payment.check.cash}")
 	public void timerCheckCashReq() {
 		log.info("提现状态轮询定时任务开始");
 		EmptyParam emptyParam = new EmptyParam();
@@ -286,7 +286,7 @@ public class TaskSchedule {
 	/**
 	 * 提现失败定时任务处理回退用户信息
 	 */
-	@Scheduled(cron = "${task.schedule.withdraw.fail}")
+//	@Scheduled(cron = "${task.schedule.withdraw.fail}")
 	public void withdrawFail() {
 		log.info("提现失败定时处理订单");
 		List<UserWithdraw> userWithdrawFailRefundigList = withdrawService.queryUserWithdrawRefundings();
@@ -303,7 +303,7 @@ public class TaskSchedule {
 	/**
 	 * 老带新活动 新用户更改状态
 	 */
-	@Scheduled(cron = "${task.schedule.activity.oldBeltNew.updateUserStatus}")
+//	@Scheduled(cron = "${task.schedule.activity.oldBeltNew.updateUserStatus}")
 	public void oldBeltNewUpdateUserStatus() {
 		log.info("老带新活动定时开始=======================================");
 		dlOldBeltNewService.updateConformingUser();// 更新符合条件的用户
@@ -467,7 +467,7 @@ public class TaskSchedule {
 		log.info("======================^_^===============================");
 		log.info("[artifiPrintLotteryTaskScheduled]" + "人工出票分单系统");
 		log.info("=====================================================");
-		EmptyParam emptyParam = new EmptyParam();
-		iArtifiPrintLotteryService.artifiTaskTimer(emptyParam);
+//		EmptyParam emptyParam = new EmptyParam();
+//		iArtifiPrintLotteryService.artifiTaskTimer(emptyParam);
 	}
 }
