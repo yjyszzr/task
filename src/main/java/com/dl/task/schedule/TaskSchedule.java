@@ -15,6 +15,7 @@ import com.alibaba.fastjson.JSON;
 import com.dl.base.param.EmptyParam;
 import com.dl.base.util.DateUtilNew;
 import com.dl.base.util.SNGenerator;
+import com.dl.lottery.api.IArtifiPrintLotteryService;
 import com.dl.shop.payment.api.IpaymentService;
 import com.dl.task.configurer.URLConfig;
 import com.dl.task.model.DlOldBeltNew;
@@ -69,7 +70,10 @@ public class TaskSchedule {
 	private URLConfig urlConfig;
 	@Resource
 	private DlMatchResultService dlMatchResultService;
-
+	@Resource
+	private IArtifiPrintLotteryService iArtifiPrintLotteryService;
+	
+	
 //	/**
 //	 * 第一步： 出票任务 （每5分钟执行一次） 调用第三方接口出票定时任务 定时的对出票中的进行查询结果
 //	 */
@@ -455,4 +459,13 @@ public class TaskSchedule {
 		log.info("老带新活动定时结束=======================================");
 	}
 
+	/**
+	 * 人工出票分单系统timer轮询
+	 */
+	@Scheduled(cron = "${task.schedule.lottery.artifi.schedualed}")
+	public void artifiPrintLotteryTaskScheduled() {
+		log.info("[artifiPrintLotteryTaskScheduled]" + "人工出票分单系统");
+		EmptyParam emptyParam = new EmptyParam();
+		ipaymentService.timerRechargeQueryScheduled(emptyParam);
+	}
 }
