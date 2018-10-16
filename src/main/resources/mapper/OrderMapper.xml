@@ -101,6 +101,11 @@
   update dl_order set order_status = 1 where order_status = 0 and order_sn = #{orderSn} 
   </update>
   
+  <!-- 手工出票，支付完成后 订单为已经出票 -->
+  <update id="updateOrderStatus0To3">
+  	update dl_order set order_status = 3 where order_status = 0 and order_sn = #{orderSn} 
+  </update>
+  
   
   <update id="updateWiningMoney">
   	update dl_order set winning_money = #{winningMoney},order_status=#{orderStatus},award_time=#{awardTime} 

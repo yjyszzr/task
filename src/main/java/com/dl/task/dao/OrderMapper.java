@@ -24,6 +24,8 @@ public interface OrderMapper extends Mapper<Order> {
 	public List<OrderWithUserDTO> selectOpenedAllRewardOrderList();
 	//待出票订单列表
 	public List<Order> ordersListNoFinishAllPrintLottery();
+	//手工出票，支付完成后 订单状态为 待开奖
+	public int updateOrderStatus0To3(@Param("orderSn")String orderSn);
 	//订单更新为待开奖
 	public int updateOrderStatus1To3(Order order);
 	//订单更新为出票失败

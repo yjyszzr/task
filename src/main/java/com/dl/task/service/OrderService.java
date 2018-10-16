@@ -1514,7 +1514,7 @@ public class OrderService extends AbstractService<Order> {
 	public void doPaySuccessOrder(Order order) {
 		String orderSn = order.getOrderSn();
 //		更新order_status=1
-		int updateRow = orderMapper.updateOrderStatus0To1(orderSn);
+		int updateRow = orderMapper.updateOrderStatus0To3(orderSn);
 //		if(updateRow==1){
 			if(order.getThirdPartyPaid().compareTo(BigDecimal.ZERO)>0){
 				insertThirdPayAccount(order);
