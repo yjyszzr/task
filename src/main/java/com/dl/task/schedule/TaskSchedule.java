@@ -468,6 +468,6 @@ public class TaskSchedule {
 		log.info("[artifiPrintLotteryTaskScheduled]" + "人工出票分单系统");
 		log.info("=====================================================");
 		EmptyParam emptyParam = new EmptyParam();
-		ipaymentService.timerRechargeQueryScheduled(emptyParam);
+		iArtifiPrintLotteryService.artifiTaskTimer(emptyParam);
 	}
 }
