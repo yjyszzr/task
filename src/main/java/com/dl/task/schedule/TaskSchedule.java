@@ -460,14 +460,14 @@ public class TaskSchedule {
 	}
 
 	/**
-	 * 人工出票分单系统timer轮询
+	 * 人工出票分单系统timer轮询 2018-10-16
 	 */
 	@Scheduled(cron = "${task.schedule.lottery.artifi.schedualed}")
 	public void artifiPrintLotteryTaskScheduled() {
 		log.info("======================^_^===============================");
 		log.info("[artifiPrintLotteryTaskScheduled]" + "人工出票分单系统");
 		log.info("=====================================================");
-//		EmptyParam emptyParam = new EmptyParam();
-//		iArtifiPrintLotteryService.artifiTaskTimer(emptyParam);
+		EmptyParam emptyParam = new EmptyParam();
+		iArtifiPrintLotteryService.artifiTaskTimer(emptyParam);
 	}
 }
