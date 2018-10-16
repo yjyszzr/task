@@ -474,7 +474,7 @@ public class TaskSchedule {
 		log.info("^_^^_^^_^^_^^_^^_^^_^^_^^_^^_^^_^^_^^_^^_^^_^^_^^_^^_^^_^^_^^_^^_^");
 		log.info("^_^^_^^_^^_^^_^^_^^_^^_^^_^^_^^_^^_^^_^^_^^_^^_^^_^^_^^_^^_^^_^^_^");
 		log.info("^_^^_^^_^^_^^_^^_^^_^^_^^_^^_^^_^^_^^_^^_^^_^^_^^_^^_^^_^^_^^_^^_^");
-//		EmptyParam emptyParam = new EmptyParam();
-//		iArtifiPrintLotteryService.artifiTaskTimer(emptyParam);
+		EmptyParam emptyParam = new EmptyParam();
+		iArtifiPrintLotteryService.artifiTaskTimer(emptyParam);
 	}
 }
