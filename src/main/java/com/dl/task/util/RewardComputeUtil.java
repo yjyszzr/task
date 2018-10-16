@@ -6,8 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import com.sun.tools.classfile.StackMapTable_attribute.append_frame;
-
 public class RewardComputeUtil {
 	public static void main(String[] args) {
 //		select concat('tickesList.add("',times,'=',reward_stakes,'");') from dl_print_lottery where order_sn='2018090709180471620363' and real_reward_money>0;
