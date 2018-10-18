@@ -12,12 +12,6 @@ public class DlArtifiPrintLottery {
     private Integer id;
 
     /**
-     * 彩票订单号-唯一
-     */
-    @Column(name = "ticket_id")
-    private String ticketId;
-    
-    /**
      * 订单号
      */
     @Column(name = "order_sn")
@@ -130,14 +124,6 @@ public class DlArtifiPrintLottery {
     public void setOperationStatus(Byte operationStatus) {
         this.operationStatus = operationStatus;
     }
-
-    public String getTicketId() {
-		return ticketId;
-	}
-
-	public void setTicketId(String ticketId) {
-		this.ticketId = ticketId;
-	}
 
 	/**
      * 获取添加时间
