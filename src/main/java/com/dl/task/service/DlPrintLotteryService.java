@@ -444,7 +444,7 @@ public class DlPrintLotteryService {
 				list.add(dto);
 			}
 		}
-		//
+		
 		List<DlPrintLottery> updates = new ArrayList<DlPrintLottery>(lotteryPrints.size());
 		for (String playCode : playCodes) {
 			boolean isCancel = false;
@@ -1388,6 +1388,7 @@ public class DlPrintLotteryService {
 		List<DlArtifiPrintLottery> artifiPrintLotterys = models.stream().map(s->{
 			DlArtifiPrintLottery dlArtifiPrintLottery = new DlArtifiPrintLottery();
 			dlArtifiPrintLottery.setOrderSn(s.getOrderSn());
+			dlArtifiPrintLottery.setOrderSn(s.getTicketId());
 			dlArtifiPrintLottery.setAddTime(DateUtil.getCurrentTimeLong());
 			return dlArtifiPrintLottery;
 		}).collect(Collectors.toList());

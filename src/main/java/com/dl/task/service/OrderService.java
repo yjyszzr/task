@@ -1521,32 +1521,10 @@ public class OrderService extends AbstractService<Order> {
 			}
 			//进行预出票
 			List<DlPrintLottery> dlPrints = dlPrintLotteryMapper.printLotterysByOrderSn(orderSn);
-			if(dlPrints.size() == 0){
-				Integer lotteryClassifyId = order.getLotteryClassifyId();
-				BigDecimal orderAmount = order.getTicketAmount();
-				Integer lotteryPlayClassifyId = order.getLotteryPlayClassifyId();
+			if(CollectionUtils.isEmpty(dlPrints)){
 				OrderInfoAndDetailDTO orderDetail = getOrderWithDetailByOrder(order);
-				if(1== lotteryClassifyId && 8 == lotteryPlayClassifyId) {
-					dlPrintLotteryService.saveLotteryPrintInfo(orderDetail, order.getOrderSn());
-					return;
-				}
 				List<LotteryPrintDTO> lotteryPrints = dlPrintLotteryService.getPrintLotteryListByOrderInfo(orderDetail,orderSn);
 				if(CollectionUtils.isNotEmpty(lotteryPrints)) {
-					BigDecimal minAmountLottery = null;
-					BigDecimal maxAmountLottery = null;
-					for(LotteryPrintDTO print:lotteryPrints){
-						if(minAmountLottery==null||maxAmountLottery==null){
-							minAmountLottery=BigDecimal.valueOf(print.getMoney());
-							maxAmountLottery=BigDecimal.valueOf(print.getMoney());
-							continue;
-						}
-						if(BigDecimal.valueOf(print.getMoney()).subtract(minAmountLottery).compareTo(BigDecimal.ZERO)<0){
-							minAmountLottery = BigDecimal.valueOf(print.getMoney());
-						}
-						if(BigDecimal.valueOf(print.getMoney()).subtract(maxAmountLottery).compareTo(BigDecimal.ZERO)>0){
-							maxAmountLottery = BigDecimal.valueOf(print.getMoney());
-						}
-					}
 					dlPrintLotteryService.saveLotteryPrintInfo(lotteryPrints, order.getOrderSn());
 			        return;
 				}

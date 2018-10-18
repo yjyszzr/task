@@ -151,7 +151,7 @@ public class TaskSchedule {
 		log.info("更新彩票信息，彩票对奖开始");
 //		dlPrintLotteryService.updatePrintLotteryCompareStatus();
 		dlPrintLotteryService.updatePrintLotteryCompareStatusJz();
-/*		dlPrintLotteryService.updatePrintLotteryCompareStatusJl();*/
+//		dlPrintLotteryService.updatePrintLotteryCompareStatusJl();
 		log.info("更新彩票信息，彩票对奖结束");
 
 	}
