@@ -1383,11 +1383,12 @@ public class DlPrintLotteryService {
 			return lotteryPrint;
 		}).collect(Collectors.toList());
 		dlPrintLotteryMapper.batchInsertDlPrintLottery(models);
-		
+			
 		//保存手工出票的信息
-		List<DlArtifiPrintLottery> artifiPrintLotterys = models.stream().map(s->{
+		List<String> orderSnList = models.stream().map(s->s.getOrderSn()).distinct().collect(Collectors.toList());
+		List<DlArtifiPrintLottery> artifiPrintLotterys = orderSnList.stream().map(s->{
 			DlArtifiPrintLottery dlArtifiPrintLottery = new DlArtifiPrintLottery();
-			dlArtifiPrintLottery.setOrderSn(s.getOrderSn());
+			dlArtifiPrintLottery.setOrderSn(s);
 			dlArtifiPrintLottery.setAddTime(DateUtil.getCurrentTimeLong());
 			return dlArtifiPrintLottery;
 		}).collect(Collectors.toList());
