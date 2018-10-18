@@ -8,7 +8,7 @@ public class DlArtifiPrintLottery {
      * id
      */
     @Id
-    @Column(name = "option_id")
+    @Column(name = "id")
     private Integer id;
 
     /**
