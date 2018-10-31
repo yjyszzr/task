@@ -17,18 +17,14 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-
 import javax.annotation.Resource;
-
 import lombok.extern.slf4j.Slf4j;
-
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.dl.base.constant.CommonConstants;
@@ -72,7 +68,6 @@ import com.dl.task.dto.OrderDetailDataDTO;
 import com.dl.task.dto.OrderInfoAndDetailDTO;
 import com.dl.task.dto.OrderInfoDTO;
 import com.dl.task.dto.OrderWithUserDTO;
-import com.dl.task.dto.PrintChannelInfo;
 import com.dl.task.dto.TMatchBetMaxAndMinOddsList;
 import com.dl.task.dto.TicketInfo;
 import com.dl.task.dto.TicketPlayInfo;
@@ -84,7 +79,6 @@ import com.dl.task.model.DlLeagueMatchResult;
 import com.dl.task.model.DlMatchBasketball;
 import com.dl.task.model.DlPrintLottery;
 import com.dl.task.model.DlResultBasketball;
-import com.dl.task.model.DlTicketChannelLotteryClassify;
 import com.dl.task.model.Order;
 import com.dl.task.model.OrderDetail;
 import com.dl.task.model.PayLog;
