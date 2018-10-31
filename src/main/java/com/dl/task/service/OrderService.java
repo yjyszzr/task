@@ -154,6 +154,24 @@ public class OrderService extends AbstractService<Order> {
     @Resource
     private GeTuiUtil geTuiUtil;
     
+    /**
+     * 处理订单超时订单
+     */
+    public void dealBeyondTimeOrderOut() {
+    	log.info("开始执行超时订单任务");
+		List<Order> orderList = orderMapper.queryOrderListByOrder20minOut(DateUtil.getCurrentTimeLong());
+    	
+		log.info("超时订单数："+orderList.size());
+    	if(orderList.size() == 0) {
+    		log.info("没有超时订单,定时任务结束");
+    		return;
+    	}
+    	List<String> orderSnList = orderList.stream().map(s->s.getOrderSn()).collect(Collectors.toList());
+    	orderMapper.batchUpdateOrderStatus0To8(orderSnList);
+		log.info("结束执行超时订单任务");
+    }
+    
+    
 	/**
 	 * 更新订单状态
 	 * 

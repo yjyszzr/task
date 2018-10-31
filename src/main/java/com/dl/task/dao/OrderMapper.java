@@ -84,6 +84,13 @@ public interface OrderMapper extends Mapper<Order> {
 	 * @return
 	 */
 	public List<Order> queryOrderListBySelective(@Param("nowTime") Integer nowTime);
+	
+	/**
+	 * 查询距离下单时间超过20min的订单集合
+	 * 
+	 * @return
+	 */
+	public List<Order> queryOrderListByOrder20minOut(@Param("nowTime") Integer nowTime);
 
 	int updateOrderStatus(Order order);
 	
@@ -111,6 +118,8 @@ public interface OrderMapper extends Mapper<Order> {
 	public int updateOrderStatus6To7(@Param("orderSn")String orderSn);
 	
 	public int updateOrderStatus0To8(@Param("orderSn")String orderSn, @Param("payTime")Integer payTime);
+	
+	public int batchUpdateOrderStatus0To8(@Param("orderSnList")List<String> orderSnList);
 	
 	public List<Order> selectPaySuccessOrdersList();
 	public int updateOrderStatus0To1(@Param("orderSn")String orderSn);

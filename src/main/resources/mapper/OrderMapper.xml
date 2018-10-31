@@ -90,7 +90,6 @@
 	   order by pay_time
   </select>
   
-  
   <select id="selectPaySuccessOrdersList" resultMap="BaseResultMap">
   select * from dl_order where order_status = 0 and pay_status = 1 and is_delete!=1
   </select>
@@ -258,6 +257,17 @@
 	     order by add_time
   </select>
   
+  <select id="queryOrderListByOrder20minOut" parameterType = "com.dl.task.model.Order" resultMap="BaseResultMap">
+	   select 
+	        *
+	   from 
+	        dl_order
+	   where    pay_status = 0
+		        AND is_delete = 0
+		        AND (#{nowTime}-add_time) &gt; 1200
+	     order by add_time limit 100；
+  </select>
+  
   <update id="updateOrderTicketInfo">
   	update dl_order set 
 	  	accept_time = #{acceptTime},
@@ -353,4 +363,13 @@
 	 update dl_order set pay_time=#{payTime},pay_status=2,order_status=8
 	 where order_sn=#{orderSn} and order_status=0
   </update>
+  
+  <update id="batchUpdateOrderStatus0To8" >
+	 update dl_order set pay_status=2,order_status=8
+	 where pay_status=0 and order_sn in 
+	 <foreach collection="orderSnList" item="item" index="index" open="(" separator="," close=")">
+            	#{item}
+     </foreach>
+  </update>
+
 </mapper>

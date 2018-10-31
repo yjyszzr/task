@@ -193,41 +193,50 @@ public class TaskSchedule {
 	/**
 	 * 更新中奖用户的账户
 	 */
-	@Scheduled(cron = "${task.schedule.member.reward.money}")
-	public void addRewardMoneyToUsers() {
-		log.info("更新中奖用户的账户，派奖开始");
-		orderService.addRewardMoneyToUsers();
-		log.info("更新中奖用户的账户，派奖结束");
-	}
+//	@Scheduled(cron = "${task.schedule.member.reward.money}")
+//	public void addRewardMoneyToUsers() {
+//		log.info("更新中奖用户的账户，派奖开始");
+//		orderService.addRewardMoneyToUsers();
+//		log.info("更新中奖用户的账户，派奖结束");
+//	}
 
 	/************************** 用户的定时任务 *****************/
 	/**
 	 * 更新过期的红包
 	 */
-	@Scheduled(cron = "${task.schedule.member.bonus.expire}")
-	public void updateBonusExpire() {
-		log.info("更新过期的红包定时任务开始");
-		userBonusService.updateBonusExpire();
-		log.info("更新过期的红包的定时任务结束");
-	}
+//	@Scheduled(cron = "${task.schedule.member.bonus.expire}")
+//	public void updateBonusExpire() {
+//		log.info("更新过期的红包定时任务开始");
+//		userBonusService.updateBonusExpire();
+//		log.info("更新过期的红包的定时任务结束");
+//	}
 
 	/**************** 支付的定时任务,调用支付模块 **************/
+//	@Scheduled(cron = "${task.schedule.payment.time.out}")
+//	public void dealBeyondPayTimeOrderOut() {
+//		log.info("开始执行混合支付超时订单任务");
+//		paymentService.dealBeyondPayTimeOrderOut();
+//		log.info("结束执行支混合付超时订单任务");
+//	}
+	
+	/**************** 超时订单处理 **************/
 	@Scheduled(cron = "${task.schedule.payment.time.out}")
-	public void dealBeyondPayTimeOrderOut() {
-		log.info("开始执行混合支付超时订单任务");
-		paymentService.dealBeyondPayTimeOrderOut();
-		log.info("结束执行支混合付超时订单任务");
+	public void dealBeyondTimeOrderOut() {
+		log.info("开始执行超时订单任务");
+		orderService.dealBeyondTimeOrderOut();
+		log.info("结束执行超时订单任务");
 	}
+	
 
 	/**
 	 * 第三方支付的query 订单
 	 */
-	@Scheduled(cron = "${task.schedule.order.pay.timeout}")
-	public void timerOrderQueryScheduled() {
-		log.info("第三方支付定时任务开始");
-		EmptyParam emptyParam = new EmptyParam();
-		ipaymentService.timerOrderQueryScheduled(emptyParam);
-	}
+//	@Scheduled(cron = "${task.schedule.order.pay.timeout}")
+//	public void timerOrderQueryScheduled() {
+//		log.info("第三方支付定时任务开始");
+//		EmptyParam emptyParam = new EmptyParam();
+//		ipaymentService.timerOrderQueryScheduled(emptyParam);
+//	}
 
 	/**
 	 * 订单支付成功逻辑处理
@@ -249,29 +258,29 @@ public class TaskSchedule {
 	/**
 	 * 订单支付失败逻辑处理
 	 */
-	@Scheduled(cron = "${task.schedule.order.pay.fail}")
-	public void orderPayFailScheduled() {
-		log.info("订单支付失败后的逻辑处理");
-		List<Order> orderList = orderService.getPayFailOrdersList();
-		for (Order order : orderList) {
-			try {
-				paymentService.dealBeyondPayTimeOrder(order);
-			} catch (Exception e) {
-				log.error("处理订单支付失败order_sn={}", order.getOrderSn(), e);
-				log.error("处理订单支付失败order_sn=",e);
-			}
-		}
-	}
+//	@Scheduled(cron = "${task.schedule.order.pay.fail}")
+//	public void orderPayFailScheduled() {
+//		log.info("订单支付失败后的逻辑处理");
+//		List<Order> orderList = orderService.getPayFailOrdersList();
+//		for (Order order : orderList) {
+//			try {
+//				paymentService.dealBeyondPayTimeOrder(order);
+//			} catch (Exception e) {
+//				log.error("处理订单支付失败order_sn={}", order.getOrderSn(), e);
+//				log.error("处理订单支付失败order_sn=",e);
+//			}
+//		}
+//	}
 
 	/**
 	 * 第三方支付的query 充值
 	 */
-	@Scheduled(cron = "${task.schedule.recharge.pay.timeout}")
-	public void timerRechargeQueryScheduled() {
-		log.info("第三方支付定时任务开始");
-		EmptyParam emptyParam = new EmptyParam();
-		ipaymentService.timerRechargeQueryScheduled(emptyParam);
-	}
+//	@Scheduled(cron = "${task.schedule.recharge.pay.timeout}")
+//	public void timerRechargeQueryScheduled() {
+//		log.info("第三方支付定时任务开始");
+//		EmptyParam emptyParam = new EmptyParam();
+//		ipaymentService.timerRechargeQueryScheduled(emptyParam);
+//	}
 
 	/**
 	 * 提现状态轮询
