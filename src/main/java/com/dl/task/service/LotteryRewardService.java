@@ -102,7 +102,7 @@ public class LotteryRewardService {
 					if(realReward.compareTo(BigDecimal.ZERO) == 0) {//未中奖
 						dlOrderDataDTO.setOrderStatus(ProjectConstant.ORDER_STATUS_NOT);
 					}else if(realReward.compareTo(BigDecimal.ZERO) > 0) {//已中奖
-						dlOrderDataDTO.setOrderStatus(ProjectConstant.ORDER_STATUS_REWARDING);
+						dlOrderDataDTO.setOrderStatus(ProjectConstant.ORDER_STATUS_ALREADY);
 					}
 					
 					if(realReward.compareTo(BigDecimal.ZERO) < 0) {//中奖金额为负数，过滤掉
