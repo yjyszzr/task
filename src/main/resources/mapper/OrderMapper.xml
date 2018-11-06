@@ -91,7 +91,7 @@
   </select>
   
   <select id="selectPaySuccessOrdersList" resultMap="BaseResultMap">
-  select * from dl_order where order_status = 0 and pay_status = 1 and is_delete!=1
+  select * from dl_order where pay_status = 1 and order_status = 3 and is_delete!=1
   </select>
   <select id="selectPayFailOrdersList" resultMap="BaseResultMap">
   select * from dl_order where order_status = 0 and pay_status = 2 and is_delete!=1

@@ -1524,26 +1524,21 @@ public class OrderService extends AbstractService<Order> {
 
 	@Transactional(value="transactionManager1")
 	public void doPaySuccessOrder(Order order) {
-		String orderSn = order.getOrderSn();
-		//更新order_status=3 为待开奖
-		int updateRow = orderMapper.updateOrderStatus0To3(orderSn);
-		if(updateRow==1){
-			if(order.getThirdPartyPaid().compareTo(BigDecimal.ZERO)>0){
-				insertThirdPayAccount(order);
-			}
-			//进行预出票
-			List<DlPrintLottery> dlPrints = dlPrintLotteryMapper.printLotterysByOrderSn(orderSn);
-			if(CollectionUtils.isEmpty(dlPrints)){
-				OrderInfoAndDetailDTO orderDetail = getOrderWithDetailByOrder(order);
-				List<LotteryPrintDTO> lotteryPrints = dlPrintLotteryService.getPrintLotteryListByOrderInfo(orderDetail,orderSn);
-				if(CollectionUtils.isNotEmpty(lotteryPrints)) {
-					dlPrintLotteryService.saveLotteryPrintInfo(lotteryPrints, order.getOrderSn());
-			        return;
+				String orderSn = order.getOrderSn();
+				if(order.getThirdPartyPaid().compareTo(BigDecimal.ZERO)>0){
+					insertThirdPayAccount(order);
 				}
-			}
-		}else{
-			log.info("order_sn={},支付成功,更新状态3失败 where 0 ",orderSn);
-		}
+				//进行预出票
+				List<DlPrintLottery> dlPrints = dlPrintLotteryMapper.printLotterysByOrderSn(orderSn);
+				if(CollectionUtils.isEmpty(dlPrints)){
+					OrderInfoAndDetailDTO orderDetail = getOrderWithDetailByOrder(order);
+					List<LotteryPrintDTO> lotteryPrints = dlPrintLotteryService.getPrintLotteryListByOrderInfo(orderDetail,orderSn);
+					if(CollectionUtils.isNotEmpty(lotteryPrints)) {
+						log.info("=============进行预出票和生成消息======================");
+						dlPrintLotteryService.saveLotteryPrintInfo(lotteryPrints, order.getOrderSn());
+				        return;
+					}
+				}
 	}
 	/**
 	 * 插入第三方支付流水
