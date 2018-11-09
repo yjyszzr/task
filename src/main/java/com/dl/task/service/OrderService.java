@@ -68,6 +68,7 @@ import com.dl.task.dto.OrderDetailDataDTO;
 import com.dl.task.dto.OrderInfoAndDetailDTO;
 import com.dl.task.dto.OrderInfoDTO;
 import com.dl.task.dto.OrderWithUserDTO;
+import com.dl.task.dto.SysConfigDTO;
 import com.dl.task.dto.TMatchBetMaxAndMinOddsList;
 import com.dl.task.dto.TicketInfo;
 import com.dl.task.dto.TicketPlayInfo;
@@ -146,6 +147,9 @@ public class OrderService extends AbstractService<Order> {
     private DlResultBasketballMapper dlResultBasketballMapper;
     
     @Resource
+    private SysConfigService   sysConfigService;
+    
+    @Resource
     private GeTuiUtil geTuiUtil;
     
     /**
@@ -153,7 +157,9 @@ public class OrderService extends AbstractService<Order> {
      */
     public void dealBeyondTimeOrderOut() {
     	log.info("开始执行超时订单任务");
-		List<Order> orderList = orderMapper.queryOrderListByOrder20minOut(DateUtil.getCurrentTimeLong());
+    	SysConfigDTO sysConfigDTO = sysConfigService.querySysConfig(45);
+    	Integer orderExpireTime = sysConfigDTO.getValue().intValue();
+		List<Order> orderList = orderMapper.queryOrderListByOrder20minOut(DateUtil.getCurrentTimeLong(),orderExpireTime);
     	
 		log.info("超时订单数："+orderList.size());
     	if(orderList.size() == 0) {
@@ -1524,21 +1530,18 @@ public class OrderService extends AbstractService<Order> {
 
 	@Transactional(value="transactionManager1")
 	public void doPaySuccessOrder(Order order) {
-				String orderSn = order.getOrderSn();
-				if(order.getThirdPartyPaid().compareTo(BigDecimal.ZERO)>0){
-					insertThirdPayAccount(order);
-				}
-				//进行预出票
-				List<DlPrintLottery> dlPrints = dlPrintLotteryMapper.printLotterysByOrderSn(orderSn);
-				if(CollectionUtils.isEmpty(dlPrints)){
-					OrderInfoAndDetailDTO orderDetail = getOrderWithDetailByOrder(order);
-					List<LotteryPrintDTO> lotteryPrints = dlPrintLotteryService.getPrintLotteryListByOrderInfo(orderDetail,orderSn);
-					if(CollectionUtils.isNotEmpty(lotteryPrints)) {
-						log.info("=============进行预出票和生成消息======================");
-						dlPrintLotteryService.saveLotteryPrintInfo(lotteryPrints, order.getOrderSn());
-				        return;
-					}
-				}
+		String orderSn = order.getOrderSn();
+		//进行预出票
+		List<DlPrintLottery> dlPrints = dlPrintLotteryMapper.printLotterysByOrderSn(orderSn);
+		if(CollectionUtils.isEmpty(dlPrints)){
+			OrderInfoAndDetailDTO orderDetail = getOrderWithDetailByOrder(order);
+			List<LotteryPrintDTO> lotteryPrints = dlPrintLotteryService.getPrintLotteryListByOrderInfo(orderDetail,orderSn);
+			if(CollectionUtils.isNotEmpty(lotteryPrints)) {
+				log.info("=============进行预出票和生成消息======================");
+				dlPrintLotteryService.saveLotteryPrintInfo(lotteryPrints, order.getOrderSn());
+		        return;
+			}
+		}
 	}
 	/**
 	 * 插入第三方支付流水

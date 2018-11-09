@@ -90,7 +90,7 @@ public interface OrderMapper extends Mapper<Order> {
 	 * 
 	 * @return
 	 */
-	public List<Order> queryOrderListByOrder20minOut(@Param("nowTime") Integer nowTime);
+	public List<Order> queryOrderListByOrder20minOut(@Param("nowTime") Integer nowTime,@Param("expireTime") Integer expireTime);
 
 	int updateOrderStatus(Order order);
 	

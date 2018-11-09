@@ -1,5 +1,7 @@
 package com.dl.task.model;
 
+import java.math.BigDecimal;
+
 import javax.persistence.*;
 
 @Table(name = "dl_artifi_print_lottery")
@@ -16,6 +18,12 @@ public class DlArtifiPrintLottery {
      */
     @Column(name = "order_sn")
     private String orderSn;
+    
+    /**
+     * 实际付款金额
+     */
+    @Column(name = "money_paid")
+    private BigDecimal moneyPaid;
 
     /**
      * 状态0待确认1出票成功2出票失败,默认为待确认状态
@@ -52,8 +60,16 @@ public class DlArtifiPrintLottery {
      */
     @Column(name = "operation_time")
     private Integer operationTime;
+    
+    public BigDecimal getMoneyPaid() {
+		return moneyPaid;
+	}
 
-    /**
+	public void setMoneyPaid(BigDecimal moneyPaid) {
+		this.moneyPaid = moneyPaid;
+	}
+
+	/**
      * 获取id
      *
      * @return id - id
