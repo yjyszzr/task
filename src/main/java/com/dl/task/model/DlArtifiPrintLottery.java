@@ -19,6 +19,7 @@ public class DlArtifiPrintLottery {
     @Column(name = "order_sn")
     private String orderSn;
     
+    
     /**
      * 实际付款金额
      */
@@ -123,6 +124,8 @@ public class DlArtifiPrintLottery {
         this.orderStatus = orderStatus;
     }
 
+    
+    
     /**
      * 获取轮询状态:0未轮询,1已轮询,默认未轮询
      *

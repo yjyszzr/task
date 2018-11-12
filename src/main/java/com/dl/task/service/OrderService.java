@@ -821,7 +821,9 @@ public class OrderService extends AbstractService<Order> {
 				userIdAndRewardDTOs.add(userIdAndRewardDTO);
 				userIdAndRewardDTO.setLotteryClassifyId(orderWithUserDTO.getLotteryClassifyId());
 			}
-			userAccountService.batchUpdateUserAccount(userIdAndRewardDTOs,ProjectConstant.REWARD_AUTO);
+			Integer accountTime = DateUtil.getCurrentTimeLong();
+			userAccountService.saveRewardMessageAsync(userIdAndRewardDTOs,accountTime);
+			//userAccountService.batchUpdateUserAccount(userIdAndRewardDTOs,ProjectConstant.REWARD_AUTO);
 		}
 	}
 	/**

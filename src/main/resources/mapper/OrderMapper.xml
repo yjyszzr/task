@@ -219,7 +219,7 @@
      from 
         dl_order
      where 
-        order_status = 6
+        order_status = 9
         and pay_status = 1
         and is_delete = 0
   </select>
