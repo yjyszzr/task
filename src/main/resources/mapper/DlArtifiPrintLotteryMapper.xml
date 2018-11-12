@@ -17,7 +17,7 @@
   </resultMap>
   
   <insert id="batchInsert" useGeneratedKeys="true" keyProperty="matchId">
-    insert into dl_artifi_print_lottery(order_sn,add_time) values
+    insert into dl_artifi_print_lottery(order_sn,add_time,money_paid) values
     	<foreach collection="dlArtifiLotterys" item="dlArtifiLottery" separator=",">
 	  		(#{dlArtifiLottery.orderSn},#{dlArtifiLottery.addTime})
   		</foreach> 
