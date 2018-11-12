@@ -1387,6 +1387,7 @@ public class DlPrintLotteryService {
 		//保存手工出票的信息
 		List<String> orderSnList = models.stream().map(s->s.getOrderSn()).distinct().collect(Collectors.toList());
 		Double totalMoney = models.stream().mapToDouble(s-> s.getMoney().doubleValue()).sum();
+		log.info("该订单彩票总金额:"+totalMoney);
 		List<DlArtifiPrintLottery> artifiPrintLotterys = orderSnList.stream().map(s->{
 			DlArtifiPrintLottery dlArtifiPrintLottery = new DlArtifiPrintLottery();
 			dlArtifiPrintLottery.setOrderSn(s);
