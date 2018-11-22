@@ -31,6 +31,13 @@ public class DlArtifiPrintLottery {
      */
     @Column(name = "order_status")
     private Byte orderStatus;
+    
+    
+    /**
+     * 状态0待确认1出票成功2出票失败,默认为待确认状态
+     */
+    @Column(name = "statistics_paid")
+    private Integer statisticsPaid;
 
     /**
      * 轮询状态:0未轮询,1已轮询,默认未轮询
@@ -56,7 +63,17 @@ public class DlArtifiPrintLottery {
     @Column(name = "admin_name")
     private String adminName;
 
-    /**
+    
+    
+    public Integer getStatisticsPaid() {
+		return statisticsPaid;
+	}
+
+	public void setStatisticsPaid(Integer statisticsPaid) {
+		this.statisticsPaid = statisticsPaid;
+	}
+
+	/**
      * 操作时间
      */
     @Column(name = "operation_time")

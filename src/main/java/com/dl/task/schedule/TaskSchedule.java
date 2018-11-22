@@ -193,12 +193,12 @@ public class TaskSchedule {
 	/**
 	 * 给中奖用户发消息
 	 */
-	@Scheduled(cron = "${task.schedule.member.reward.money}")
-	public void addRewardMoneyToUsers() {
-		log.info("更新中奖用户的账户，派奖开始");
-		orderService.addRewardMoneyToUsers();
-		log.info("更新中奖用户的账户，派奖结束");
-	}
+//	@Scheduled(cron = "${task.schedule.member.reward.money}")
+//	public void addRewardMoneyToUsers() {
+//		log.info("更新中奖用户的账户，派奖开始");
+//		orderService.addRewardMoneyToUsers();
+//		log.info("更新中奖用户的账户，派奖结束");
+//	}
 
 	/************************** 用户的定时任务 *****************/
 	/**
