@@ -39,7 +39,7 @@
         </dependency>
         <dependency>
 	        <groupId>com.dl</groupId>
-		    <artifactId>store-service</artifactId>
+		    <artifactId>storeH5-api</artifactId>
 		    <version>1.0-SNAPSHOT</version>
         </dependency>
         <!--Spring Boot依赖-->
