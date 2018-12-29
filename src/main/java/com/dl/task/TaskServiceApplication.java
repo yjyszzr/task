@@ -21,7 +21,7 @@ import com.dl.task.core.ProjectConstant;
 @Import({ RestTemplateConfig.class, Swagger2.class, WebMvcConfigurer.class, FeignConfiguration.class })
 @MapperScan(basePackages = { ProjectConstant.MAPPER_PACKAGE, "com.dl.task.dao2" })
 @EnableEurekaClient
-@EnableFeignClients({"com.dl.shop.payment.api","com.dl.lottery.api"})
+@EnableFeignClients({"com.dl.shop.payment.api","com.dl.lottery.api","com.dl.store.api"})
 @EnableTransactionManagement
 public class TaskServiceApplication {
 

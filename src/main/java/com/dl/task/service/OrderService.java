@@ -17,14 +17,16 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+
 import javax.annotation.Resource;
-import lombok.extern.slf4j.Slf4j;
+
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.dl.base.constant.CommonConstants;
@@ -47,6 +49,8 @@ import com.dl.base.util.DateUtil;
 import com.dl.base.util.DateUtilNew;
 import com.dl.base.util.JSONHelper;
 import com.dl.base.util.SNGenerator;
+import com.dl.store.api.IStoreUserMoneyService;
+import com.dl.store.param.AwardParam;
 import com.dl.task.core.ProjectConstant;
 import com.dl.task.dao.DlPrintLotteryMapper;
 import com.dl.task.dao.OrderDetailMapper;
@@ -72,7 +76,6 @@ import com.dl.task.dto.SysConfigDTO;
 import com.dl.task.dto.TMatchBetMaxAndMinOddsList;
 import com.dl.task.dto.TicketInfo;
 import com.dl.task.dto.TicketPlayInfo;
-import com.dl.task.dto.UserIdAndRewardDTO;
 import com.dl.task.model.ChannelOperationLog;
 import com.dl.task.model.DlChannelConsumer;
 import com.dl.task.model.DlChannelDistributor;
@@ -94,6 +97,8 @@ import com.dl.task.param.UpdateOrderInfoParam;
 import com.dl.task.printlottery.PrintLotteryAdapter;
 import com.dl.task.util.GeTuiMessage;
 import com.dl.task.util.GeTuiUtil;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
@@ -148,6 +153,9 @@ public class OrderService extends AbstractService<Order> {
     
     @Resource
     private SysConfigService   sysConfigService;
+    
+    @Resource
+    private IStoreUserMoneyService   storeUserMoneyService;
     
     @Resource
     private GeTuiUtil geTuiUtil;
@@ -802,30 +810,42 @@ public class OrderService extends AbstractService<Order> {
         	log.info("已购赛事收藏結束");
     	}
 	}
-	
-	
+
 	public void addRewardMoneyToUsers() {
 		List<OrderWithUserDTO> orderWithUserDTOs = orderMapper.selectOpenedAllRewardOrderList();
 		log.info("派奖已中奖的用户数据：code=" + orderWithUserDTOs.size());
 		if (CollectionUtils.isNotEmpty(orderWithUserDTOs)) {
 			log.info("需要派奖的数据:" + orderWithUserDTOs.size());
-			List<UserIdAndRewardDTO> userIdAndRewardDTOs = new LinkedList<UserIdAndRewardDTO>();
 			for (OrderWithUserDTO orderWithUserDTO : orderWithUserDTOs) {
-				UserIdAndRewardDTO userIdAndRewardDTO = new UserIdAndRewardDTO();
-				userIdAndRewardDTO.setUserId(orderWithUserDTO.getUserId());
-				userIdAndRewardDTO.setOrderSn(orderWithUserDTO.getOrderSn());
-				userIdAndRewardDTO.setReward(orderWithUserDTO.getRealRewardMoney());
-				int betTime = orderWithUserDTO.getBetTime();
-				userIdAndRewardDTO.setBetMoney(orderWithUserDTO.getBetMoney());
-				userIdAndRewardDTO.setBetTime(DateUtil.getTimeString(betTime, DateUtil.datetimeFormat));
-				userIdAndRewardDTOs.add(userIdAndRewardDTO);
-				userIdAndRewardDTO.setLotteryClassifyId(orderWithUserDTO.getLotteryClassifyId());
+				AwardParam awardParam =new AwardParam();
+				awardParam.setOrderSn(orderWithUserDTO.getOrderSn());
+				storeUserMoneyService.orderAward(awardParam);
 			}
-			Integer accountTime = DateUtil.getCurrentTimeLong();
-			userAccountService.saveRewardMessageAsync(userIdAndRewardDTOs,accountTime);
-			//userAccountService.batchUpdateUserAccount(userIdAndRewardDTOs,ProjectConstant.REWARD_AUTO);
 		}
 	}
+	
+//	public void addRewardMoneyToUsers() {
+//		List<OrderWithUserDTO> orderWithUserDTOs = orderMapper.selectOpenedAllRewardOrderList();
+//		log.info("派奖已中奖的用户数据：code=" + orderWithUserDTOs.size());
+//		if (CollectionUtils.isNotEmpty(orderWithUserDTOs)) {
+//			log.info("需要派奖的数据:" + orderWithUserDTOs.size());
+//			List<UserIdAndRewardDTO> userIdAndRewardDTOs = new LinkedList<UserIdAndRewardDTO>();
+//			for (OrderWithUserDTO orderWithUserDTO : orderWithUserDTOs) {
+//				UserIdAndRewardDTO userIdAndRewardDTO = new UserIdAndRewardDTO();
+//				userIdAndRewardDTO.setUserId(orderWithUserDTO.getUserId());
+//				userIdAndRewardDTO.setOrderSn(orderWithUserDTO.getOrderSn());
+//				userIdAndRewardDTO.setReward(orderWithUserDTO.getRealRewardMoney());
+//				int betTime = orderWithUserDTO.getBetTime();
+//				userIdAndRewardDTO.setBetMoney(orderWithUserDTO.getBetMoney());
+//				userIdAndRewardDTO.setBetTime(DateUtil.getTimeString(betTime, DateUtil.datetimeFormat));
+//				userIdAndRewardDTOs.add(userIdAndRewardDTO);
+//				userIdAndRewardDTO.setLotteryClassifyId(orderWithUserDTO.getLotteryClassifyId());
+//			}
+//			Integer accountTime = DateUtil.getCurrentTimeLong();
+//			userAccountService.saveRewardMessageAsync(userIdAndRewardDTOs,accountTime);
+////			userAccountService.batchUpdateUserAccount(userIdAndRewardDTOs,ProjectConstant.REWARD_AUTO);
+//		}
+//	}
 	/**
 	 * 转化投注信息用来计算预测试奖金
 	 * 

@@ -73,6 +73,15 @@ public class TaskSchedule {
 	@Resource
 	private IArtifiPrintLotteryService iArtifiPrintLotteryService;
 	
+	/**
+	 * 给中奖用户派奖
+	 */
+	@Scheduled(cron = "${task.schedule.member.reward.money}")
+	public void addRewardMoneyToUsers() {
+		log.info("更新中奖用户的账户，派奖开始");
+		orderService.addRewardMoneyToUsers();
+		log.info("更新中奖用户的账户，派奖结束");
+	}
 	
 //	/**
 //	 * 第一步： 出票任务 （每5分钟执行一次） 调用第三方接口出票定时任务 定时的对出票中的进行查询结果
