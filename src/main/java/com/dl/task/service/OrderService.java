@@ -813,9 +813,9 @@ public class OrderService extends AbstractService<Order> {
 
 	public void addRewardMoneyToUsers() {
 		List<OrderWithUserDTO> orderWithUserDTOs = orderMapper.selectOpenedAllRewardOrderList();
-		log.info("派奖已中奖的用户数据：code=" + orderWithUserDTOs.size());
+		log.info("派奖已中奖的用户数据,需要派奖数量size============{}", orderWithUserDTOs.size());
+		log.info("派奖已中奖的用户数据：orderWithUserDTOs=============={}", orderWithUserDTOs );
 		if (CollectionUtils.isNotEmpty(orderWithUserDTOs)) {
-			log.info("需要派奖的数据:" + orderWithUserDTOs.size());
 			for (OrderWithUserDTO orderWithUserDTO : orderWithUserDTOs) {
 				AwardParam awardParam =new AwardParam();
 				awardParam.setOrderSn(orderWithUserDTO.getOrderSn());
