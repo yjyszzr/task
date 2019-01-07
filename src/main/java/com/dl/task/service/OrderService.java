@@ -816,7 +816,9 @@ public class OrderService extends AbstractService<Order> {
 		log.info("派奖已中奖的用户数据,需要派奖数量size============{}", orderWithUserDTOs.size());
 		log.info("派奖已中奖的用户数据：orderWithUserDTOs=============={}", orderWithUserDTOs );
 		if (CollectionUtils.isNotEmpty(orderWithUserDTOs)) {
+			
 			for (OrderWithUserDTO orderWithUserDTO : orderWithUserDTOs) {
+				orderMapper.updateStatisticsRewardStatusTo0(orderWithUserDTO.getOrderSn());
 				AwardParam awardParam =new AwardParam();
 				awardParam.setOrderSn(orderWithUserDTO.getOrderSn());
 				storeUserMoneyService.orderAward(awardParam);

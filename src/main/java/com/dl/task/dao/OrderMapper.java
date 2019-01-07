@@ -125,4 +125,6 @@ public interface OrderMapper extends Mapper<Order> {
 	public int updateOrderStatus0To1(@Param("orderSn")String orderSn);
 	public List<Order> selectPayFailOrdersList();
 	
+	public void updateStatisticsRewardStatusTo0(@Param("orderSn")String orderSn);
+	
 }

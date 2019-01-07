@@ -372,5 +372,9 @@
             	#{item}
      </foreach>
   </update>
+  
+  <update id="updateStatisticsRewardStatusTo0" >
+	 update dl_artifi_print_lottery set statistics_reward = 0  where order_sn = #{orderSn}
+  </update>
 
 </mapper>
