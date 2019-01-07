@@ -223,6 +223,7 @@
         and pay_status = 1
         and surplus > 0
         and is_delete = 0
+        and add_time > 1546876800
   </select>
   
   <select id="queryOrderSnListByStatus" parameterType = "com.dl.task.model.Order" resultType="java.lang.String">
