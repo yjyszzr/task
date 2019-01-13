@@ -3,8 +3,12 @@ package com.dl.task.model;
 import java.math.BigDecimal;
 import java.util.Date;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
+import lombok.Data;
+@Data
 @Table(name = "dl_print_lottery")
 public class DlPrintLottery {
     /**
