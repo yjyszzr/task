@@ -182,11 +182,12 @@
   	and (compare_status = 0 or compare_status is null or compare_status = '')
   	and stakes is not null and stakes != ''
   </select>
+  <!-- 先开大乐透	where game!='T51' 改成 	where game='T01'   -->
   <select id="lotteryPrintsByUnCompare" resultMap="BaseResultMap">
   	select 
   	<include refid="allFields"></include>
   	from dl_print_lottery 
-  	where game!='T51' and status=1 
+  	where game ='T01' and status=1 
   	and (compare_status = 0 or compare_status is null or compare_status = '')
   	and stakes is not null and stakes != ''
   </select>
