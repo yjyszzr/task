@@ -1,7 +1,5 @@
 package com.dl.task.service;
 
-import io.jsonwebtoken.lang.Collections;
-
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
@@ -16,8 +14,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
-
-import lombok.extern.slf4j.Slf4j;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -62,7 +58,6 @@ import com.dl.task.dto.MatchBetPlayDTO;
 import com.dl.task.dto.OrderDetailDataDTO;
 import com.dl.task.dto.OrderInfoAndDetailDTO;
 import com.dl.task.dto.OrderInfoDTO;
-import com.dl.task.dto.PrintChannelInfo;
 import com.dl.task.enums.PrintLotteryStatusEnum;
 import com.dl.task.enums.ThirdRewardStatusEnum;
 import com.dl.task.model.BetResultInfo;
@@ -73,7 +68,6 @@ import com.dl.task.model.DlPrintLottery;
 import com.dl.task.model.DlResultBasketball;
 import com.dl.task.model.DlSuperLotto;
 import com.dl.task.model.DlTicketChannel;
-import com.dl.task.model.DlTicketChannelLotteryClassify;
 import com.dl.task.param.DlJcZqMatchBetParam;
 import com.dl.task.printlottery.PrintComEnums;
 import com.dl.task.printlottery.PrintLotteryAdapter;
@@ -85,6 +79,9 @@ import com.dl.task.printlottery.responseDto.ToRewardResponseDTO;
 import com.dl.task.printlottery.responseDto.ToRewardResponseDTO.ToRewardOrderResponse;
 import com.dl.task.printlottery.responseDto.ToStakeResponseDTO;
 import com.dl.task.printlottery.responseDto.ToStakeResponseDTO.ToStakeBackOrderDetail;
+
+import io.jsonwebtoken.lang.Collections;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
@@ -130,6 +127,7 @@ public class DlPrintLotteryService {
 	 */
 	public void updatePrintLotteryCompareStatus() {
 		List<DlPrintLottery> lotteryPrints = dlPrintLotteryMapper.lotteryPrintsByUnCompare();
+		log.info("未更新赛果的出票列表======================{}",lotteryPrints);
 		if (lotteryPrints == null) {
 			log.info("updatePrintLotteryCompareStatus 没有获取到需要更新状态的彩票数据");
 			return;
