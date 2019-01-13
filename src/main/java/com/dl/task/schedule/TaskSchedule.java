@@ -145,7 +145,7 @@ public class TaskSchedule {
 	@Scheduled(cron = "${task.schedule.lottery.print.comparestatus}")
 	public void updatePrintLotteryCompareStatus() {
 		log.info("更新彩票信息，彩票对奖开始");
-//		dlPrintLotteryService.updatePrintLotteryCompareStatus();
+		dlPrintLotteryService.updatePrintLotteryCompareStatus();
 		dlPrintLotteryService.updatePrintLotteryCompareStatusJz();
 //		dlPrintLotteryService.updatePrintLotteryCompareStatusJl();
 		log.info("更新彩票信息，彩票对奖结束");
