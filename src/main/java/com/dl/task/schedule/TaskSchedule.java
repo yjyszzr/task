@@ -127,17 +127,18 @@ public class TaskSchedule {
 	/**
 	 * 去兑奖
 	 */
-/*	@Scheduled(cron = "${task.schedule.lottery.print.caixaiomi.toreward}")
+	/*
+ 	@Scheduled(cron = "${task.schedule.lottery.print.caixaiomi.toreward}")
 	public void updatePrintLotteryCaiXiaoMiToRewardInfo() {
 		dlPrintLotteryService.toRewardPrintLotteryVersion2(PrintComEnums.CAIXIAOMI);
-	}*/
+	} */
 	/**
 	 * 更新出票的中奖信息
 	 */
-/*	@Scheduled(cron = "${task.schedule.lottery.print.third.reward}")
+ 	@Scheduled(cron = "${task.schedule.lottery.print.third.reward}")
 	public void updatePrintLotteryThirdRewardInfo() {
 		dlPrintLotteryService.rewardPrintLotteryVersion2();
-	}*/
+	} 
 
 	/**
 	 * 第二步： 对出票数据进行兑奖，更新彩票信息

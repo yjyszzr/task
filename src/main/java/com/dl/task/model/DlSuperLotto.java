@@ -1,7 +1,11 @@
 package com.dl.task.model;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
+import lombok.Data;
+@Data
 @Table(name = "dl_super_lotto")
 public class DlSuperLotto {
     /**

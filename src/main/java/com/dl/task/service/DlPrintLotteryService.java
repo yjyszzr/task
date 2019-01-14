@@ -144,6 +144,7 @@ public class DlPrintLotteryService {
 		log.info("游戏期次==========================={}",t01Game);
 		for(String t01Issue:t01Game){
 			DlSuperLotto dlSuperLotto = dlSuperLottoMapper.selectPrizeResultByTermNum(t01Issue);
+			log.info("游戏期次详情==========================={}",dlSuperLotto);
 			if(dlSuperLotto!=null&&!StringUtils.isEmpty(dlSuperLotto.getPrizeNum())){				
 				orderDetailMapper.beatchUpdateMatchResult(t01Issue,dlSuperLotto.getPrizeNum());
 				dlPrintLotteryMapper.beatchUpdateComparedStakes(t01Issue);
