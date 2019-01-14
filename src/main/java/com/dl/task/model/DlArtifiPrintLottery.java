@@ -63,9 +63,21 @@ public class DlArtifiPrintLottery {
     @Column(name = "admin_name")
     private String adminName;
 
-    
-    
-    public Integer getStatisticsPaid() {
+    /***
+     * 彩票分类
+     */
+    @Column(name = "lottery_classify_id")
+    private Integer lotteryClassifyId;
+
+    public Integer getLotteryClassifyId() {
+		return lotteryClassifyId;
+	}
+
+	public void setLotteryClassifyId(Integer lotteryClassifyId) {
+		this.lotteryClassifyId = lotteryClassifyId;
+	}
+
+	public Integer getStatisticsPaid() {
 		return statisticsPaid;
 	}
 

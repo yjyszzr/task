@@ -1562,7 +1562,7 @@ public class OrderService extends AbstractService<Order> {
 			List<LotteryPrintDTO> lotteryPrints = dlPrintLotteryService.getPrintLotteryListByOrderInfo(orderDetail,orderSn);
 			if(CollectionUtils.isNotEmpty(lotteryPrints)) {
 				log.info("=============进行预出票和生成消息======================");
-				dlPrintLotteryService.saveLotteryPrintInfo(lotteryPrints, order.getOrderSn());
+				dlPrintLotteryService.saveLotteryPrintInfo(lotteryPrints, order.getOrderSn(),order.getLotteryClassifyId());
 		        return;
 			}
 		}

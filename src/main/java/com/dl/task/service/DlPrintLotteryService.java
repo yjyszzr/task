@@ -1351,7 +1351,7 @@ public class DlPrintLotteryService {
 	 * @param orderSn
 	 * @param printChannelInfo
 	 */
-	public void saveLotteryPrintInfo(List<LotteryPrintDTO> lotteryPrints,String orderSn) {
+	public void saveLotteryPrintInfo(List<LotteryPrintDTO> lotteryPrints,String orderSn,Integer lotteryClassifyId) {
 		List<DlPrintLottery> printLotterysByOrderSn = dlPrintLotteryMapper.printLotterysByOrderSn(orderSn);
 		if(CollectionUtils.isNotEmpty(printLotterysByOrderSn)) {
 			log.info("订单orderSn={},已经出票",orderSn);
