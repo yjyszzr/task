@@ -281,17 +281,17 @@ public class TaskSchedule {
 
 
 
-	/**
-	 * 人工出票分单系统timer轮询
-	 */
-	@Scheduled(cron = "${task.schedule.lottery.artifi.schedualed}")
-	public void artifiPrintLotteryTaskScheduled() {
-		log.info("======================^_^===============================");
-		log.info("[artifiPrintLotteryTaskScheduled]" + "人工出票分单系统");
-		log.info("=====================================================");
-		EmptyParam emptyParam = new EmptyParam();
-		iArtifiPrintLotteryService.artifiTaskTimer(emptyParam);
-	}
+//	/**
+//	 * 人工出票分单系统timer轮询
+//	 */
+//	@Scheduled(cron = "${task.schedule.lottery.artifi.schedualed}")
+//	public void artifiPrintLotteryTaskScheduled() {
+//		log.info("======================^_^===============================");
+//		log.info("[artifiPrintLotteryTaskScheduled]" + "人工出票分单系统");
+//		log.info("=====================================================");
+//		EmptyParam emptyParam = new EmptyParam();
+//		iArtifiPrintLotteryService.artifiTaskTimer(emptyParam);
+//	}
 	
 	
 	
