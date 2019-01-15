@@ -354,6 +354,13 @@
   		*
   	from dl_channel_option_log where order_sn = #{orderSn}
   </select>
+
+	<select id = "queryOrderListByOrderSns" resultMap="BaseResultMap">
+		select * from dl_order where order_sn in
+		<foreach collection="orderSnList" item="item" index="index" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</select>
  
   <update id="updateOrderStatus6To7"> 
    update dl_order set order_status = 7 WHERE order_sn =#{orderSn} and order_status = 6
