@@ -1708,7 +1708,9 @@ public class OrderService extends AbstractService<Order> {
 						break;
 					}
 					log.info("订单详情为※※※※※※※※※※※※※※※※※※※※※※※※※※※※{}",orderDetailList.get(k));
-					LottoResultEntity resultEntity = LottoUtils.calPrizeLevel(orderDetail.getTicketData(), orderDetail.getMatchResult());
+				   StringBuilder matchResult = new StringBuilder(orderDetail.getMatchResult());
+				   matchResult=matchResult.replace(14,15, "|");
+					LottoResultEntity resultEntity = LottoUtils.calPrizeLevel(orderDetail.getTicketData(), matchResult.toString());
 					log.info("算奖结果实体类※※※※※※※※※※※※※※※※※※※※※※※※※※※※{}",resultEntity);
 					BigDecimal moneyPrize = LottoMoneyUtil.calculate(resultEntity, BigDecimal.valueOf(1000),BigDecimal.valueOf(600),BigDecimal.valueOf(200),false);
 					//赛选出最大的奖项 数值越小 奖项越靠前
