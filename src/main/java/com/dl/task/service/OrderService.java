@@ -1712,7 +1712,10 @@ public class OrderService extends AbstractService<Order> {
 				   matchResult=matchResult.replace(14,15, "|");
 					LottoResultEntity resultEntity = LottoUtils.calPrizeLevel(orderDetail.getTicketData(), matchResult.toString());
 					log.info("算奖结果实体类※※※※※※※※※※※※※※※※※※※※※※※※※※※※{}",resultEntity);
-					BigDecimal moneyPrize = LottoMoneyUtil.calculate(resultEntity, BigDecimal.valueOf(1000),BigDecimal.valueOf(600),BigDecimal.valueOf(200),false);
+					BigDecimal moneyPrize = new BigDecimal(0);
+					if (resultEntity.status == LottoResultEntity.STATUS_HIT) {
+						moneyPrize = LottoMoneyUtil.calculate(resultEntity, BigDecimal.valueOf(1000),BigDecimal.valueOf(600),BigDecimal.valueOf(200),false);
+					}
 					//赛选出最大的奖项 数值越小 奖项越靠前
 					if (maxWinningLevel > resultEntity.getMaxLevel()) {
 						maxWinningLevel = resultEntity.getMaxLevel();
