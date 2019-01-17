@@ -1730,6 +1730,7 @@ public class OrderService extends AbstractService<Order> {
 					}
 //					回写到订单详情
 					orderDetailMapper.updateOrderDetailInfoForSupperLotto(supperLottoOrderDetailParam);
+					log.info("第"+uniqueGameIssue.get(i)+"期要更新的订单详情数据※※※※※※※※※※※※※※※※※※※※※※※※※※※※{}",supperLottoOrderDetailParam);
 				}
 				if (flag) {
 					SupperLottoOrderParam supperLottoOrderParam =new SupperLottoOrderParam();
@@ -1743,6 +1744,7 @@ public class OrderService extends AbstractService<Order> {
 					supperLottoOrderParam.setMaxLevel(maxWinningLevel);
 					//	累加计算订单详情金额保存到订单
 					orderMapper.updateOrderInfoForSupperLotto(supperLottoOrderParam);
+					log.info("第"+uniqueGameIssue.get(i)+"期"+orderList.get(j).getOrderSn()+"要更新的订单数据※※※※※※※※※※※※※※※※※※※※※※※※※※※※{}",supperLottoOrderParam);
 				}
 			}
 		}
