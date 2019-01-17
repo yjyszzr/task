@@ -123,6 +123,9 @@ public class DlPrintLotteryService {
 
     @Resource
 	private OrderMapper orderMapper;
+    
+    @Resource
+    private OrderService orderService;
 
 	@Value("${print.ticket.merchant}")
 	private String merchant;
@@ -1369,7 +1372,13 @@ public class DlPrintLotteryService {
 		}
 		List<DlPrintLottery> models = lotteryPrints.stream().map(dto->{
 			DlPrintLottery lotteryPrint = new DlPrintLottery();
-			lotteryPrint.setGame("");//足彩
+			if (lotteryClassifyId == 1 ) {
+				lotteryPrint.setGame("T51");//足彩
+			}else	if (lotteryClassifyId == 2 ) {
+				lotteryPrint.setGame("T01");//大乐透
+			}else {
+				lotteryPrint.setGame("");//其他彩种先空着
+			}
 			lotteryPrint.setMerchant("");
 			lotteryPrint.setTicketId(dto.getTicketId());
 			lotteryPrint.setAcceptTime(DateUtil.getCurrentTimeLong());
