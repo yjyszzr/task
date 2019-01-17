@@ -1695,12 +1695,13 @@ public class OrderService extends AbstractService<Order> {
 			   //操作订单,计算奖金
 			   for (int j = 0; j < orderList.size(); j++) {
 				List< OrderDetail>  orderDetailList =orderDetailMapper.queryListByOrderSn(orderList.get(j).getOrderSn());
-				log.info("第"+uniqueGameIssue.get(i)+"期要开奖的订单详情列表.size※※※※※※※※※※※※※※※※※※※※※※※※※※※※{}",orderDetailList.size());
+				log.info("第"+uniqueGameIssue.get(i)+"期,订单号为:"+orderList.get(j).getOrderSn()+"要开奖的订单详情列表.size※※※※※※※※※※※※※※※※※※※※※※※※※※※※{}",orderDetailList.size());
 				boolean flag = true;
 				BigDecimal winningMoney = new BigDecimal(0);
 				Integer maxWinningLevel = 888;
 				for (int k = 0; k < orderDetailList.size(); k++) {
 					OrderDetail orderDetail = orderDetailList.get(k);
+					log.info("订单详情Id为:"+orderDetailList.get(k).getOrderDetailId()+"的赛果为不为空※※※※※※※※※※※※※※※※※※※※※※※※※※※※{}",null == orderDetail.getMatchResult());
 					if (null == orderDetail.getMatchResult()) {
 						flag = false;
 						break;
