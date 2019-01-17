@@ -1676,23 +1676,25 @@ public class OrderService extends AbstractService<Order> {
 	public void openPrizeForSupperLotto() {
 		//查询待开奖的投注列表
 		 List<Order> orderList =orderMapper.selectAllUnOpenPrizeListForSupperLotto();  
-			log.info("大乐透未开奖列表===================={}",orderList);
+			log.info("大乐透未开奖订单列表※※※※※※※※※※※※※※※※※※※※※※※※※※※※{}",orderList);
 			List<String> gameIssue = new ArrayList<String>();
 			orderList.forEach(order->{
 					gameIssue.add(order.getIssue()); 
 			});
 			//对期次去重
 		   List<String> uniqueGameIssue = gameIssue.stream().distinct().collect(Collectors.toList());
-		   Map<String,DlSuperLotto> map =new HashMap<String,DlSuperLotto>();
+		   log.info("大乐透未开奖的期次※※※※※※※※※※※※※※※※※※※※※※※※※※※※{}",uniqueGameIssue);
+		   
 		   //获取期次相关信息
 		   for (int i = 0; i < uniqueGameIssue.size(); i++) {
+			   log.info("当前要开奖的期次※※※※※※※※※※※※※※※※※※※※※※※※※※※※{}",uniqueGameIssue.get(i));
 			   DlSuperLotto dlSuperLotto = dlSuperLottoMapper.selectPrizeResultByTermNum(uniqueGameIssue.get(i));
+//			   判断该期次是否开奖
 			   if(dlSuperLotto!=null&&!StringUtils.isEmpty(dlSuperLotto.getPrizeNum())){	
-				   map.put(uniqueGameIssue.get(i), dlSuperLotto);
-				}
 			   //操作订单,计算奖金
 			   for (int j = 0; j < orderList.size(); j++) {
 				List< OrderDetail>  orderDetailList =orderDetailMapper.queryListByOrderSn(orderList.get(j).getOrderSn());
+				log.info("当前要开奖的订单详情列表※※※※※※※※※※※※※※※※※※※※※※※※※※※※{}",orderDetailList);
 				boolean flag = true;
 				BigDecimal winningMoney = new BigDecimal(0);
 				Integer maxWinningLevel = 888;
@@ -1708,7 +1710,7 @@ public class OrderService extends AbstractService<Order> {
 					if (maxWinningLevel > resultEntity.getMaxLevel()) {
 						maxWinningLevel = resultEntity.getMaxLevel();
 					}
-					moneyPrize =moneyPrize.multiply(BigDecimal.valueOf(orderList.get(i).getCathectic()));
+					moneyPrize =moneyPrize.multiply(BigDecimal.valueOf(orderList.get(j).getCathectic()));
 					winningMoney = winningMoney.add(moneyPrize);
 					SupperLottoOrderDetailParam supperLottoOrderDetailParam =new SupperLottoOrderDetailParam();
 					if (resultEntity.status== LottoResultEntity.STATUS_HIT) {
@@ -1731,7 +1733,7 @@ public class OrderService extends AbstractService<Order> {
 				}
 				if (flag) {
 					SupperLottoOrderParam supperLottoOrderParam =new SupperLottoOrderParam();
-					supperLottoOrderParam.setOrderSn(orderList.get(i).getOrderSn());
+					supperLottoOrderParam.setOrderSn(orderList.get(j).getOrderSn());
 					if (winningMoney.compareTo(BigDecimal.ZERO) <= 0 ) {
 						supperLottoOrderParam.setOrderStatus(4);
 					}else {
@@ -1744,6 +1746,7 @@ public class OrderService extends AbstractService<Order> {
 				}
 			}
 		}
+	}
 		//查询期次
 		//根据期次查询开奖结果
 		//对比投注结果,
