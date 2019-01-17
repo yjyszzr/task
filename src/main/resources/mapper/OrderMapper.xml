@@ -365,6 +365,7 @@
 		WHERE
 			order_status = 3 
 			AND lottery_classify_id = 2
+			and    add_time > 1546876800
   </select>
 
 	<select id = "queryOrderListByOrderSns" resultMap="BaseResultMap">
