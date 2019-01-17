@@ -61,6 +61,15 @@
   	set match_result = #{matchResult} 
   	where issue = #{issue}
   </update>
+  
+  <update id="updateOrderDetailInfoForSupperLotto">
+  	update dl_order_detail 
+  	set money_prize = #{supperLottoOrderDetailParam.moneyPrize},
+  	ticket_status = #{supperLottoOrderDetailParam.ticketStatus},
+  	is_guess = #{supperLottoOrderDetailParam.isGuess},
+  	level_prize = #{supperLottoOrderDetailParam.levelPrize}
+  	where order_detail_id = #{supperLottoOrderDetailParam.orderDetailId}
+  </update>
   <select id="selectByOrderId" resultType="com.dl.task.model.OrderDetail">
         select
             dod.match_id matchId,

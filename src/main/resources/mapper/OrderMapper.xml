@@ -215,7 +215,8 @@
         order_sn orderSn,
         user_id userId,
         lottery_classify_id lotteryClassifyId,
-        winning_money realRewardMoney
+        winning_money realRewardMoney,
+        max_level maxLevel
      from 
         dl_order
      where 
@@ -354,6 +355,17 @@
   		*
   	from dl_channel_option_log where order_sn = #{orderSn}
   </select>
+  
+<!--   查询大乐透待开奖列表 -->
+  <select id="selectAllUnOpenPrizeListForSupperLotto"  parameterType = "com.dl.task.model.Order" resultMap="BaseResultMap">
+		SELECT
+			* 
+		FROM
+			dl_order 
+		WHERE
+			order_status = 3 
+			AND lottery_classify_id = 2
+  </select>
 
 	<select id = "queryOrderListByOrderSns" resultMap="BaseResultMap">
 		select * from dl_order where order_sn in
@@ -383,6 +395,16 @@
   
   <update id="updateStatisticsRewardStatusTo0" >
 	 update dl_artifi_print_lottery set statistics_reward = 0  where order_sn = #{orderSn}
+  </update>
+  
+  <update id="updateOrderInfoForSupperLotto" >
+	 update 
+	 		dl_order 
+	 set winning_money = #{supperLottoOrderParam.winningMoney},
+	 		order_status = #{supperLottoOrderParam.orderStatus},
+	 		max_level = #{supperLottoOrderParam.maxLevel}
+	 where 
+	 		order_sn = #{supperLottoOrderParam.orderSn}
   </update>
 
 </mapper>

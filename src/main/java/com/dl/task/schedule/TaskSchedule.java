@@ -8,7 +8,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 
-import com.dl.base.param.EmptyParam;
 import com.dl.lottery.api.IArtifiPrintLotteryService;
 import com.dl.shop.payment.api.IpaymentService;
 import com.dl.task.configurer.URLConfig;
@@ -69,6 +68,19 @@ public class TaskSchedule {
 		orderService.addRewardMoneyToUsers();
 		log.info("更新中奖用户的账户，派奖结束");
 	}
+	
+	
+	/**
+	 * 给中奖用户派奖
+	 */
+	@Scheduled(cron = "${task.schedule.lotto.openPrize}")
+	public void openPrizeForSupperLotto() {
+		log.info("※※※※※※※※※※※※※※SuperLotto※※※※※※※※※※※※※※超级大乐透开奖开始");
+		orderService.openPrizeForSupperLotto();
+		log.info("※※※※※※※※※※※※※※SuperLotto※※※※※※※※※※※※※※超级大乐透开奖结束");
+	}
+	
+
 	
 //	/**
 //	 * 第一步： 出票任务 （每5分钟执行一次） 调用第三方接口出票定时任务 定时的对出票中的进行查询结果
@@ -135,10 +147,11 @@ public class TaskSchedule {
 	/**
 	 * 更新出票的中奖信息
 	 */
+	/*
  	@Scheduled(cron = "${task.schedule.lottery.print.third.reward}")
 	public void updatePrintLotteryThirdRewardInfo() {
 		dlPrintLotteryService.rewardPrintLotteryVersion2();
-	} 
+	} */
 
 	/**
 	 * 第二步： 对出票数据进行兑奖，更新彩票信息

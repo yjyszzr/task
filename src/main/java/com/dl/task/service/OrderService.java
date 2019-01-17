@@ -42,6 +42,9 @@ import com.dl.base.enums.MatchResultHafuEnum;
 import com.dl.base.enums.RespStatusEnum;
 import com.dl.base.enums.SNBusinessCodeEnum;
 import com.dl.base.exception.ServiceException;
+import com.dl.base.lotto.LottoMoneyUtil;
+import com.dl.base.lotto.LottoUtils;
+import com.dl.base.lotto.entity.LottoResultEntity;
 import com.dl.base.result.BaseResult;
 import com.dl.base.result.ResultGenerator;
 import com.dl.base.service.AbstractService;
@@ -63,6 +66,7 @@ import com.dl.task.dao.UserMatchCollectMapper;
 import com.dl.task.dao2.DlLeagueMatchResultMapper;
 import com.dl.task.dao2.DlMatchBasketballMapper;
 import com.dl.task.dao2.DlResultBasketballMapper;
+import com.dl.task.dao2.DlSuperLottoMapper;
 import com.dl.task.dao2.LotteryMatchMapper;
 import com.dl.task.dto.BasketMatchOneResultDTO;
 import com.dl.task.dto.CellInfo;
@@ -83,6 +87,7 @@ import com.dl.task.model.DlLeagueMatchResult;
 import com.dl.task.model.DlMatchBasketball;
 import com.dl.task.model.DlPrintLottery;
 import com.dl.task.model.DlResultBasketball;
+import com.dl.task.model.DlSuperLotto;
 import com.dl.task.model.Order;
 import com.dl.task.model.OrderDetail;
 import com.dl.task.model.PayLog;
@@ -93,6 +98,8 @@ import com.dl.task.model.UserMatchCollect;
 import com.dl.task.param.AddMessageParam;
 import com.dl.task.param.MessageAddParam;
 import com.dl.task.param.OrderSnParam;
+import com.dl.task.param.SupperLottoOrderDetailParam;
+import com.dl.task.param.SupperLottoOrderParam;
 import com.dl.task.param.UpdateOrderInfoParam;
 import com.dl.task.printlottery.PrintLotteryAdapter;
 import com.dl.task.util.GeTuiMessage;
@@ -127,6 +134,9 @@ public class OrderService extends AbstractService<Order> {
 	
 	@Resource
 	private DlPrintLotteryService dlPrintLotteryService;
+	
+	@Resource
+	private DlSuperLottoMapper dlSuperLottoMapper;
 	
 	@Resource
 	private DlLeagueMatchResultMapper dlLeagueMatchResultMapper;
@@ -819,9 +829,11 @@ public class OrderService extends AbstractService<Order> {
 			
 			for (OrderWithUserDTO orderWithUserDTO : orderWithUserDTOs) {
 				orderMapper.updateStatisticsRewardStatusTo0(orderWithUserDTO.getOrderSn());
-				AwardParam awardParam =new AwardParam();
-				awardParam.setOrderSn(orderWithUserDTO.getOrderSn());
-				storeUserMoneyService.orderAward(awardParam);
+				if (!(orderWithUserDTO.getMaxLevel() == 1 || orderWithUserDTO.getMaxLevel() == 2 || orderWithUserDTO.getMaxLevel() == 3)) {
+					AwardParam awardParam =new AwardParam();
+					awardParam.setOrderSn(orderWithUserDTO.getOrderSn());
+					storeUserMoneyService.orderAward(awardParam);
+				}
 			}
 		}
 	}
@@ -1658,5 +1670,82 @@ public class OrderService extends AbstractService<Order> {
 
 	public List<Order> getPayFailOrdersList() {
 		return orderMapper.selectPayFailOrdersList();
+	}
+
+
+	public void openPrizeForSupperLotto() {
+		//查询待开奖的投注列表
+		 List<Order> orderList =orderMapper.selectAllUnOpenPrizeListForSupperLotto();  
+			log.info("大乐透未开奖列表===================={}",orderList);
+			List<String> gameIssue = new ArrayList<String>();
+			orderList.forEach(order->{
+					gameIssue.add(order.getIssue()); 
+			});
+			//对期次去重
+		   List<String> uniqueGameIssue = gameIssue.stream().distinct().collect(Collectors.toList());
+		   Map<String,DlSuperLotto> map =new HashMap<String,DlSuperLotto>();
+		   //获取期次相关信息
+		   for (int i = 0; i < uniqueGameIssue.size(); i++) {
+			   DlSuperLotto dlSuperLotto = dlSuperLottoMapper.selectPrizeResultByTermNum(uniqueGameIssue.get(i));
+			   if(dlSuperLotto!=null&&!StringUtils.isEmpty(dlSuperLotto.getPrizeNum())){	
+				   map.put(uniqueGameIssue.get(i), dlSuperLotto);
+				}
+			   //操作订单,计算奖金
+			   for (int j = 0; j < orderList.size(); j++) {
+				List< OrderDetail>  orderDetailList =orderDetailMapper.queryListByOrderSn(orderList.get(j).getOrderSn());
+				boolean flag = true;
+				BigDecimal winningMoney = new BigDecimal(0);
+				Integer maxWinningLevel = 888;
+				for (int k = 0; k < orderDetailList.size(); k++) {
+					OrderDetail orderDetail = orderDetailList.get(k);
+					if (null == orderDetail.getMatchResult()) {
+						flag = false;
+						break;
+					}
+					LottoResultEntity resultEntity = LottoUtils.calPrizeLevel(orderDetail.getTicketData(), orderDetail.getMatchResult());
+					BigDecimal moneyPrize = LottoMoneyUtil.calculate(resultEntity, BigDecimal.valueOf(1000),BigDecimal.valueOf(600),BigDecimal.valueOf(200),false);
+					//赛选出最大的奖项 数值越小 奖项越靠前
+					if (maxWinningLevel > resultEntity.getMaxLevel()) {
+						maxWinningLevel = resultEntity.getMaxLevel();
+					}
+					moneyPrize =moneyPrize.multiply(BigDecimal.valueOf(orderList.get(i).getCathectic()));
+					winningMoney = winningMoney.add(moneyPrize);
+					SupperLottoOrderDetailParam supperLottoOrderDetailParam =new SupperLottoOrderDetailParam();
+					if (resultEntity.status== LottoResultEntity.STATUS_HIT) {
+						supperLottoOrderDetailParam.setMoneyPrize(moneyPrize);
+						supperLottoOrderDetailParam.setIsGuess(1);//0-未猜中 1-已猜中
+						supperLottoOrderDetailParam.setTicketStatus(2);//1-未中奖,2-已中奖
+						if (resultEntity.isCompund) {
+							supperLottoOrderDetailParam.setLevelPrize(resultEntity.lottoLevel.toCompoundPrizeLevle());
+						}else {
+							supperLottoOrderDetailParam.setLevelPrize(resultEntity.lottoLevel.level+"");
+						}
+					}else {
+						supperLottoOrderDetailParam.setMoneyPrize(BigDecimal.ZERO);
+						supperLottoOrderDetailParam.setIsGuess(0);//0-未猜中 1-已猜中
+						supperLottoOrderDetailParam.setTicketStatus(1);//1-未中奖,2-已中奖
+						supperLottoOrderDetailParam.setLevelPrize("");
+					}
+//					回写到订单详情
+					orderDetailMapper.updateOrderDetailInfoForSupperLotto(supperLottoOrderDetailParam);
+				}
+				if (flag) {
+					SupperLottoOrderParam supperLottoOrderParam =new SupperLottoOrderParam();
+					supperLottoOrderParam.setOrderSn(orderList.get(i).getOrderSn());
+					if (winningMoney.compareTo(BigDecimal.ZERO) <= 0 ) {
+						supperLottoOrderParam.setOrderStatus(4);
+					}else {
+						supperLottoOrderParam.setOrderStatus(5);
+					}
+					supperLottoOrderParam.setWinningMoney(winningMoney);
+					supperLottoOrderParam.setMaxLevel(maxWinningLevel);
+					//	累加计算订单详情金额保存到订单
+					orderMapper.updateOrderInfoForSupperLotto(supperLottoOrderParam);
+				}
+			}
+		}
+		//查询期次
+		//根据期次查询开奖结果
+		//对比投注结果,
 	}
 }

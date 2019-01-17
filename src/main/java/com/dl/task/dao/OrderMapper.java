@@ -1,13 +1,19 @@
 package com.dl.task.dao;
 
+import java.util.List;
+
+import org.apache.ibatis.annotations.Param;
+
 import com.dl.base.mapper.Mapper;
 import com.dl.task.dto.OrderInfoListDTO;
 import com.dl.task.dto.OrderWithUserDTO;
-import com.dl.task.model.*;
+import com.dl.task.model.ChannelOperationLog;
+import com.dl.task.model.DlChannelConsumer;
+import com.dl.task.model.DlChannelDistributor;
+import com.dl.task.model.Order;
+import com.dl.task.model.User;
+import com.dl.task.param.SupperLottoOrderParam;
 import com.dl.task.param.UpdateOrderInfoParam;
-import org.apache.ibatis.annotations.Param;
-
-import java.util.List;
 
 public interface OrderMapper extends Mapper<Order> {
 	
@@ -120,5 +126,9 @@ public interface OrderMapper extends Mapper<Order> {
 	public List<Order> selectPayFailOrdersList();
 	
 	public void updateStatisticsRewardStatusTo0(@Param("orderSn")String orderSn);
+	
+	public List<Order> selectAllUnOpenPrizeListForSupperLotto();
+	
+	public void updateOrderInfoForSupperLotto(@Param("supperLottoOrderParam")SupperLottoOrderParam supperLottoOrderParam);
 	
 }

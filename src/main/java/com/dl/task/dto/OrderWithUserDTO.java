@@ -27,4 +27,6 @@ public class OrderWithUserDTO implements Serializable{
 	private int betTime;
 	@ApiModelProperty(value = "彩种类型")
 	private Integer lotteryClassifyId;
+	@ApiModelProperty(value = "最大等级奖项")
+	private Integer maxLevel;
 }
