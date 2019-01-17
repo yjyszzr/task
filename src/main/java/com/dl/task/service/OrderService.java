@@ -1707,6 +1707,7 @@ public class OrderService extends AbstractService<Order> {
 						flag = false;
 						break;
 					}
+					log.info("订单详情为※※※※※※※※※※※※※※※※※※※※※※※※※※※※{}",orderDetailList.get(k));
 					LottoResultEntity resultEntity = LottoUtils.calPrizeLevel(orderDetail.getTicketData(), orderDetail.getMatchResult());
 					BigDecimal moneyPrize = LottoMoneyUtil.calculate(resultEntity, BigDecimal.valueOf(1000),BigDecimal.valueOf(600),BigDecimal.valueOf(200),false);
 					//赛选出最大的奖项 数值越小 奖项越靠前
