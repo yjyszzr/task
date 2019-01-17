@@ -1676,7 +1676,7 @@ public class OrderService extends AbstractService<Order> {
 	public void openPrizeForSupperLotto() {
 		//查询待开奖的投注列表
 		 List<Order> orderList =orderMapper.selectAllUnOpenPrizeListForSupperLotto();  
-			log.info("大乐透未开奖订单列表※※※※※※※※※※※※※※※※※※※※※※※※※※※※{}",orderList);
+			log.info("大乐透未开奖订单列表.size※※※※※※※※※※※※※※※※※※※※※※※※※※※※{}",orderList.size());
 			List<String> gameIssue = new ArrayList<String>();
 			orderList.forEach(order->{
 					gameIssue.add(order.getIssue()); 
@@ -1689,12 +1689,13 @@ public class OrderService extends AbstractService<Order> {
 		   for (int i = 0; i < uniqueGameIssue.size(); i++) {
 			   log.info("当前要开奖的期次※※※※※※※※※※※※※※※※※※※※※※※※※※※※{}",uniqueGameIssue.get(i));
 			   DlSuperLotto dlSuperLotto = dlSuperLottoMapper.selectPrizeResultByTermNum(uniqueGameIssue.get(i));
+			   log.info("第"+uniqueGameIssue.get(i)+"期次信息※※※※※※※※※※※※※※※※※※※※※※※※※※※※{}",dlSuperLotto);
 //			   判断该期次是否开奖
 			   if(dlSuperLotto!=null&&!StringUtils.isEmpty(dlSuperLotto.getPrizeNum())){	
 			   //操作订单,计算奖金
 			   for (int j = 0; j < orderList.size(); j++) {
 				List< OrderDetail>  orderDetailList =orderDetailMapper.queryListByOrderSn(orderList.get(j).getOrderSn());
-				log.info("第"+uniqueGameIssue.get(i)+"期要开奖的订单详情列表※※※※※※※※※※※※※※※※※※※※※※※※※※※※{}",orderDetailList);
+				log.info("第"+uniqueGameIssue.get(i)+"期要开奖的订单详情列表.size※※※※※※※※※※※※※※※※※※※※※※※※※※※※{}",orderDetailList.size());
 				boolean flag = true;
 				BigDecimal winningMoney = new BigDecimal(0);
 				Integer maxWinningLevel = 888;
