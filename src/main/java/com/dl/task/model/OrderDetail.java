@@ -2,8 +2,13 @@ package com.dl.task.model;
 
 import java.util.Date;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.Transient;
 
+import lombok.Data;
+@Data
 @Table(name = "dl_order_detail")
 public class OrderDetail {
     /**

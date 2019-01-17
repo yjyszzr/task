@@ -1694,7 +1694,7 @@ public class OrderService extends AbstractService<Order> {
 			   //操作订单,计算奖金
 			   for (int j = 0; j < orderList.size(); j++) {
 				List< OrderDetail>  orderDetailList =orderDetailMapper.queryListByOrderSn(orderList.get(j).getOrderSn());
-				log.info("当前要开奖的订单详情列表※※※※※※※※※※※※※※※※※※※※※※※※※※※※{}",orderDetailList);
+				log.info("第"+uniqueGameIssue.get(i)+"期要开奖的订单详情列表※※※※※※※※※※※※※※※※※※※※※※※※※※※※{}",orderDetailList);
 				boolean flag = true;
 				BigDecimal winningMoney = new BigDecimal(0);
 				Integer maxWinningLevel = 888;
