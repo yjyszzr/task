@@ -147,6 +147,7 @@ public class DlPrintLotteryService {
 			}
 		});
 	   List<String> uniqueT01Game = T01Game.stream().distinct().collect(Collectors.toList());
+	   log.info("游戏期次uniqueT01Game===================={}",uniqueT01Game);
 		updateT01GameDetailAndLottery(uniqueT01Game);
 	}
 	

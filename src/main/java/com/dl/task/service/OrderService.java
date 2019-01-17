@@ -1692,6 +1692,7 @@ public class OrderService extends AbstractService<Order> {
 			   log.info("第"+uniqueGameIssue.get(i)+"期次信息※※※※※※※※※※※※※※※※※※※※※※※※※※※※{}",dlSuperLotto);
 //			   判断该期次是否开奖
 			   if(dlSuperLotto!=null&&!StringUtils.isEmpty(dlSuperLotto.getPrizeNum())){	
+				   orderDetailMapper.beatchUpdateMatchResult(uniqueGameIssue.get(i),dlSuperLotto.getPrizeNum());
 			   //操作订单,计算奖金
 			   for (int j = 0; j < orderList.size(); j++) {
 				List< OrderDetail>  orderDetailList =orderDetailMapper.queryListByOrderSn(orderList.get(j).getOrderSn());
