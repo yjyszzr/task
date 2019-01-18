@@ -1723,6 +1723,7 @@ public class OrderService extends AbstractService<Order> {
 					moneyPrize =moneyPrize.multiply(BigDecimal.valueOf(orderList.get(j).getCathectic()));
 					winningMoney = winningMoney.add(moneyPrize);
 					SupperLottoOrderDetailParam supperLottoOrderDetailParam =new SupperLottoOrderDetailParam();
+					supperLottoOrderDetailParam.setOrderDetailId(orderDetailList.get(k).getOrderDetailId());
 					if (resultEntity.status== LottoResultEntity.STATUS_HIT) {
 						supperLottoOrderDetailParam.setMoneyPrize(moneyPrize);
 						supperLottoOrderDetailParam.setIsGuess(1);//0-未猜中 1-已猜中
