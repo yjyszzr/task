@@ -52,6 +52,9 @@ import com.dl.base.util.DateUtil;
 import com.dl.base.util.DateUtilNew;
 import com.dl.base.util.JSONHelper;
 import com.dl.base.util.SNGenerator;
+import com.dl.lottery.api.ISupperLottoService;
+import com.dl.lottery.dto.DlSuperLottoRewardDTO;
+import com.dl.lottery.param.SupperLottoParam;
 import com.dl.store.api.IStoreUserMoneyService;
 import com.dl.store.param.AwardParam;
 import com.dl.task.core.ProjectConstant;
@@ -166,6 +169,9 @@ public class OrderService extends AbstractService<Order> {
     
     @Resource
     private IStoreUserMoneyService   storeUserMoneyService;
+    
+    @Resource
+    private ISupperLottoService   supperLottoService;
     
     @Resource
     private GeTuiUtil geTuiUtil;
@@ -1689,12 +1695,35 @@ public class OrderService extends AbstractService<Order> {
 		   for (int i = 0; i < uniqueGameIssue.size(); i++) {
 			   log.info("当前要开奖的期次※※※※※※※※※※※※※※※※※※※※※※※※※※※※{}",uniqueGameIssue.get(i));
 			   DlSuperLotto dlSuperLotto = dlSuperLottoMapper.selectPrizeResultByTermNum(uniqueGameIssue.get(i));
+			   SupperLottoParam supperLottoParam =new SupperLottoParam();
+			   supperLottoParam.setTermNum(Integer.parseInt(uniqueGameIssue.get(i)));
+				List<DlSuperLottoRewardDTO> superLottoRewardList = supperLottoService.findByTermNum(supperLottoParam).getData();
 			   log.info("第"+uniqueGameIssue.get(i)+"期次信息※※※※※※※※※※※※※※※※※※※※※※※※※※※※{}",dlSuperLotto);
 //			   判断该期次是否开奖
 			   if(dlSuperLotto!=null&&!StringUtils.isEmpty(dlSuperLotto.getPrizeNum())){	
+				BigDecimal prizeA = new BigDecimal(0);
+				BigDecimal prizeB = new BigDecimal(0);
+				BigDecimal prizeC = new BigDecimal(0);
+				BigDecimal prizeAAppend = new BigDecimal(0);
+				BigDecimal prizeBAppend = new BigDecimal(0);
+				BigDecimal prizeCAppend= new BigDecimal(0);
+				   for (int j = 0; j < superLottoRewardList.size(); j++) {
+					   DlSuperLottoRewardDTO superLottoRewardDTO =superLottoRewardList.get(j);
+					if (superLottoRewardDTO.getRewardLevel()==1) {
+						prizeA = BigDecimal.valueOf(superLottoRewardDTO.getRewardPrice1());
+						prizeAAppend = BigDecimal.valueOf(superLottoRewardDTO.getRewardPrice2());
+					}else if (superLottoRewardDTO.getRewardLevel()==2) {
+						prizeB = BigDecimal.valueOf(superLottoRewardDTO.getRewardPrice1());
+						prizeBAppend = BigDecimal.valueOf(superLottoRewardDTO.getRewardPrice2());
+					}else if (superLottoRewardDTO.getRewardLevel()==3) {
+						prizeC = BigDecimal.valueOf(superLottoRewardDTO.getRewardPrice1());
+						prizeCAppend = BigDecimal.valueOf(superLottoRewardDTO.getRewardPrice2());
+					}
+				}
 				   orderDetailMapper.beatchUpdateMatchResult(uniqueGameIssue.get(i),dlSuperLotto.getPrizeNum());
 			   //操作订单,计算奖金
 			   for (int j = 0; j < orderList.size(); j++) {
+				  
 				List< OrderDetail>  orderDetailList =orderDetailMapper.queryListByOrderSn(orderList.get(j).getOrderSn());
 				log.info("第"+uniqueGameIssue.get(i)+"期,订单号为:"+orderList.get(j).getOrderSn()+"要开奖的订单详情列表.size※※※※※※※※※※※※※※※※※※※※※※※※※※※※{}",orderDetailList.size());
 				boolean flag = true;
@@ -1714,7 +1743,11 @@ public class OrderService extends AbstractService<Order> {
 					log.info("算奖结果实体类※※※※※※※※※※※※※※※※※※※※※※※※※※※※{}",resultEntity);
 					BigDecimal moneyPrize = new BigDecimal(0);
 					if (resultEntity.status == LottoResultEntity.STATUS_HIT) {
-						moneyPrize = LottoMoneyUtil.calculate(resultEntity, BigDecimal.valueOf(1000),BigDecimal.valueOf(600),BigDecimal.valueOf(200),false);
+						 boolean isAppend = false;
+						   if (orderList.get(j).getPlayType().equals("05")) {
+							   isAppend = true;
+						}
+						moneyPrize = LottoMoneyUtil.calculate(resultEntity ,  prizeA,  prizeB,  prizeC, prizeAAppend,  prizeBAppend,  prizeCAppend,  isAppend);
 					}
 					//赛选出最大的奖项 数值越小 奖项越靠前
 					if (maxWinningLevel > resultEntity.getMaxLevel()) {
