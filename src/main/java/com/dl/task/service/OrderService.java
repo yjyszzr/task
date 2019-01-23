@@ -1695,7 +1695,7 @@ public class OrderService extends AbstractService<Order> {
 		   
 		   //获取期次相关信息
 		   for (int i = 0; i < uniqueGameIssue.size(); i++) {
-			   log.info("当前要开奖的期次※※※※※※※※※※※※※※※※※※※※※※※※※※※※{}",uniqueGameIssue.get(i));
+//			   log.info("当前要开奖的期次※※※※※※※※※※※※※※※※※※※※※※※※※※※※{}",uniqueGameIssue.get(i));
 			   DlSuperLotto dlSuperLotto = dlSuperLottoMapper.selectPrizeResultByTermNum(uniqueGameIssue.get(i));
 			   SupperLottoParam supperLottoParam =new SupperLottoParam();
 			   supperLottoParam.setTermNum(Integer.parseInt(uniqueGameIssue.get(i)));
@@ -1727,22 +1727,22 @@ public class OrderService extends AbstractService<Order> {
 			   for (int j = 0; j < orderList.size(); j++) {
 				  
 				List< OrderDetail>  orderDetailList =orderDetailMapper.queryListByOrderSn(orderList.get(j).getOrderSn());
-				log.info("第"+uniqueGameIssue.get(i)+"期,订单号为:"+orderList.get(j).getOrderSn()+"要开奖的订单详情列表.size※※※※※※※※※※※※※※※※※※※※※※※※※※※※{}",orderDetailList.size());
+//				log.info("第"+uniqueGameIssue.get(i)+"期,订单号为:"+orderList.get(j).getOrderSn()+"要开奖的订单详情列表.size※※※※※※※※※※※※※※※※※※※※※※※※※※※※{}",orderDetailList.size());
 				boolean flag = true;
 				BigDecimal winningMoney = new BigDecimal(0);
 				Integer maxWinningLevel = 888;
 				for (int k = 0; k < orderDetailList.size(); k++) {
 					OrderDetail orderDetail = orderDetailList.get(k);
-					log.info("订单详情Id为:"+orderDetailList.get(k).getOrderDetailId()+"的赛果为不为空※※※※※※※※※※※※※※※※※※※※※※※※※※※※{}",null == orderDetail.getMatchResult());
+//					log.info("订单详情Id为:"+orderDetailList.get(k).getOrderDetailId()+"的赛果为不为空※※※※※※※※※※※※※※※※※※※※※※※※※※※※{}",null == orderDetail.getMatchResult());
 					if (null == orderDetail.getMatchResult()) {
 						flag = false;
 						break;
 					}
-					log.info("订单详情为※※※※※※※※※※※※※※※※※※※※※※※※※※※※{}",orderDetailList.get(k));
+//					log.info("订单详情为※※※※※※※※※※※※※※※※※※※※※※※※※※※※{}",orderDetailList.get(k));
 				   StringBuilder matchResult = new StringBuilder(orderDetail.getMatchResult());
 				   matchResult=matchResult.replace(14,15, "|");
 					LottoResultEntity resultEntity = LottoUtils.calPrizeLevel(orderDetail.getTicketData(), matchResult.toString());
-					log.info("算奖结果实体类※※※※※※※※※※※※※※※※※※※※※※※※※※※※{}",resultEntity);
+//					log.info("算奖结果实体类※※※※※※※※※※※※※※※※※※※※※※※※※※※※{}",resultEntity);
 					BigDecimal moneyPrize = new BigDecimal(0);
 					if (resultEntity.status == LottoResultEntity.STATUS_HIT) {
 						 boolean isAppend = false;

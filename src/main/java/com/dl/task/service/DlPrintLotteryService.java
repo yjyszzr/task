@@ -135,7 +135,7 @@ public class DlPrintLotteryService {
 	 */
 	public void updatePrintLotteryCompareStatus() {
 		List<DlPrintLottery> lotteryPrints = dlPrintLotteryMapper.lotteryPrintsByUnCompare();
-		log.info("未更新赛果的出票列表======================{}",lotteryPrints);
+//		log.info("未更新赛果的出票列表======================{}",lotteryPrints);
 		if (lotteryPrints == null) {
 			log.info("updatePrintLotteryCompareStatus 没有获取到需要更新状态的彩票数据");
 			return;
@@ -155,7 +155,7 @@ public class DlPrintLotteryService {
 		log.info("游戏期次==========================={}",t01Game);
 		for(String t01Issue:t01Game){
 			DlSuperLotto dlSuperLotto = dlSuperLottoMapper.selectPrizeResultByTermNum(t01Issue);
-			log.info("游戏期次详情==========================={}",dlSuperLotto);
+//			log.info("游戏期次详情==========================={}",dlSuperLotto);
 			if(dlSuperLotto!=null&&!StringUtils.isEmpty(dlSuperLotto.getPrizeNum())){				
 				orderDetailMapper.beatchUpdateMatchResult(t01Issue,dlSuperLotto.getPrizeNum());
 				dlPrintLotteryMapper.beatchUpdateComparedStakes(t01Issue);
