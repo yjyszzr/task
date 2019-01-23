@@ -1741,7 +1741,7 @@ public class OrderService extends AbstractService<Order> {
 					log.info("订单详情为※※※※※※※※※※※※※※※※※※※※※※※※※※※※{}",orderDetailList.get(k));
 				   StringBuilder matchResult = new StringBuilder(orderDetail.getMatchResult());
 				   matchResult=matchResult.replace(14,15, "|");
-				   log.info("用户投注数据※※※※※※※※※※※※※※※※{}。开奖结果※※※※※※※※※※※※※※※※{}。",orderDetail.getTicketData(), matchResult.toString());
+				   log.info("待开奖订单编号※※※※※※※※※※※※※※※※{}。用户投注数据※※※※※※※※※※※※※※※※{}。开奖结果※※※※※※※※※※※※※※※※{}。",orderDetail.getOrderSn(),orderDetail.getTicketData(), matchResult.toString());
 					LottoResultEntity resultEntity = LottoUtils.calPrizeLevel(orderDetail.getTicketData(), matchResult.toString());
 					log.info("算奖结果实体类※※※※※※※※※※※※※※※※※※※※※※※※※※※※{}",resultEntity);
 					BigDecimal moneyPrize = new BigDecimal(0);
