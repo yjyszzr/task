@@ -1751,7 +1751,7 @@ public class OrderService extends AbstractService<Order> {
 						}
 						moneyPrize = LottoMoneyUtil.calculate(resultEntity ,  prizeA,  prizeB,  prizeC, prizeAAppend,  prizeBAppend,  prizeCAppend,  isAppend);
 					}
-					log.info("待开奖订单编号※※※※※※※※※※※※※※※※{}。用户投注数据※※※※※※※※※※※※※※※※{}。开奖结果※※※※※※※※※※※※※※※※{}。中奖金额※※※※※※※※※※※※※※※※{}。",orderDetail.getOrderSn(),orderDetail.getTicketData(), matchResult.toString(),moneyPrize);
+					log.info("待开奖编号※※※{}。用户投注※※※{}。开奖结果※※※{}。中奖金额※※※{}。一等奖※※※{}。二等奖※※※{}。三等奖※※※{}。追加一※※※{}。追加二※※※{}。追加三※※※{}。",orderDetail.getOrderSn(),orderDetail.getTicketData(), matchResult.toString(),moneyPrize,  prizeA,  prizeB,  prizeC, prizeAAppend,  prizeBAppend,  prizeCAppend);
 					//赛选出最大的奖项 数值越小 奖项越靠前
 					if (maxWinningLevel > resultEntity.getMaxLevel()) {
 						maxWinningLevel = resultEntity.getMaxLevel();
