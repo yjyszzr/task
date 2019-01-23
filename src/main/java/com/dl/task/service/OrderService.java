@@ -835,7 +835,7 @@ public class OrderService extends AbstractService<Order> {
 			
 			for (OrderWithUserDTO orderWithUserDTO : orderWithUserDTOs) {
 				orderMapper.updateStatisticsRewardStatusTo0(orderWithUserDTO.getOrderSn());
-				if (!(orderWithUserDTO.getMaxLevel() == 1 || orderWithUserDTO.getMaxLevel() == 2 || orderWithUserDTO.getMaxLevel() == 3)) {
+				if (null == orderWithUserDTO.getMaxLevel() || !(orderWithUserDTO.getMaxLevel() == 1 || orderWithUserDTO.getMaxLevel() == 2 || orderWithUserDTO.getMaxLevel() == 3)) {
 					log.info("订单的中奖级别=============={}", orderWithUserDTO.getMaxLevel());
 					AwardParam awardParam =new AwardParam();
 					awardParam.setOrderSn(orderWithUserDTO.getOrderSn());
