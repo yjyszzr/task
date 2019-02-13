@@ -1738,18 +1738,18 @@ public class OrderService extends AbstractService<Order> {
 						flag = false;
 						break;
 					}
-//					log.info("订单详情为※※※※※※※※※※※※※※※※※※※※※※※※※※※※{}",orderDetailList.get(k));
+					log.info("订单详情为※※※※※※※※※※※※※※※※※※※※※※※※※※※※{}",orderDetailList.get(k));
 				   StringBuilder matchResult = new StringBuilder(orderDetail.getMatchResult());
 				   matchResult=matchResult.replace(14,15, "|");
 					LottoResultEntity resultEntity = LottoUtils.calPrizeLevel(orderDetail.getTicketData(), matchResult.toString());
-//					log.info("算奖结果实体类※※※※※※※※※※※※※※※※※※※※※※※※※※※※{}",resultEntity);
+					log.info("算奖结果实体类※※※※※※※※※※※※※※※※※※※※※※※※※※※※{}",resultEntity);
 					BigDecimal moneyPrize = new BigDecimal(0);
 					if (resultEntity.status == LottoResultEntity.STATUS_HIT) {
 						 boolean isAppend = false;
 						   if (orderList.get(j).getPlayType().equals("05")) {
 							   isAppend = true;
 						}
-						moneyPrize = LottoMoneyUtil.calculate(resultEntity ,  prizeA,  prizeB,  prizeC, prizeAAppend,  prizeBAppend,  prizeCAppend,  isAppend);
+						moneyPrize = LottoMoneyUtil.calculateV2(resultEntity ,  prizeA,  prizeB,  prizeC, prizeAAppend,  prizeBAppend,  prizeCAppend,  isAppend);
 					}
 					log.info("待开奖编号※※※{}。用户投注※※※{}。开奖结果※※※{}。中奖金额※※※{}。一等奖※※※{}。二等奖※※※{}。三等奖※※※{}。追加一※※※{}。追加二※※※{}。追加三※※※{}。",orderDetail.getOrderSn(),orderDetail.getTicketData(), matchResult.toString(),moneyPrize,  prizeA,  prizeB,  prizeC, prizeAAppend,  prizeBAppend,  prizeCAppend);
 					//赛选出最大的奖项 数值越小 奖项越靠前
