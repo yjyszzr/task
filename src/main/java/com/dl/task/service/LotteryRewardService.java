@@ -1,21 +1,8 @@
 package com.dl.task.service;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.annotation.Resource;
-
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Service;
-
 import com.dl.base.util.DateUtil;
+import com.dl.lottery.api.ILotteryPrintService;
+import com.dl.lottery.param.NotifyParam;
 import com.dl.task.core.ProjectConstant;
 import com.dl.task.dao.DlPrintLotteryMapper;
 import com.dl.task.dao.LotteryRewardMapper;
@@ -24,8 +11,14 @@ import com.dl.task.dao2.LotteryMatchMapper;
 import com.dl.task.model.DlPrintLottery;
 import com.dl.task.model.Order;
 import com.dl.task.param.OrderDataParam;
-
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
+import java.math.BigDecimal;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -42,6 +35,9 @@ public class LotteryRewardService {
 	
 	@Resource
 	private	OrderMapper orderMapper;
+
+	@Resource
+	private ILotteryPrintService iLotteryPrintService;
 
 	
 	/**
@@ -110,6 +106,7 @@ public class LotteryRewardService {
 					}
 					
 					dtos.add(dlOrderDataDTO);
+
 				}
 				log.info("%%%%%%准备执行开奖订单数："+dtos.size());
 				if(dtos.size() > 0) {
@@ -121,6 +118,16 @@ public class LotteryRewardService {
 						updateOrder.setOrderStatus(orderDataParam.getOrderStatus());
 						updateOrder.setAwardTime(DateUtil.getCurrentTimeLong());
 						n += orderMapper.updateWiningMoney(updateOrder);
+
+						//若是商户订单,主动通知商户中奖信息
+						Order order = orderMapper.getOrderInfoByOrderSn(orderDataParam.getOrderSn());
+						if(!StringUtils.isEmpty(order.getMerchantOrderSn())){
+							log.info("&&&&&&商户订单,开始通知商户是否中奖&&&&&&&&&");
+							String merchantOrderSn = order.getMerchantOrderSn();
+							NotifyParam qParam = new NotifyParam();
+							qParam.setMerchantOrderSn(merchantOrderSn);
+							iLotteryPrintService.notifyPrintResultToMerchant(qParam);
+						}
 					}
 					log.info("更新订单中奖状态和中奖金额updateOrderInfoByExchangeReward param size="+ n);
 

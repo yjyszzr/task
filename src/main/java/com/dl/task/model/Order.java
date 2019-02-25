@@ -1,13 +1,12 @@
 package com.dl.task.model;
 
-import java.math.BigDecimal;
-import java.util.Date;
+import lombok.Data;
 
 import javax.persistence.Column;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
-import lombok.Data;
+import java.math.BigDecimal;
+import java.util.Date;
 @Data
 @Table(name = "dl_order")
 public class Order {
@@ -23,6 +22,13 @@ public class Order {
      */
     @Column(name = "order_sn")
     private String orderSn;
+
+
+    /**
+     * 订单号
+     */
+    @Column(name = "merchant_order_sn")
+    private String merchantOrderSn;
 
     /**
      * 父订单号
