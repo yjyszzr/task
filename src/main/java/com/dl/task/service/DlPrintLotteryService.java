@@ -1352,7 +1352,7 @@ public class DlPrintLotteryService {
 	 * @param orderSn
 	 * @param printChannelInfo
 	 */
-	public void saveLotteryPrintInfo(List<LotteryPrintDTO> lotteryPrints,String orderSn) {
+	public void saveLotteryPrintInfo(List<LotteryPrintDTO> lotteryPrints,String orderSn,Integer lotteryClassifyId) {
 		List<DlPrintLottery> printLotterysByOrderSn = dlPrintLotteryMapper.printLotterysByOrderSn(orderSn);
 		if(CollectionUtils.isNotEmpty(printLotterysByOrderSn)) {
 			log.info("订单orderSn={},已经出票",orderSn);
@@ -1360,7 +1360,15 @@ public class DlPrintLotteryService {
 		}
 		List<DlPrintLottery> models = lotteryPrints.stream().map(dto->{
 			DlPrintLottery lotteryPrint = new DlPrintLottery();
-			lotteryPrint.setGame("T51");//足彩
+			if (lotteryClassifyId == 1 ) {
+				lotteryPrint.setGame("T51");//足彩
+			}else	if (lotteryClassifyId == 2 ) {
+				lotteryPrint.setGame("T01");//大乐透
+			}else {
+				lotteryPrint.setGame("");//其他彩种先空着
+			}
+
+			lotteryPrint.setGame("");//足彩
 			lotteryPrint.setMerchant("");
 			lotteryPrint.setTicketId(dto.getTicketId());
 			lotteryPrint.setAcceptTime(DateUtil.getCurrentTimeLong());
