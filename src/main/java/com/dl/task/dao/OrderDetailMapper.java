@@ -5,10 +5,8 @@ import java.util.List;
 import org.apache.ibatis.annotations.Param;
 
 import com.dl.base.mapper.Mapper;
-import com.dl.task.model.LotteryClassifyTemp;
-import com.dl.task.model.LotteryPlayClassifyTemp;
 import com.dl.task.model.OrderDetail;
-import com.dl.task.model.PlayTypeName;
+import com.dl.task.param.SupperLottoOrderDetailParam;
 
 public interface OrderDetailMapper extends Mapper<OrderDetail> {
 	
@@ -25,4 +23,6 @@ public interface OrderDetailMapper extends Mapper<OrderDetail> {
 	//更新赔率信息
 	public int updateTicketData(OrderDetail orderDetail);
 	public int beatchUpdateMatchResult(@Param("issue") String t01Issue, @Param("matchResult") String matchResult);
+
+	public void updateOrderDetailInfoForSupperLotto(@Param("supperLottoOrderDetailParam") SupperLottoOrderDetailParam supperLottoOrderDetailParam);
 }

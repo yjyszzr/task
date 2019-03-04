@@ -12,6 +12,7 @@ import com.dl.task.model.DlChannelConsumer;
 import com.dl.task.model.DlChannelDistributor;
 import com.dl.task.model.Order;
 import com.dl.task.model.User;
+import com.dl.task.param.SupperLottoOrderParam;
 import com.dl.task.param.UpdateOrderInfoParam;
 
 public interface OrderMapper extends Mapper<Order> {
@@ -122,7 +123,13 @@ public interface OrderMapper extends Mapper<Order> {
 	public int batchUpdateOrderStatus0To8(@Param("orderSnList")List<String> orderSnList);
 	
 	public List<Order> selectPaySuccessOrdersList();
+	
 	public int updateOrderStatus0To1(@Param("orderSn")String orderSn);
+	
 	public List<Order> selectPayFailOrdersList();
+	
+	public void updateOrderInfoForSupperLotto(@Param("supperLottoOrderParam")SupperLottoOrderParam supperLottoOrderParam);
+	
+	public List<Order> selectAllUnOpenPrizeListForSupperLotto();
 	
 }

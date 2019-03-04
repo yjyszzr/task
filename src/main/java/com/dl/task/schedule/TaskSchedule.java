@@ -176,6 +176,9 @@ public class TaskSchedule {
 		log.info("更新待开奖的订单开始");
 		lotteryRewardService.updateOrderAfterOpenReward();
 		log.info("更新待开奖的订单结束");
+		log.info("※※※※※※※※※※※※※※SuperLotto※※※※※※※※※※※※※※超级大乐透开奖开始");
+		orderService.openPrizeForSupperLotto();
+		log.info("※※※※※※※※※※※※※※SuperLotto※※※※※※※※※※※※※※超级大乐透开奖结束");
 	}
 
 	/************************* 订单的定时任务 *****************/
