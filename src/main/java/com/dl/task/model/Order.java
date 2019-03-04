@@ -3,10 +3,12 @@ package com.dl.task.model;
 import java.math.BigDecimal;
 import java.util.Date;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
-import tk.mybatis.mapper.annotation.ColumnType;
-
+import lombok.Data;
+@Data
 @Table(name = "dl_order")
 public class Order {
     /**
@@ -21,6 +23,13 @@ public class Order {
      */
     @Column(name = "order_sn")
     private String orderSn;
+
+
+    /**
+     * 订单号
+     */
+    @Column(name = "merchant_order_sn")
+    private String merchantOrderSn;
 
     /**
      * 父订单号

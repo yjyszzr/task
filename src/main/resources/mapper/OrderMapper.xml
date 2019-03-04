@@ -372,4 +372,26 @@
      </foreach>
   </update>
 
+ <update id="updateOrderInfoForSupperLotto" >
+	 update 
+	 		dl_order 
+	 set winning_money = #{supperLottoOrderParam.winningMoney},
+	 		order_status = #{supperLottoOrderParam.orderStatus},
+	 		max_level = #{supperLottoOrderParam.maxLevel}
+	 where 
+	 		order_sn = #{supperLottoOrderParam.orderSn}
+  </update>
+
+<!--   查询大乐透待开奖列表 -->
+  <select id="selectAllUnOpenPrizeListForSupperLotto"  parameterType = "com.dl.task.model.Order" resultMap="BaseResultMap">
+		SELECT
+			* 
+		FROM
+			dl_order 
+		WHERE
+			order_status = 3 
+			AND lottery_classify_id = 2
+			and    add_time > 1546876800
+  </select>
+
 </mapper>

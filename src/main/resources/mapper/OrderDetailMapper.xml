@@ -119,4 +119,15 @@
   <select id="lotteryClassify" resultType="com.dl.task.model.LotteryClassifyTemp">
   	select lottery_name lotteryName, lottery_img lotteryImg from dl_lottery_classify where lottery_classify_id=#{classifyId} 
   </select>
+  
+    <update id="updateOrderDetailInfoForSupperLotto">
+  	update dl_order_detail 
+  	set money_prize = #{supperLottoOrderDetailParam.moneyPrize},
+  	ticket_status = #{supperLottoOrderDetailParam.ticketStatus},
+  	is_guess = #{supperLottoOrderDetailParam.isGuess},
+  	level_prize = #{supperLottoOrderDetailParam.levelPrize}
+  	where order_detail_id = #{supperLottoOrderDetailParam.orderDetailId}
+  </update>
+  
+  
 </mapper>
