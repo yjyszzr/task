@@ -1326,7 +1326,6 @@ public class DlPrintLotteryService {
 				lotteryPrint.setGame("");//其他彩种先空着
 			}
 
-			lotteryPrint.setGame("");//足彩
 			lotteryPrint.setMerchant("");
 			lotteryPrint.setTicketId(dto.getTicketId());
 			lotteryPrint.setAcceptTime(DateUtil.getCurrentTimeLong());
