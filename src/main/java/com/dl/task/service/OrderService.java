@@ -842,7 +842,7 @@ public class OrderService extends AbstractService<Order> {
 			}
 			Integer accountTime = DateUtil.getCurrentTimeLong();
 			userAccountService.saveRewardMessageAsync(userIdAndRewardDTOs,accountTime);
-			//userAccountService.batchUpdateUserAccount(userIdAndRewardDTOs,ProjectConstant.REWARD_AUTO);
+			userAccountService.batchUpdateUserAccount(userIdAndRewardDTOs,ProjectConstant.REWARD_AUTO);
 		}
 	}
 	/**
