@@ -1,8 +1,9 @@
 package com.dl.task.model;
 
+import javax.persistence.Column;
+import javax.persistence.Id;
+import javax.persistence.Table;
 import java.math.BigDecimal;
-
-import javax.persistence.*;
 
 @Table(name = "dl_artifi_print_lottery")
 public class DlArtifiPrintLottery {
@@ -39,6 +40,9 @@ public class DlArtifiPrintLottery {
     @Column(name = "statistics_paid")
     private Integer statisticsPaid;
 
+    @Column(name = "lottery_classify_id")
+    private Integer lotteryClassifyId;
+
     /**
      * 轮询状态:0未轮询,1已轮询,默认未轮询
      */
@@ -63,8 +67,14 @@ public class DlArtifiPrintLottery {
     @Column(name = "admin_name")
     private String adminName;
 
-    
-    
+    public Integer getLotteryClassifyId() {
+        return lotteryClassifyId;
+    }
+
+    public void setLotteryClassifyId(Integer lotteryClassifyId) {
+        this.lotteryClassifyId = lotteryClassifyId;
+    }
+
     public Integer getStatisticsPaid() {
 		return statisticsPaid;
 	}

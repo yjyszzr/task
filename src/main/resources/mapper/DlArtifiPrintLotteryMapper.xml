@@ -15,12 +15,14 @@
     <result column="statistics_paid" jdbcType="INTEGER" property="statisticsPaid" />
     <result column="admin_name" jdbcType="VARCHAR" property="adminName" />
     <result column="operation_time" jdbcType="INTEGER" property="operationTime" />
+    <result column="lottery_classify_id" jdbcType="INTEGER" property="lotteryClassifyId" />
+
   </resultMap>
   
   <insert id="batchInsert" useGeneratedKeys="true" keyProperty="matchId">
-    insert into dl_artifi_print_lottery(order_sn,add_time,money_paid,statistics_paid) values
+    insert into dl_artifi_print_lottery(order_sn,add_time,money_paid,statistics_paid,lottery_classify_id) values
     	<foreach collection="dlArtifiLotterys" item="dlArtifiLottery" separator=",">
-	  		(#{dlArtifiLottery.orderSn},#{dlArtifiLottery.addTime},#{dlArtifiLottery.moneyPaid},#{dlArtifiLottery.statisticsPaid})
+	  		(#{dlArtifiLottery.orderSn},#{dlArtifiLottery.addTime},#{dlArtifiLottery.moneyPaid},#{dlArtifiLottery.statisticsPaid},#{dlArtifiLottery.lotteryClassifyId})
   		</foreach> 
   </insert>
 </mapper>
