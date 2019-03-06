@@ -11,8 +11,6 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.scheduling.annotation.Async;
@@ -48,6 +46,8 @@ import com.dl.task.param.SurplusPayParam;
 import com.dl.task.util.GeTuiMessage;
 import com.dl.task.util.GeTuiUtil;
 import com.google.common.base.Joiner;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
@@ -99,6 +99,9 @@ public class UserAccountService extends AbstractService<UserAccount> {
 	 * 中奖后批量更新用户账户的可提现余额,dealType = 1,自动；dealType = 2,手动
 	 * 
 	 * @param userIdAndRewardList
+	 * 
+	 * 
+	 * 2019年3月份因产品需求回滚到 2018年十月份 目前订单用的状态为 5,7,9
 	 */
 	public BaseResult<String> batchUpdateUserAccount(List<UserIdAndRewardDTO> dtos, Integer dealType) {
 		List<UserIdAndRewardDTO> oldUserIdAndRewardDtos = new ArrayList<UserIdAndRewardDTO>(dtos);
@@ -127,7 +130,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
 		if (rewardOrderSnList.size() > 0) {
 			log.error("含有已派发过奖金的订单号，已被过滤,订单号包括：" + Joiner.on(",").join(rewardOrderSnList));
 			for(String s: rewardOrderSnList){
-				orderMapper.updateOrderStatus6To5(s);
+				orderMapper.updateOrderStatus5To9(s);
 			}
 			userIdAndRewardList.removeIf(s -> rewardOrderSnList.contains(s.getOrderSn()));
 		}
@@ -161,7 +164,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
 		}
 		log.info("更新用户中奖订单为已派奖开始");
 		for(UserIdAndRewardDTO s: userIdAndRewardList){
-			orderMapper.updateOrderStatus6To5(s.getOrderSn());
+			orderMapper.updateOrderStatus5To9(s.getOrderSn());
 		}
 		log.info("更新用户中奖订单为已派奖成功");
 		//推送消息
@@ -238,7 +241,8 @@ public class UserAccountService extends AbstractService<UserAccount> {
 			return;
 		}
 		for(UserIdAndRewardDTO s: beyondLimitList){
-			orderMapper.updateOrderStatus6To7(s.getOrderSn());
+//			orderMapper.updateOrderStatus6To7(s.getOrderSn());
+			orderMapper.updateOrderStatus5To7(s.getOrderSn());
 		}
 	}
 	

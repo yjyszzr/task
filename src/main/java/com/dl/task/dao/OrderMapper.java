@@ -118,6 +118,8 @@ public interface OrderMapper extends Mapper<Order> {
 	
 	public int updateOrderStatus6To7(@Param("orderSn")String orderSn);
 	
+	public int updateOrderStatus5To7(@Param("orderSn")String orderSn);
+	
 	public int updateOrderStatus0To8(@Param("orderSn")String orderSn, @Param("payTime")Integer payTime);
 	
 	public int batchUpdateOrderStatus0To8(@Param("orderSnList")List<String> orderSnList);
@@ -131,5 +133,7 @@ public interface OrderMapper extends Mapper<Order> {
 	public void updateOrderInfoForSupperLotto(@Param("supperLottoOrderParam")SupperLottoOrderParam supperLottoOrderParam);
 	
 	public List<Order> selectAllUnOpenPrizeListForSupperLotto();
+	
+	public void updateOrderStatus5To9(@Param("orderSn")String orderSn);
 	
 }
