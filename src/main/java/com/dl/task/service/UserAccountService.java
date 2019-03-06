@@ -122,7 +122,8 @@ public class UserAccountService extends AbstractService<UserAccount> {
 			return ResultGenerator.genSuccessResult("没有要自动开奖的订单");
 		}
 
-		log.info("=^_^= =^_^= =^_^= =^_^= 派奖开始,派奖数据包括:" + JSON.toJSONString(userIdAndRewardList));
+//		log.info("=^_^= =^_^= =^_^= =^_^= 派奖开始,派奖数据包括:" + JSON.toJSONString(userIdAndRewardList));
+		log.info("=※=※=※=※=※=※=※=※=※=※=※=※=※=※=※=※=※=※=※= 派奖开始,派奖list:" + userIdAndRewardList.size());
 
 		// 查询是否已经派发奖金,并过滤掉
 		List<String> orderSnList = userIdAndRewardList.stream().map(s -> s.getOrderSn()).collect(Collectors.toList());
@@ -152,14 +153,19 @@ public class UserAccountService extends AbstractService<UserAccount> {
 			userAccountParam.setAddTime(accountTime);
 			userAccountParam.setStatus(Integer.valueOf(ProjectConstant.FINISH));
             User curUser = userMapper.queryUserByUserId(uDTO.getUserId());
-            log.info("派奖 userId={},orderSn={},userMoney={},userMoneyLimit={}",uDTO.getUserId(),uDTO.getOrderSn(),curUser.getUserMoney(),curUser.getUserMoneyLimit());
-            BigDecimal curBalance = curUser.getUserMoney().add(curUser.getUserMoneyLimit());
-            userAccountParam.setCurBalance(curBalance);
-			int insertRst = userAccountMapper.insertUserAccountBySelective(userAccountParam);
-			if (1 != insertRst) {
-				log.error("中奖订单号为" + uDTO.getOrderSn() + "生成中奖流水失败");
-			} else {
-                log.info("用户" + uDTO.getUserId() + "中奖订单号为" + uDTO.getOrderSn() + "奖金派发完成");
+            
+            if (null!=curUser) {
+	            	log.info("派奖 userId={},orderSn={},userMoney={},userMoneyLimit={}",uDTO.getUserId(),uDTO.getOrderSn(),curUser.getUserMoney(),curUser.getUserMoneyLimit());
+	            	BigDecimal curBalance = curUser.getUserMoney().add(curUser.getUserMoneyLimit());
+	            	userAccountParam.setCurBalance(curBalance);
+	            	int insertRst = userAccountMapper.insertUserAccountBySelective(userAccountParam);
+	            	if (1 != insertRst) {
+	            		log.error("中奖订单号为" + uDTO.getOrderSn() + "生成中奖流水失败");
+	            	} else {
+	            		log.info("用户" + uDTO.getUserId() + "中奖订单号为" + uDTO.getOrderSn() + "奖金派发完成");
+	            	}
+            	}else {
+            		log.info("订单编号为" + uDTO.getOrderSn()+ "已中奖,但是未找到该用户,用户id为=" +uDTO.getUserId());
 			}
 		}
 		log.info("更新用户中奖订单为已派奖开始");
