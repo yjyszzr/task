@@ -209,19 +209,20 @@
   </update>
   
  <select id="selectOpenedAllRewardOrderList" resultType="com.dl.task.dto.OrderWithUserDTO">
-     select 
-     	ticket_amount betMoney,
-     	add_time betTime,
-        order_sn orderSn,
-        user_id userId,
-        lottery_classify_id lotteryClassifyId,
-        winning_money realRewardMoney
-     from 
-        dl_order
-     where 
-        order_status = 6
-        and pay_status = 1
-        and is_delete = 0
+		SELECT
+			ticket_amount betMoney,
+			add_time betTime,
+			order_sn orderSn,
+			user_id userId,
+			lottery_classify_id lotteryClassifyId,
+			winning_money realRewardMoney 
+		FROM
+			dl_order 
+		WHERE
+			order_status = 6 
+			AND pay_status = 1 
+			AND is_delete = 0 
+			AND store_id IS NULL;
   </select>
   
   <select id="queryOrderSnListByStatus" parameterType = "com.dl.task.model.Order" resultType="java.lang.String">
