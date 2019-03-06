@@ -219,7 +219,7 @@
 		FROM
 			dl_order 
 		WHERE
-			order_status = 6 
+			order_status = 5 
 			AND pay_status = 1 
 			AND is_delete = 0 
 			AND store_id IS NULL;
