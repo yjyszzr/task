@@ -194,6 +194,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
 			return;
 		}
 		log.info(" 00000   " + JSONHelper.bean2json(userIdList));
+		log.info("索取派奖用户Id===============" + JSONHelper.bean2json(userIdList));
 		List<User> userList = userMapper.queryUserByUserIds(userIdList);
 		if (CollectionUtils.isEmpty(userList)) {
 			return;
