@@ -843,7 +843,7 @@ public class OrderService extends AbstractService<Order> {
 			Integer accountTime = DateUtil.getCurrentTimeLong();
 			log.info("需要发派奖信息的数据===================※※※※※※※※※※※※※※※:" + userIdAndRewardDTOs);
 			
-			userAccountService.saveRewardMessageAsync(userIdAndRewardDTOs,accountTime);
+//			userAccountService.saveRewardMessageAsync(userIdAndRewardDTOs,accountTime);
 			userAccountService.batchUpdateUserAccount(userIdAndRewardDTOs,ProjectConstant.REWARD_AUTO);
 		}
 	}
