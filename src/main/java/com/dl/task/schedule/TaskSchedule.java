@@ -246,7 +246,7 @@ public class TaskSchedule {
 	public void timerOrderQueryScheduled() {
 		log.info("第三方支付定时任务开始");
 		EmptyParam emptyParam = new EmptyParam();
-//		ipaymentService.timerOrderQueryScheduled(emptyParam);
+		ipaymentService.timerOrderQueryScheduled(emptyParam);
 	}
 
 	/**
@@ -290,7 +290,7 @@ public class TaskSchedule {
 	public void timerRechargeQueryScheduled() {
 		log.info("第三方支付定时任务开始");
 		EmptyParam emptyParam = new EmptyParam();
-//		ipaymentService.timerRechargeQueryScheduled(emptyParam);
+		ipaymentService.timerRechargeQueryScheduled(emptyParam);
 	}
 
 
