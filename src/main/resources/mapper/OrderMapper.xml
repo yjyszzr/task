@@ -226,6 +226,27 @@
         and is_delete = 0
         and add_time > 1546876800
   </select>
+
+
+	<select id="selectQddOpenedAllRewardOrderList" resultType="com.dl.task.dto.OrderWithUserDTO">
+		select
+			ticket_amount betMoney,
+			add_time betTime,
+			order_sn orderSn,
+			user_id userId,
+			lottery_classify_id lotteryClassifyId,
+			winning_money realRewardMoney,
+			max_level maxLevel
+		from
+			dl_order
+		where
+			order_status = 5
+		  and pay_status = 1
+		  and surplus > 0
+		  and is_delete = 0
+		  and app_code_name = 11
+		  and add_time > 1546876800
+	</select>
   
   <select id="queryOrderSnListByStatus" parameterType = "com.dl.task.model.Order" resultType="java.lang.String">
 	   select 
@@ -267,7 +288,7 @@
 	        dl_order
 	   where    pay_status = 0
 		        AND is_delete = 0
-		        AND (#{nowTime}-add_time) &gt; 1200
+		        AND (#{nowTime}-add_time) &gt; 360
 	     order by add_time limit 80
   </select>
   
