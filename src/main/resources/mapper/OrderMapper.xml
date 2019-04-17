@@ -222,9 +222,9 @@
      where 
         order_status = 5
         and pay_status = 1
-        and surplus > 0
         and is_delete = 0
         and add_time > 1546876800
+		and app_code_name = 10
   </select>
 
 
@@ -242,7 +242,6 @@
 		where
 			order_status = 5
 		  and pay_status = 1
-		  and surplus > 0
 		  and is_delete = 0
 		  and app_code_name = 11
 		  and add_time > 1546876800
