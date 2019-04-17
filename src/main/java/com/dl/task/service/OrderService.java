@@ -83,6 +83,7 @@ import com.dl.task.dto.SysConfigDTO;
 import com.dl.task.dto.TMatchBetMaxAndMinOddsList;
 import com.dl.task.dto.TicketInfo;
 import com.dl.task.dto.TicketPlayInfo;
+import com.dl.task.dto.UserIdAndRewardDTO;
 import com.dl.task.model.ChannelOperationLog;
 import com.dl.task.model.DlChannelConsumer;
 import com.dl.task.model.DlChannelDistributor;
@@ -846,28 +847,28 @@ public class OrderService extends AbstractService<Order> {
 		}
 	}
 	
-//	public void addRewardMoneyToUsers() {
-//		List<OrderWithUserDTO> orderWithUserDTOs = orderMapper.selectOpenedAllRewardOrderList();
-//		log.info("派奖已中奖的用户数据：code=" + orderWithUserDTOs.size());
-//		if (CollectionUtils.isNotEmpty(orderWithUserDTOs)) {
-//			log.info("需要派奖的数据:" + orderWithUserDTOs.size());
-//			List<UserIdAndRewardDTO> userIdAndRewardDTOs = new LinkedList<UserIdAndRewardDTO>();
-//			for (OrderWithUserDTO orderWithUserDTO : orderWithUserDTOs) {
-//				UserIdAndRewardDTO userIdAndRewardDTO = new UserIdAndRewardDTO();
-//				userIdAndRewardDTO.setUserId(orderWithUserDTO.getUserId());
-//				userIdAndRewardDTO.setOrderSn(orderWithUserDTO.getOrderSn());
-//				userIdAndRewardDTO.setReward(orderWithUserDTO.getRealRewardMoney());
-//				int betTime = orderWithUserDTO.getBetTime();
-//				userIdAndRewardDTO.setBetMoney(orderWithUserDTO.getBetMoney());
-//				userIdAndRewardDTO.setBetTime(DateUtil.getTimeString(betTime, DateUtil.datetimeFormat));
-//				userIdAndRewardDTOs.add(userIdAndRewardDTO);
-//				userIdAndRewardDTO.setLotteryClassifyId(orderWithUserDTO.getLotteryClassifyId());
-//			}
+	public void addRewardMoneyToUsersTwo() {
+		List<OrderWithUserDTO> orderWithUserDTOs = orderMapper.selectOpenedAllRewardOrderList();
+		log.info("派奖已中奖的用户数据：code=" + orderWithUserDTOs.size());
+		if (CollectionUtils.isNotEmpty(orderWithUserDTOs)) {
+			log.info("需要派奖的数据:" + orderWithUserDTOs.size());
+			List<UserIdAndRewardDTO> userIdAndRewardDTOs = new LinkedList<UserIdAndRewardDTO>();
+			for (OrderWithUserDTO orderWithUserDTO : orderWithUserDTOs) {
+				UserIdAndRewardDTO userIdAndRewardDTO = new UserIdAndRewardDTO();
+				userIdAndRewardDTO.setUserId(orderWithUserDTO.getUserId());
+				userIdAndRewardDTO.setOrderSn(orderWithUserDTO.getOrderSn());
+				userIdAndRewardDTO.setReward(orderWithUserDTO.getRealRewardMoney());
+				int betTime = orderWithUserDTO.getBetTime();
+				userIdAndRewardDTO.setBetMoney(orderWithUserDTO.getBetMoney());
+				userIdAndRewardDTO.setBetTime(DateUtil.getTimeString(betTime, DateUtil.datetimeFormat));
+				userIdAndRewardDTO.setLotteryClassifyId(orderWithUserDTO.getLotteryClassifyId());
+				userIdAndRewardDTOs.add(userIdAndRewardDTO);
+			}
 //			Integer accountTime = DateUtil.getCurrentTimeLong();
 //			userAccountService.saveRewardMessageAsync(userIdAndRewardDTOs,accountTime);
-////			userAccountService.batchUpdateUserAccount(userIdAndRewardDTOs,ProjectConstant.REWARD_AUTO);
-//		}
-//	}
+			userAccountService.batchUpdateUserAccount(userIdAndRewardDTOs,ProjectConstant.REWARD_AUTO);
+		}
+	}
 	/**
 	 * 转化投注信息用来计算预测试奖金
 	 * 

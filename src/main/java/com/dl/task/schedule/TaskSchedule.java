@@ -66,6 +66,7 @@ public class TaskSchedule {
 	public void addRewardMoneyToUsers() {
 		log.info("更新中奖用户的账户，派奖开始");
 		orderService.addRewardMoneyToUsers();
+		orderService.addRewardMoneyToUsersTwo();
 		log.info("更新中奖用户的账户，派奖结束");
 	}
 	
