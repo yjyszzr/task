@@ -233,12 +233,12 @@ public class TaskSchedule {
 	/**
 	 * 第三方支付的query 订单
 	 */
-	@Scheduled(cron = "${task.schedule.order.pay.timeout}")
-	public void timerOrderQueryScheduled() {
-		log.info("第三方支付定时任务开始");
-		EmptyParam emptyParam = new EmptyParam();
-		ipaymentService.timerOrderQueryScheduled(emptyParam);
-	}
+//	@Scheduled(cron = "${task.schedule.order.pay.timeout}")
+//	public void timerOrderQueryScheduled() {
+//		log.info("第三方支付定时任务开始");
+//		EmptyParam emptyParam = new EmptyParam();
+//		ipaymentService.timerOrderQueryScheduled(emptyParam);
+//	}
 
 	/**
 	 * 订单支付成功逻辑处理
@@ -277,12 +277,12 @@ public class TaskSchedule {
 	/**
 	 * 第三方支付的query 充值
 	 */
-	@Scheduled(cron = "${task.schedule.recharge.pay.timeout}")
-	public void timerRechargeQueryScheduled() {
-		log.info("第三方支付定时任务开始");
-		EmptyParam emptyParam = new EmptyParam();
-		ipaymentService.timerRechargeQueryScheduled(emptyParam);
-	}
+//	@Scheduled(cron = "${task.schedule.recharge.pay.timeout}")
+//	public void timerRechargeQueryScheduled() {
+//		log.info("第三方支付定时任务开始");
+//		EmptyParam emptyParam = new EmptyParam();
+//		ipaymentService.timerRechargeQueryScheduled(emptyParam);
+//	}
 
 
 
