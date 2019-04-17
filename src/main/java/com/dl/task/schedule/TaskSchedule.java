@@ -1,27 +1,17 @@
 package com.dl.task.schedule;
 
-import java.util.List;
-
-import javax.annotation.Resource;
-
-import org.springframework.context.annotation.Configuration;
-import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.scheduling.annotation.Scheduled;
-
 import com.dl.lottery.api.IArtifiPrintLotteryService;
 import com.dl.shop.payment.api.IpaymentService;
 import com.dl.task.configurer.URLConfig;
 import com.dl.task.model.Order;
-import com.dl.task.service.DlMatchResultService;
-import com.dl.task.service.DlOldBeltNewService;
-import com.dl.task.service.DlPrintLotteryService;
-import com.dl.task.service.LotteryRewardService;
-import com.dl.task.service.OrderService;
-import com.dl.task.service.PayMentService;
-import com.dl.task.service.UserBonusService;
-import com.dl.task.service.WithdrawService;
-
+import com.dl.task.service.*;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
+
+import javax.annotation.Resource;
+import java.util.List;
 
 @Slf4j
 @Configuration
@@ -269,19 +259,19 @@ public class TaskSchedule {
 	/**
 	 * 订单支付失败逻辑处理
 	 */
-//	@Scheduled(cron = "${task.schedule.order.pay.fail}")
-//	public void orderPayFailScheduled() {
-//		log.info("订单支付失败后的逻辑处理");
-//		List<Order> orderList = orderService.getPayFailOrdersList();
-//		for (Order order : orderList) {
-//			try {
-//				paymentService.dealBeyondPayTimeOrder(order);
-//			} catch (Exception e) {
-//				log.error("处理订单支付失败order_sn={}", order.getOrderSn(), e);
-//				log.error("处理订单支付失败order_sn=",e);
-//			}
-//		}
-//	}
+	@Scheduled(cron = "${task.schedule.order.pay.fail}")
+	public void orderPayFailScheduled() {
+		log.info("订单支付失败后的逻辑处理");
+		List<Order> orderList = orderService.getPayFailOrdersList();
+		for (Order order : orderList) {
+			try {
+				paymentService.dealBeyondPayTimeOrder(order);
+			} catch (Exception e) {
+				log.error("处理订单支付失败order_sn={}", order.getOrderSn(), e);
+				log.error("处理订单支付失败order_sn=",e);
+			}
+		}
+	}
 
 	/**
 	 * 第三方支付的query 充值

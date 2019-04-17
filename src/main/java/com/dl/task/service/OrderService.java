@@ -1,46 +1,9 @@
 package com.dl.task.service;
 
-import java.lang.reflect.InvocationTargetException;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.text.MessageFormat;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import javax.annotation.Resource;
-
-import org.apache.commons.beanutils.BeanUtils;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.dl.base.constant.CommonConstants;
-import com.dl.base.enums.BasketBallHILOLeverlEnum;
-import com.dl.base.enums.MatchBasketBallResultHDCEnum;
-import com.dl.base.enums.MatchBasketBallResultHILOEnum;
-import com.dl.base.enums.MatchBasketPlayTypeEnum;
-import com.dl.base.enums.MatchBasketResultHdEnum;
-import com.dl.base.enums.MatchPlayTypeEnum;
-import com.dl.base.enums.MatchResultCrsEnum;
-import com.dl.base.enums.MatchResultHadEnum;
-import com.dl.base.enums.MatchResultHafuEnum;
-import com.dl.base.enums.RespStatusEnum;
-import com.dl.base.enums.SNBusinessCodeEnum;
+import com.dl.base.enums.*;
 import com.dl.base.exception.ServiceException;
 import com.dl.base.lotto.LottoMoneyUtil;
 import com.dl.base.lotto.LottoUtils;
@@ -58,58 +21,32 @@ import com.dl.lottery.param.SupperLottoParam;
 import com.dl.store.api.IStoreUserMoneyService;
 import com.dl.store.param.AwardParam;
 import com.dl.task.core.ProjectConstant;
-import com.dl.task.dao.DlPrintLotteryMapper;
-import com.dl.task.dao.OrderDetailMapper;
-import com.dl.task.dao.OrderMapper;
-import com.dl.task.dao.PayLogMapper;
-import com.dl.task.dao.UserAccountMapper;
-import com.dl.task.dao.UserBonusMapper;
-import com.dl.task.dao.UserMapper;
-import com.dl.task.dao.UserMatchCollectMapper;
-import com.dl.task.dao2.DlLeagueMatchResultMapper;
-import com.dl.task.dao2.DlMatchBasketballMapper;
-import com.dl.task.dao2.DlResultBasketballMapper;
-import com.dl.task.dao2.DlSuperLottoMapper;
-import com.dl.task.dao2.LotteryMatchMapper;
-import com.dl.task.dto.BasketMatchOneResultDTO;
-import com.dl.task.dto.CellInfo;
-import com.dl.task.dto.LotteryPrintDTO;
-import com.dl.task.dto.OrderDTO;
-import com.dl.task.dto.OrderDetailDataDTO;
-import com.dl.task.dto.OrderInfoAndDetailDTO;
-import com.dl.task.dto.OrderInfoDTO;
-import com.dl.task.dto.OrderWithUserDTO;
-import com.dl.task.dto.SysConfigDTO;
-import com.dl.task.dto.TMatchBetMaxAndMinOddsList;
-import com.dl.task.dto.TicketInfo;
-import com.dl.task.dto.TicketPlayInfo;
-import com.dl.task.dto.UserIdAndRewardDTO;
-import com.dl.task.model.ChannelOperationLog;
-import com.dl.task.model.DlChannelConsumer;
-import com.dl.task.model.DlChannelDistributor;
-import com.dl.task.model.DlLeagueMatchResult;
-import com.dl.task.model.DlMatchBasketball;
-import com.dl.task.model.DlPrintLottery;
-import com.dl.task.model.DlResultBasketball;
-import com.dl.task.model.DlSuperLotto;
-import com.dl.task.model.Order;
-import com.dl.task.model.OrderDetail;
-import com.dl.task.model.PayLog;
-import com.dl.task.model.User;
-import com.dl.task.model.UserAccount;
-import com.dl.task.model.UserBonus;
-import com.dl.task.model.UserMatchCollect;
-import com.dl.task.param.AddMessageParam;
-import com.dl.task.param.MessageAddParam;
-import com.dl.task.param.OrderSnParam;
-import com.dl.task.param.SupperLottoOrderDetailParam;
-import com.dl.task.param.SupperLottoOrderParam;
-import com.dl.task.param.UpdateOrderInfoParam;
+import com.dl.task.dao.*;
+import com.dl.task.dao2.*;
+import com.dl.task.dto.*;
+import com.dl.task.model.*;
+import com.dl.task.param.*;
 import com.dl.task.printlottery.PrintLotteryAdapter;
 import com.dl.task.util.GeTuiMessage;
 import com.dl.task.util.GeTuiUtil;
-
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.Resource;
+import java.lang.reflect.InvocationTargetException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.text.MessageFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -848,7 +785,7 @@ public class OrderService extends AbstractService<Order> {
 	}
 	
 	public void addRewardMoneyToUsersTwo() {
-		List<OrderWithUserDTO> orderWithUserDTOs = orderMapper.selectOpenedAllRewardOrderList();
+		List<OrderWithUserDTO> orderWithUserDTOs = orderMapper.selectQddOpenedAllRewardOrderList();
 		log.info("派奖已中奖的用户数据：code=" + orderWithUserDTOs.size());
 		if (CollectionUtils.isNotEmpty(orderWithUserDTOs)) {
 			log.info("需要派奖的数据:" + orderWithUserDTOs.size());

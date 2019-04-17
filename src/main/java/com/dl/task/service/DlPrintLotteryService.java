@@ -1,38 +1,8 @@
 package com.dl.task.service;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import javax.annotation.Resource;
-
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.dl.base.enums.BasketBallHILOLeverlEnum;
-import com.dl.base.enums.MatchBasketBallResultHDCEnum;
-import com.dl.base.enums.MatchBasketBallResultHILOEnum;
-import com.dl.base.enums.MatchBasketPlayTypeEnum;
-import com.dl.base.enums.MatchBasketResultHdEnum;
-import com.dl.base.enums.MatchPlayTypeEnum;
-import com.dl.base.enums.MatchResultCrsEnum;
-import com.dl.base.enums.MatchResultHadEnum;
-import com.dl.base.enums.MatchResultHafuEnum;
-import com.dl.base.enums.SNBusinessCodeEnum;
+import com.dl.base.enums.*;
 import com.dl.base.result.BaseResult;
 import com.dl.base.result.ResultGenerator;
 import com.dl.base.util.BetUtils;
@@ -40,36 +10,12 @@ import com.dl.base.util.DateUtil;
 import com.dl.base.util.JSONHelper;
 import com.dl.base.util.SNGenerator;
 import com.dl.task.core.ProjectConstant;
-import com.dl.task.dao.DlArtifiPrintLotteryMapper;
-import com.dl.task.dao.DlPrintLotteryMapper;
-import com.dl.task.dao.OrderDetailMapper;
-import com.dl.task.dao.OrderMapper;
-import com.dl.task.dao.PeriodRewardDetailMapper;
-import com.dl.task.dao2.DlLeagueMatchResultMapper;
-import com.dl.task.dao2.DlMatchBasketballMapper;
-import com.dl.task.dao2.DlResultBasketballMapper;
-import com.dl.task.dao2.DlSuperLottoMapper;
-import com.dl.task.dao2.LotteryMatchMapper;
-import com.dl.task.dto.BasketMatchOneResultDTO;
-import com.dl.task.dto.DlJcZqMatchCellDTO;
-import com.dl.task.dto.LotteryPrintDTO;
-import com.dl.task.dto.MatchBetCellDTO;
-import com.dl.task.dto.MatchBetPlayCellDTO;
-import com.dl.task.dto.MatchBetPlayDTO;
-import com.dl.task.dto.OrderDetailDataDTO;
-import com.dl.task.dto.OrderInfoAndDetailDTO;
-import com.dl.task.dto.OrderInfoDTO;
+import com.dl.task.dao.*;
+import com.dl.task.dao2.*;
+import com.dl.task.dto.*;
 import com.dl.task.enums.PrintLotteryStatusEnum;
 import com.dl.task.enums.ThirdRewardStatusEnum;
-import com.dl.task.model.BetResultInfo;
-import com.dl.task.model.DlArtifiPrintLottery;
-import com.dl.task.model.DlLeagueMatchResult;
-import com.dl.task.model.DlMatchBasketball;
-import com.dl.task.model.DlPrintLottery;
-import com.dl.task.model.DlResultBasketball;
-import com.dl.task.model.DlSuperLotto;
-import com.dl.task.model.DlTicketChannel;
-import com.dl.task.model.Order;
+import com.dl.task.model.*;
 import com.dl.task.param.DlJcZqMatchBetParam;
 import com.dl.task.printlottery.PrintComEnums;
 import com.dl.task.printlottery.PrintLotteryAdapter;
@@ -81,9 +27,19 @@ import com.dl.task.printlottery.responseDto.ToRewardResponseDTO;
 import com.dl.task.printlottery.responseDto.ToRewardResponseDTO.ToRewardOrderResponse;
 import com.dl.task.printlottery.responseDto.ToStakeResponseDTO;
 import com.dl.task.printlottery.responseDto.ToStakeResponseDTO.ToStakeBackOrderDetail;
-
 import io.jsonwebtoken.lang.Collections;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.Resource;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -1417,8 +1373,9 @@ public class DlPrintLotteryService {
 			dlArtifiPrintLottery.setMoneyPaid(new BigDecimal(totalMoney));
 			return dlArtifiPrintLottery;
 		}).collect(Collectors.toList());
-		
+
 		dlArtifiPrintLotteryMapper.batchInsert(artifiPrintLotterys);
+		log.info("订单orderSn={},入总队列",orderSn);
 		return;
 	}
 	
