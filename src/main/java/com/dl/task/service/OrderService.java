@@ -1613,13 +1613,12 @@ public class OrderService extends AbstractService<Order> {
 		userAccount.setCurBalance(user.getUserMoney().add(user.getUserMoneyLimit()));
 		userAccount.setStatus(1);
 		userAccount.setNote("支付成功");
-		String payCode = payLog.getPayCode();
-		String payName;
-		if(payCode.equals("app_weixin") || payCode.equals("app_weixin_h5")) {
-			payName = "微信";
-		}else {
-			payName = "银行卡";
-		}
+		String payName = payLog.getPayName();
+//		if(payCode.equals("app_weixin") || payCode.equals("app_weixin_h5")) {
+//			payName = "微信";
+//		}else {
+//			payName = "银行卡";
+//		}
 		userAccount.setPaymentName(payName);
 		userAccount.setThirdPartName(payName);
 		userAccount.setThirdPartPaid(payLog.getOrderAmount());
