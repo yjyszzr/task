@@ -23,6 +23,8 @@ public class Order {
     @Column(name = "order_sn")
     private String orderSn;
 
+    @Column(name = "app_code_name")
+    private Integer appCodeName;
 
     /**
      * 订单号
@@ -809,5 +811,12 @@ public class Order {
 	public void setPrintLotteryRefundAmount(BigDecimal printLotteryRefundAmount) {
 		this.printLotteryRefundAmount = printLotteryRefundAmount;
 	}
-    
+
+    public Integer getAppCodeName() {
+        return appCodeName;
+    }
+
+    public void setAppCodeName(Integer appCodeName) {
+        this.appCodeName = appCodeName;
+    }
 }

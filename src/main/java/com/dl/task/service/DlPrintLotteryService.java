@@ -1369,6 +1369,7 @@ public class DlPrintLotteryService {
 			dlArtifiPrintLottery.setOrderSn(s.getOrderSn());
 			dlArtifiPrintLottery.setLotteryClassifyId(s.getLotteryClassifyId());
 			dlArtifiPrintLottery.setAddTime(DateUtil.getCurrentTimeLong());
+			dlArtifiPrintLottery.setAppCodeName(s.getAppCodeName());
 			dlArtifiPrintLottery.setStatisticsPaid(0);
 			dlArtifiPrintLottery.setMoneyPaid(new BigDecimal(totalMoney));
 			return dlArtifiPrintLottery;

@@ -221,14 +221,22 @@ public class TaskSchedule {
 //		log.info("结束执行支混合付超时订单任务");
 //	}
 	
-	/**************** 超时订单处理 **************/
+	/**************** 超时订单处理-订单状态置为8 **************/
 	@Scheduled(cron = "${task.schedule.payment.time.out}")
 	public void dealBeyondTimeOrderOut() {
 		log.info("开始执行超时订单任务");
 		orderService.dealBeyondTimeOrderOut();
 		log.info("结束执行超时订单任务");
 	}
-	
+
+
+	/**************** 混合支付超时订单处理-退余额支付部分 **************/
+	@Scheduled(cron = "${task.schedule.mixpayment.time.out}")
+	public void dealBeyondTimeMixOrderOut() {
+		log.info("开始执行超时订单任务");
+		paymentService.dealBeyondPayTimeOrderOut();
+		log.info("结束执行超时订单任务");
+	}
 
 	/**
 	 * 第三方支付的query 订单
@@ -273,6 +281,8 @@ public class TaskSchedule {
 			}
 		}
 	}
+
+
 
 	/**
 	 * 第三方支付的query 充值

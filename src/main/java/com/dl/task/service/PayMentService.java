@@ -1,16 +1,4 @@
 package com.dl.task.service;
-import java.math.BigDecimal;
-import java.util.List;
-
-import javax.annotation.Resource;
-
-import lombok.extern.slf4j.Slf4j;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.alibaba.fastjson.JSON;
 import com.dl.base.result.BaseResult;
 import com.dl.base.service.AbstractService;
@@ -24,6 +12,15 @@ import com.dl.task.model.PayLog;
 import com.dl.task.model.PayMent;
 import com.dl.task.param.SurplusPayParam;
 import com.dl.task.param.UserBonusParam;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.Resource;
+import java.math.BigDecimal;
+import java.util.List;
 
 @Service
 @Slf4j
@@ -49,7 +46,7 @@ public class PayMentService extends AbstractService<PayMent> {
     private OrderService  orderService;
 
     /**
-     * 处理支付超时订单
+     * 处理混合支付超时订单
      */
     public void dealBeyondPayTimeOrderOut() {
 		logger.info("开始执行混合支付超时订单任务");

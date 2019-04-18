@@ -42,6 +42,7 @@
     <result column="issue" jdbcType="VARCHAR" property="issue" />
     <result column="is_delete" jdbcType="INTEGER" property="isDelete" />
     <result column="ticket_num" jdbcType="INTEGER" property="ticketNum" />
+	  <result column="app_code_name" jdbcType="INTEGER" property="appCodeName" />
     <result column="device_channel" jdbcType="VARCHAR" property="deviceChannel" />
     <result column="award_time" jdbcType="VARCHAR" property="awardTime" />
     <result column="print_lottery_status" jdbcType="INTEGER" property="printLotteryStatus" />
@@ -276,7 +277,7 @@
 		        AND order_status = 0
 		        AND pay_status = 0
 		        AND is_delete = 0
-		        AND (#{nowTime}-add_time) &gt; 1800
+		        AND (#{nowTime}-add_time) &gt; 300
 	     order by add_time
   </select>
   
