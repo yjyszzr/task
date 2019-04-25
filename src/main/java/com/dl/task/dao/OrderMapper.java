@@ -112,6 +112,8 @@ public interface OrderMapper extends Mapper<Order> {
 	public void saveChannelOperation(ChannelOperationLog channelOperationLog);
 	
 	public int updateOrderStatus6To5(@Param("orderSn")String orderSn);
+
+	public int updateOrderStatus5To9(@Param("orderSn")String orderSn);
 	
 	public int updateOrderStatus6To7(@Param("orderSn")String orderSn);
 	

@@ -1,24 +1,5 @@
 package com.dl.task.service;
 
-import java.math.BigDecimal;
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import javax.annotation.Resource;
-
-import lombok.extern.slf4j.Slf4j;
-
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.alibaba.fastjson.JSON;
 import com.dl.base.constant.CommonConstants;
 import com.dl.base.enums.SNBusinessCodeEnum;
@@ -29,25 +10,27 @@ import com.dl.base.util.DateUtil;
 import com.dl.base.util.JSONHelper;
 import com.dl.base.util.SNGenerator;
 import com.dl.task.core.ProjectConstant;
-import com.dl.task.dao.DlLotteryClassifyMapper;
-import com.dl.task.dao.DlMessageMapper;
-import com.dl.task.dao.LotteryWinningLogTempMapper;
-import com.dl.task.dao.OrderMapper;
-import com.dl.task.dao.UserAccountMapper;
-import com.dl.task.dao.UserMapper;
+import com.dl.task.dao.*;
 import com.dl.task.dto.SurplusPaymentCallbackDTO;
 import com.dl.task.dto.SysConfigDTO;
 import com.dl.task.dto.UserIdAndRewardDTO;
-import com.dl.task.model.DlLotteryClassify;
-import com.dl.task.model.DlMessage;
-import com.dl.task.model.LotteryWinningLogTemp;
-import com.dl.task.model.Order;
-import com.dl.task.model.User;
-import com.dl.task.model.UserAccount;
+import com.dl.task.model.*;
 import com.dl.task.param.SurplusPayParam;
 import com.dl.task.util.GeTuiMessage;
 import com.dl.task.util.GeTuiUtil;
 import com.google.common.base.Joiner;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.Resource;
+import java.math.BigDecimal;
+import java.text.MessageFormat;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -161,7 +144,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
 		}
 		log.info("更新用户中奖订单为已派奖开始");
 		for(UserIdAndRewardDTO s: userIdAndRewardList){
-			orderMapper.updateOrderStatus6To5(s.getOrderSn());
+			orderMapper.updateOrderStatus5To9(s.getOrderSn());
 		}
 		log.info("更新用户中奖订单为已派奖成功");
 		//推送消息
