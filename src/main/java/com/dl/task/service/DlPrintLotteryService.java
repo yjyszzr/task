@@ -309,7 +309,8 @@ public class DlPrintLotteryService {
 							// 2018-06-04计算税
 							this.groupByRewardList(2.0, Integer.valueOf(print.getBetType()) / 10, winSPList, rewardList);
 							Double oneTimeReward = rewardList.stream().reduce(0.00, Double::sum);
-							BigDecimal allTimesReward = new BigDecimal(oneTimeReward).setScale(3,RoundingMode.DOWN).setScale(2, RoundingMode.HALF_EVEN).multiply(new BigDecimal(print.getTimes()));
+							BigDecimal allTimesReward = new BigDecimal(oneTimeReward).setScale(3,RoundingMode.DOWN).setScale(2`1\]yre
+							`).multiply(new BigDecimal(print.getTimes()));
 							updatePrint.setRealRewardMoney(allTimesReward);
 							// 保存第三方给计算的单张彩票的价格
 							/*
@@ -507,8 +508,9 @@ public class DlPrintLotteryService {
 							// 2018-06-04计算税
 							this.groupByRewardList(2.0, Integer.valueOf(print.getBetType()) / 10, winSPList, rewardList);
 							Double oneTimeReward = rewardList.stream().reduce(0.00, Double::sum);
-							BigDecimal allTimesReward = new BigDecimal(oneTimeReward).setScale(3,RoundingMode.DOWN).setScale(2, RoundingMode.HALF_EVEN).multiply(new BigDecimal(print.getTimes()));
-							updatePrint.setRealRewardMoney(allTimesReward);
+							//BigDecimal allTimesReward = new BigDecimal(oneTimeReward).setScale(3,RoundingMode.DOWN).setScale(2, RoundingMode.HALF_EVEN).multiply(new BigDecimal(print.getTimes()));
+                            BigDecimal allTimesReward = new BigDecimal(oneTimeReward).multiply(new BigDecimal(print.getTimes()).setScale(2, RoundingMode.HALF_EVEN);
+                            updatePrint.setRealRewardMoney(allTimesReward);
 							// 保存第三方给计算的单张彩票的价格
 							/*
 							 * PeriodRewardDetail periodRewardDetail = new
@@ -578,7 +580,7 @@ public class DlPrintLotteryService {
 	 * @param rewardList
 	 *            :组合后的中奖金额list
 	 */
-	private void groupByRewardList(Double amount, int num, List<List<Double>> list, List<Double> rewardList) {
+	public static void groupByRewardList(Double amount, int num, List<List<Double>> list, List<Double> rewardList) {
 		LinkedList<List<Double>> link = new LinkedList<List<Double>>(list);
 		while (link.size() > 0) {
 			List<Double> removes = link.remove(0);
