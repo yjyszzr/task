@@ -509,8 +509,8 @@ public class DlPrintLotteryService {
 							this.groupByRewardList(2.0, Integer.valueOf(print.getBetType()) / 10, winSPList, rewardList);
 							Double oneTimeReward = rewardList.stream().reduce(0.00, Double::sum);
 							//BigDecimal allTimesReward = new BigDecimal(oneTimeReward).setScale(3,RoundingMode.DOWN).setScale(2, RoundingMode.HALF_EVEN).multiply(new BigDecimal(print.getTimes()));
-                            BigDecimal allTimesReward = new BigDecimal(oneTimeReward).multiply(new BigDecimal(print.getTimes()).setScale(2, RoundingMode.HALF_EVEN);
-                            updatePrint.setRealRewardMoney(allTimesReward);
+                            BigDecimal allTimesReward = new BigDecimal(oneTimeReward).multiply(new BigDecimal(print.getTimes());
+                            updatePrint.setRealRewardMoney(allTimesReward.setScale(2, RoundingMode.HALF_EVEN));
 							// 保存第三方给计算的单张彩票的价格
 							/*
 							 * PeriodRewardDetail periodRewardDetail = new
