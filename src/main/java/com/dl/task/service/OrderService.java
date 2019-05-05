@@ -141,14 +141,14 @@ public class OrderService extends AbstractService<Order> {
 	 * @return
 	 */
 	public BaseResult<String> updateOrderInfoStatus(UpdateOrderInfoParam param) {
-		log.info("-----------%%%--------更新订单状态:" + JSON.toJSONString(param));
+//		log.info("-----------%%%--------更新订单状态:" + JSON.toJSONString(param));
 		Order order = new Order();
 		order.setOrderSn(param.getOrderSn());
 		order.setOrderStatus(param.getOrderStatus());
 		order.setPayStatus(param.getPayStatus());
 		order.setPayTime(param.getPayTime());
 		int rst = orderMapper.updateOrderStatus(order);
-		log.info("-----------%%%%-----------更新订单状态结果:" + rst);
+//		log.info("-----------%%%%-----------更新订单状态结果:" + rst);
 		return ResultGenerator.genSuccessResult("订单支付数据更新成功");
 	}
 	
@@ -256,7 +256,7 @@ public class OrderService extends AbstractService<Order> {
 					user.setUserMoneyLimit(refundMoney);
 					user.setUserId(userId);
 					int cnt = userMapper.updateInDBUserMoneyLimit(user);
-					log.info("[rollbackUserMoneyOrderFailure]" + " userId:" + userId + " amt:" + refundMoney +" result cnt:" + cnt);
+//					log.info("[rollbackUserMoneyOrderFailure]" + " userId:" + userId + " amt:" + refundMoney +" result cnt:" + cnt);
 					//===========记录退款流水====================
 					UserAccount userAccountParamByType = new UserAccount();
 					Integer accountType = ProjectConstant.ACCOUNT_ROLLBACK;
@@ -750,32 +750,32 @@ public class OrderService extends AbstractService<Order> {
 		Integer userId = detail.getUserId();
 		Integer matchId = detail.getMatchId();
     	int rst = userMatchCollectMapper.queryUserMatchCollect(userId, matchId);
-    	log.info("查询到已购赛事:"+rst);
+//    	log.info("查询到已购赛事:"+rst);
     	if(rst <= 0) {
-    		log.info("已购赛事收藏开始");
+//    		log.info("已购赛事收藏开始");
         	UserMatchCollect umc = new UserMatchCollect();
         	umc.setUserId(detail.getUserId());
         	umc.setMatchId(detail.getMatchId());
         	Date matchDate = detail.getMatchTime();
-        	log.info("日期格式："+matchDate.toString());
+//        	log.info("日期格式："+matchDate.toString());
         	umc.setAddTime(DateUtil.getTimeSomeDate(matchDate));
         	umc.setIsDelete(0);
         	userMatchCollectMapper.insertUserCollectMatch(umc);
-        	log.info("已购赛事收藏結束");
+//        	log.info("已购赛事收藏結束");
     	}
 	}
 
 	public void addRewardMoneyToUsers() {
 		List<OrderWithUserDTO> orderWithUserDTOs = orderMapper.selectOpenedAllRewardOrderList();
-		log.info("派奖已中奖的用户数据,需要派奖数量size============{}", orderWithUserDTOs.size());
-		log.info("派奖已中奖的用户数据：orderWithUserDTOs=============={}", orderWithUserDTOs );
+//		log.info("派奖已中奖的用户数据,需要派奖数量size============{}", orderWithUserDTOs.size());
+//		log.info("派奖已中奖的用户数据：orderWithUserDTOs=============={}", orderWithUserDTOs );
 		if (CollectionUtils.isNotEmpty(orderWithUserDTOs)) {
 			
 			for (OrderWithUserDTO orderWithUserDTO : orderWithUserDTOs) {
 				orderMapper.updateStatisticsRewardStatusTo0(orderWithUserDTO.getOrderSn());
-				log.info("订单的中奖编号=============={}", orderWithUserDTO.getOrderSn());
+//				log.info("订单的中奖编号=============={}", orderWithUserDTO.getOrderSn());
 				if (null == orderWithUserDTO.getMaxLevel() || !(orderWithUserDTO.getMaxLevel() == 1 || orderWithUserDTO.getMaxLevel() == 2 || orderWithUserDTO.getMaxLevel() == 3)) {
-					log.info("订单的中奖级别=============={}", orderWithUserDTO.getMaxLevel());
+//					log.info("订单的中奖级别=============={}", orderWithUserDTO.getMaxLevel());
 					AwardParam awardParam =new AwardParam();
 					awardParam.setOrderSn(orderWithUserDTO.getOrderSn());
 					storeUserMoneyService.orderAward(awardParam);
@@ -786,9 +786,9 @@ public class OrderService extends AbstractService<Order> {
 	
 	public void addRewardMoneyToUsersTwo() {
 		List<OrderWithUserDTO> orderWithUserDTOs = orderMapper.selectQddOpenedAllRewardOrderList();
-		log.info("派奖已中奖的用户数据：code=" + orderWithUserDTOs.size());
+//		log.info("派奖已中奖的用户数据：code=" + orderWithUserDTOs.size());
 		if (CollectionUtils.isNotEmpty(orderWithUserDTOs)) {
-			log.info("需要派奖的数据:" + orderWithUserDTOs.size());
+//			log.info("需要派奖的数据:" + orderWithUserDTOs.size());
 			List<UserIdAndRewardDTO> userIdAndRewardDTOs = new LinkedList<UserIdAndRewardDTO>();
 			for (OrderWithUserDTO orderWithUserDTO : orderWithUserDTOs) {
 				UserIdAndRewardDTO userIdAndRewardDTO = new UserIdAndRewardDTO();
@@ -1622,14 +1622,14 @@ public class OrderService extends AbstractService<Order> {
 	public void openPrizeForSupperLotto() {
 		//查询待开奖的投注列表
 		 List<Order> orderList =orderMapper.selectAllUnOpenPrizeListForSupperLotto();  
-			log.info("大乐透未开奖订单列表.size※※※※※※※※※※※※※※※※※※※※※※※※※※※※{}",orderList.size());
+//			log.info("大乐透未开奖订单列表.size※※※※※※※※※※※※※※※※※※※※※※※※※※※※{}",orderList.size());
 			List<String> gameIssue = new ArrayList<String>();
 			orderList.forEach(order->{
 					gameIssue.add(order.getIssue()); 
 			});
 			//对期次去重
 		   List<String> uniqueGameIssue = gameIssue.stream().distinct().collect(Collectors.toList());
-		   log.info("大乐透未开奖的期次※※※※※※※※※※※※※※※※※※※※※※※※※※※※{}",uniqueGameIssue);
+//		   log.info("大乐透未开奖的期次※※※※※※※※※※※※※※※※※※※※※※※※※※※※{}",uniqueGameIssue);
 		   
 		   //获取期次相关信息
 		   for (int i = 0; i < uniqueGameIssue.size(); i++) {
@@ -1638,7 +1638,7 @@ public class OrderService extends AbstractService<Order> {
 			   SupperLottoParam supperLottoParam =new SupperLottoParam();
 			   supperLottoParam.setTermNum(Integer.parseInt(uniqueGameIssue.get(i)));
 				List<DlSuperLottoRewardDTO> superLottoRewardList = supperLottoService.findByTermNum(supperLottoParam).getData();
-			   log.info("第"+uniqueGameIssue.get(i)+"期次信息※※※※※※※※※※※※※※※※※※※※※※※※※※※※{}",dlSuperLotto);
+//			   log.info("第"+uniqueGameIssue.get(i)+"期次信息※※※※※※※※※※※※※※※※※※※※※※※※※※※※{}",dlSuperLotto);
 //			   判断该期次是否开奖
 			   if(dlSuperLotto!=null&&!StringUtils.isEmpty(dlSuperLotto.getPrizeNum())){	
 				BigDecimal prizeA = new BigDecimal(0);
@@ -1676,11 +1676,11 @@ public class OrderService extends AbstractService<Order> {
 						flag = false;
 						break;
 					}
-					log.info("订单详情为※※※※※※※※※※※※※※※※※※※※※※※※※※※※{}",orderDetailList.get(k));
+//					log.info("订单详情为※※※※※※※※※※※※※※※※※※※※※※※※※※※※{}",orderDetailList.get(k));
 				   StringBuilder matchResult = new StringBuilder(orderDetail.getMatchResult());
 				   matchResult=matchResult.replace(14,15, "|");
 					LottoResultEntity resultEntity = LottoUtils.calPrizeLevel(orderDetail.getTicketData(), matchResult.toString());
-					log.info("算奖结果实体类※※※※※※※※※※※※※※※※※※※※※※※※※※※※{}",resultEntity);
+//					log.info("算奖结果实体类※※※※※※※※※※※※※※※※※※※※※※※※※※※※{}",resultEntity);
 					BigDecimal moneyPrize = new BigDecimal(0);
 					if (resultEntity.status == LottoResultEntity.STATUS_HIT) {
 						 boolean isAppend = false;
@@ -1689,7 +1689,7 @@ public class OrderService extends AbstractService<Order> {
 						}
 						moneyPrize = LottoMoneyUtil.calculateV2(resultEntity ,  prizeA,  prizeB,  prizeC, prizeAAppend,  prizeBAppend,  prizeCAppend,  isAppend);
 					}
-					log.info("待开奖编号※※※{}。用户投注※※※{}。开奖结果※※※{}。中奖金额※※※{}。一等奖※※※{}。二等奖※※※{}。三等奖※※※{}。追加一※※※{}。追加二※※※{}。追加三※※※{}。",orderDetail.getOrderSn(),orderDetail.getTicketData(), matchResult.toString(),moneyPrize,  prizeA,  prizeB,  prizeC, prizeAAppend,  prizeBAppend,  prizeCAppend);
+//					log.info("待开奖编号※※※{}。用户投注※※※{}。开奖结果※※※{}。中奖金额※※※{}。一等奖※※※{}。二等奖※※※{}。三等奖※※※{}。追加一※※※{}。追加二※※※{}。追加三※※※{}。",orderDetail.getOrderSn(),orderDetail.getTicketData(), matchResult.toString(),moneyPrize,  prizeA,  prizeB,  prizeC, prizeAAppend,  prizeBAppend,  prizeCAppend);
 					//赛选出最大的奖项 数值越小 奖项越靠前
 					if (maxWinningLevel > resultEntity.getMaxLevel()) {
 						maxWinningLevel = resultEntity.getMaxLevel();
@@ -1715,7 +1715,7 @@ public class OrderService extends AbstractService<Order> {
 					}
 //					回写到订单详情
 					orderDetailMapper.updateOrderDetailInfoForSupperLotto(supperLottoOrderDetailParam);
-					log.info("第"+uniqueGameIssue.get(i)+"期要更新的订单详情数据※※※※※※※※※※※※※※※※※※※※※※※※※※※※{}",supperLottoOrderDetailParam);
+//					log.info("第"+uniqueGameIssue.get(i)+"期要更新的订单详情数据※※※※※※※※※※※※※※※※※※※※※※※※※※※※{}",supperLottoOrderDetailParam);
 				}
 				if (flag) {
 					SupperLottoOrderParam supperLottoOrderParam =new SupperLottoOrderParam();
@@ -1729,7 +1729,7 @@ public class OrderService extends AbstractService<Order> {
 					supperLottoOrderParam.setMaxLevel(maxWinningLevel);
 					//	累加计算订单详情金额保存到订单
 					orderMapper.updateOrderInfoForSupperLotto(supperLottoOrderParam);
-					log.info("第"+uniqueGameIssue.get(i)+"期"+orderList.get(j).getOrderSn()+"要更新的订单数据※※※※※※※※※※※※※※※※※※※※※※※※※※※※{}",supperLottoOrderParam);
+//					log.info("第"+uniqueGameIssue.get(i)+"期"+orderList.get(j).getOrderSn()+"要更新的订单数据※※※※※※※※※※※※※※※※※※※※※※※※※※※※{}",supperLottoOrderParam);
 				}
 			}
 		}

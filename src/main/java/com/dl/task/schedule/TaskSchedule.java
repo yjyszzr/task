@@ -276,8 +276,8 @@ public class TaskSchedule {
 			try {
 				paymentService.dealBeyondPayTimeOrder(order);
 			} catch (Exception e) {
-				log.error("处理订单支付失败order_sn={}", order.getOrderSn(), e);
-				log.error("处理订单支付失败order_sn=",e);
+				log.error("处理订单支付失败order_sn={},{}", order.getOrderSn(), e);
+//				log.error("处理订单支付失败order_sn=",e);
 			}
 		}
 	}

@@ -48,7 +48,7 @@ public class LotteryRewardService {
 		//查询订单状态是待开奖的，查询是否每笔订单锁包含的彩票都已经比对完成
 		List<String> orderSnList = orderMapper.queryOrderSnListUnOpenReward();
 		
-		log.info("待开奖数据： size="+orderSnList.size());
+//		log.info("待开奖数据： size="+orderSnList.size());
 		if(CollectionUtils.isEmpty(orderSnList)) {
 			return "待开奖数据： size="+orderSnList.size();
 		}
@@ -57,7 +57,7 @@ public class LotteryRewardService {
 			int num = orderSnList.size()>20?20:orderSnList.size();
 			List<String> subList = orderSnList.subList(0, num);
 			List<DlPrintLottery> dlOrderDataDTOs = dlPrintLotteryMapper.getPrintLotteryListByGoOpenRewardOrderSns(subList);
-			log.info("获取可开奖彩票信息："+dlOrderDataDTOs.size());
+//			log.info("获取可开奖彩票信息："+dlOrderDataDTOs.size());
 			if(CollectionUtils.isNotEmpty(dlOrderDataDTOs)) {
 				Map<String, Double> map = new HashMap<String, Double>();
 				Set<String> unOrderSns = new HashSet<String>();
@@ -87,7 +87,7 @@ public class LotteryRewardService {
 					map.put(orderSn, double1);
 				}
 				
-				log.info("*********8可开奖订单及资金数："+map.size());
+//				log.info("*********8可开奖订单及资金数："+map.size());
 				List<OrderDataParam> dtos = new ArrayList<OrderDataParam>(map.size());
 				for(String orderSn: map.keySet()) {
 					OrderDataParam dlOrderDataDTO = new OrderDataParam();
@@ -108,7 +108,7 @@ public class LotteryRewardService {
 					dtos.add(dlOrderDataDTO);
 
 				}
-				log.info("%%%%%%准备执行开奖订单数："+dtos.size());
+//				log.info("%%%%%%准备执行开奖订单数："+dtos.size());
 				if(dtos.size() > 0) {
 					int n = 0;
 					for (OrderDataParam orderDataParam : dtos) {

@@ -98,17 +98,18 @@ public class UserAccountService extends AbstractService<UserAccount> {
 			userIdAndRewardList.removeIf(s -> s.getReward().doubleValue() >= limitValueDouble);
 		}
 		if (userIdAndRewardList.size() == 0) {
-			log.info("没有要自动开奖的订单");
+//			log.info("没有要自动开奖的订单");
 			return ResultGenerator.genSuccessResult("没有要自动开奖的订单");
 		}
 
-		log.info("=^_^= =^_^= =^_^= =^_^= 派奖开始,派奖数据包括:" + JSON.toJSONString(userIdAndRewardList));
+//		log.info("=^_^= =^_^= =^_^= =^_^= 派奖开始,派奖数据包括:" + JSON.toJSONString(userIdAndRewardList));
+		log.info("=^_^= =^_^= =^_^= =^_^= 派奖开始");
 
 		// 查询是否已经派发奖金,并过滤掉
 		List<String> orderSnList = userIdAndRewardList.stream().map(s -> s.getOrderSn()).collect(Collectors.toList());
 		List<String> rewardOrderSnList = userAccountMapper.queryUserAccountRewardByOrdersn(orderSnList);
 		if (rewardOrderSnList.size() > 0) {
-			log.error("含有已派发过奖金的订单号，已被过滤,订单号包括：" + Joiner.on(",").join(rewardOrderSnList));
+//			log.error("含有已派发过奖金的订单号，已被过滤,订单号包括：" + Joiner.on(",").join(rewardOrderSnList));
 			for(String s: rewardOrderSnList){
 				orderMapper.updateOrderStatus6To5(s);
 			}
@@ -132,7 +133,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
 			userAccountParam.setAddTime(accountTime);
 			userAccountParam.setStatus(Integer.valueOf(ProjectConstant.FINISH));
             User curUser = userMapper.queryUserByUserId(uDTO.getUserId());
-            log.info("派奖 userId={},orderSn={},userMoney={},userMoneyLimit={}",uDTO.getUserId(),uDTO.getOrderSn(),curUser.getUserMoney(),curUser.getUserMoneyLimit());
+//            log.info("派奖 userId={},orderSn={},userMoney={},userMoneyLimit={}",uDTO.getUserId(),uDTO.getOrderSn(),curUser.getUserMoney(),curUser.getUserMoneyLimit());
             BigDecimal curBalance = curUser.getUserMoney().add(curUser.getUserMoneyLimit());
             userAccountParam.setCurBalance(curBalance);
 			int insertRst = userAccountMapper.insertUserAccountBySelective(userAccountParam);
@@ -142,17 +143,17 @@ public class UserAccountService extends AbstractService<UserAccount> {
                 log.info("用户" + uDTO.getUserId() + "中奖订单号为" + uDTO.getOrderSn() + "奖金派发完成");
 			}
 		}
-		log.info("更新用户中奖订单为已派奖开始");
+//		log.info("更新用户中奖订单为已派奖开始");
 		for(UserIdAndRewardDTO s: userIdAndRewardList){
 			orderMapper.updateOrderStatus5To9(s.getOrderSn());
 		}
-		log.info("更新用户中奖订单为已派奖成功");
+//		log.info("更新用户中奖订单为已派奖成功");
 		//推送消息
 		saveRewardMessageAsync(userIdAndRewardList, accountTime);
 
 		//记录中奖信息
 		this.updateLotteryWinning(oldUserIdAndRewardDtos);
-		log.info("=^_^= =^_^= =^_^= =^_^= " + DateUtil.getCurrentDateTime() + "用户派发奖金完成" + "=^_^= =^_^= =^_^= =^_^= ");
+		log.info("=^_^= =^_^= =^_^= =^_^= " + DateUtil.getCurrentDateTime() + "用户派发奖金完成");
 
 		return ResultGenerator.genSuccessResult("用户派发奖金完成");
 	}
@@ -290,7 +291,7 @@ public class UserAccountService extends AbstractService<UserAccount> {
 	 */
 	public BaseResult<SurplusPaymentCallbackDTO> rollbackUserAccountChangeByPay(SurplusPayParam surplusPayParam) {
 		String inPrams = JSON.toJSONString(surplusPayParam);
-		log.info(DateUtil.getCurrentDateTime() + "使用到了部分或全部余额时候回滚支付传递的参数:" + inPrams);
+//		log.info(DateUtil.getCurrentDateTime() + "使用到了部分或全部余额时候回滚支付传递的参数:" + inPrams);
 		Order order = orderMapper.getOrderInfoByOrderSn(surplusPayParam.getOrderSn());
 		if (null == order) {
 			return ResultGenerator.genFailResult("没有该笔订单" + surplusPayParam.getOrderSn() + "，无法回滚账户");
