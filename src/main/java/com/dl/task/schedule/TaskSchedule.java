@@ -5,6 +5,7 @@ import com.dl.lottery.api.IArtifiPrintLotteryService;
 import com.dl.shop.payment.api.IpaymentService;
 import com.dl.task.configurer.URLConfig;
 import com.dl.task.model.Order;
+import com.dl.task.model.UserWithdraw;
 import com.dl.task.service.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
@@ -360,22 +361,22 @@ public class TaskSchedule {
 //		ipaymentService.timerCheckCashReq(emptyParam);
 //	}
 //
-//	/**
-//	 * 提现失败定时任务处理回退用户信息
-//	 */
-//	@Scheduled(cron = "${task.schedule.withdraw.fail}")
-//	public void withdrawFail() {
-//		log.info("提现失败定时处理订单");
-//		List<UserWithdraw> userWithdrawFailRefundigList = withdrawService.queryUserWithdrawRefundings();
-//		for (UserWithdraw userWithdraw : userWithdrawFailRefundigList) {
-//			try {
-//				withdrawService.userWithdrawFailRefund(userWithdraw);
-//			} catch (Exception e) {
-//				log.error("withdrawsn={},提现失败回滚用户账户金额异常", userWithdraw.getWithdrawalSn(), e);
-//				log.error("提现失败回滚用户账户金额异常",e);
-//			}
-//		}
-//	}
+	/**
+	 * 提现失败定时任务处理回退用户信息
+	 */
+	@Scheduled(cron = "${task.schedule.withdraw.fail}")
+	public void withdrawFail() {
+		log.info("提现失败定时处理订单");
+		List<UserWithdraw> userWithdrawFailRefundigList = withdrawService.queryUserWithdrawRefundings();
+		for (UserWithdraw userWithdraw : userWithdrawFailRefundigList) {
+			try {
+				withdrawService.userWithdrawFailRefund(userWithdraw);
+			} catch (Exception e) {
+				log.error("withdrawsn={},提现失败回滚用户账户金额异常", userWithdraw.getWithdrawalSn(), e);
+				log.error("提现失败回滚用户账户金额异常",e);
+			}
+		}
+	}
 	
 //	/**
 //	 * 老带新活动 新用户更改状态
