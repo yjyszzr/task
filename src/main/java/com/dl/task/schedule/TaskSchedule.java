@@ -207,12 +207,12 @@ public class TaskSchedule {
 	/**
 	 * 更新过期的红包
 	 */
-//	@Scheduled(cron = "${task.schedule.member.bonus.expire}")
-//	public void updateBonusExpire() {
-//		log.info("更新过期的红包定时任务开始");
-//		userBonusService.updateBonusExpire();
-//		log.info("更新过期的红包的定时任务结束");
-//	}
+	@Scheduled(cron = "${task.schedule.member.bonus.expire}")
+	public void updateBonusExpire() {
+		log.info("更新过期的红包定时任务开始");
+		userBonusService.updateBonusExpire();
+		log.info("更新过期的红包的定时任务结束");
+	}
 
 	/**************** 支付的定时任务,调用支付模块 **************/
 //	@Scheduled(cron = "${task.schedule.payment.time.out}")
