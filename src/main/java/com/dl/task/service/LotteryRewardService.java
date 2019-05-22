@@ -126,6 +126,7 @@ public class LotteryRewardService {
 							String merchantOrderSn = order.getMerchantOrderSn();
 							NotifyParam qParam = new NotifyParam();
 							qParam.setMerchantOrderSn(merchantOrderSn);
+							qParam.setNotifyUrl("http://app.shoumiba.cn/api/callback/ticket/status");
 							iLotteryPrintService.notifyPrintResultToMerchant(qParam);
 						}
 					}
