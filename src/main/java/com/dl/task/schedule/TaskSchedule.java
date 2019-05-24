@@ -50,6 +50,8 @@ public class TaskSchedule {
 	private DlMatchResultService dlMatchResultService;
 	@Resource
 	private IArtifiPrintLotteryService iArtifiPrintLotteryService;
+	@Resource
+	private DlDonationRechargeCardService dlDonationRechargeCardService;
 	
 	/**
 	 * 给中奖用户派奖
@@ -212,6 +214,9 @@ public class TaskSchedule {
 		log.info("更新过期的红包定时任务开始");
 		userBonusService.updateBonusExpire();
 		log.info("更新过期的红包的定时任务结束");
+		log.info("****************更新过期的优惠券大礼包定时任务开始****************");
+		dlDonationRechargeCardService.updateRechargeCardExpire();
+		log.info("****************更新过期的优惠券大礼包定时任务结束****************");
 	}
 
 	/**************** 支付的定时任务,调用支付模块 **************/
