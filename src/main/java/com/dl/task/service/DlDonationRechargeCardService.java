@@ -28,6 +28,7 @@ public class DlDonationRechargeCardService extends AbstractService<DlDonationRec
 		Condition condition = new Condition(DlDonationRechargeCard.class);
 		condition.createCriteria().andCondition("status=", 0);
 		List<DlDonationRechargeCard> donationRechargeCardList = dlDonationRechargeCardMapper.selectByCondition(condition);
+		log.info("*****可用的大礼包列表" + donationRechargeCardList);
 		List<Integer> userBonusIdList =new ArrayList<Integer>();
 		for (int i = 0; i < donationRechargeCardList.size(); i++) {
 			DlDonationRechargeCard donationRechargeCard =new DlDonationRechargeCard();
