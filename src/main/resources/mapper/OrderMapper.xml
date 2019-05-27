@@ -153,7 +153,7 @@
   	select order_id,  order_sn, parent_sn,user_id,order_status,pay_status,pay_id,pay_code,pay_name,pay_sn,
   		money_paid,ticket_amount,surplus,user_surplus,user_surplus_limit,third_party_paid,user_bonus_id,bonus,give_integral,order_from,
   		add_time,pay_time,order_type,lottery_classify_id,lottery_play_classify_id,match_time,winning_money,pass_type,
-  		play_type,cathectic,bet_num,forecast_money,is_delete,device_channel
+  		play_type,cathectic,bet_num,forecast_money,is_delete,device_channel,merchant_order_sn
   	from dl_order
   	where order_sn = #{orderSn}
   </select>
