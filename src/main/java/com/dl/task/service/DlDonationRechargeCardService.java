@@ -15,8 +15,6 @@ import com.dl.task.model.DlDonationRechargeCard;
 import com.dl.task.util.DateUtils;
 
 import lombok.extern.slf4j.Slf4j;
-import tk.mybatis.mapper.entity.Condition;
-import tk.mybatis.mapper.entity.Example.Criteria;
 @Slf4j
 @Service
 @Transactional(value = "transactionManager1")

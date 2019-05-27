@@ -78,5 +78,5 @@ public class DlDonationRechargeCard {
      * real_value
      */
     @Column(name = "real_value")
-    private BigDecimal real_value;
+    private BigDecimal realValue;
 }
