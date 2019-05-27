@@ -10,13 +10,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.dl.base.service.AbstractService;
-import com.dl.base.util.DateUtil;
 import com.dl.task.dao.DlDonationRechargeCardMapper;
 import com.dl.task.model.DlDonationRechargeCard;
 import com.dl.task.util.DateUtils;
 
 import lombok.extern.slf4j.Slf4j;
 import tk.mybatis.mapper.entity.Condition;
+import tk.mybatis.mapper.entity.Example.Criteria;
 @Slf4j
 @Service
 @Transactional(value = "transactionManager1")
@@ -26,7 +26,8 @@ public class DlDonationRechargeCardService extends AbstractService<DlDonationRec
  
 	public void updateRechargeCardExpire() {
 		Condition condition = new Condition(DlDonationRechargeCard.class);
-		condition.createCriteria().andCondition("status=", 0);
+		Criteria criteria = condition.createCriteria();
+		criteria.andCondition("status=", 0);
 		List<DlDonationRechargeCard> donationRechargeCardList = dlDonationRechargeCardMapper.selectByCondition(condition);
 		log.info("*****可用的大礼包列表" + donationRechargeCardList);
 		List<Integer> userBonusIdList =new ArrayList<Integer>();
