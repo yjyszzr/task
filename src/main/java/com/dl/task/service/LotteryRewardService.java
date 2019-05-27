@@ -120,7 +120,8 @@ public class LotteryRewardService {
 
 						//若是商户订单,主动通知商户中奖信息
 						Order order = orderMapper.getOrderInfoByOrderSn(orderDataParam.getOrderSn());
-						log.info("updateOrderAfterOpenReward:order="+order.getMerchantOrderSn());
+						log.info("updateOrderAfterOpenReward:order="+order);
+						log.info("updateOrderAfterOpenReward:getMerchantOrderSn="+order.getMerchantOrderSn());
 						if(!StringUtils.isEmpty(order.getMerchantOrderSn())){
 							log.info("updateOrderAfterOpenReward&&&&&&商户订单,开始通知商户是否中奖&&&&&&&&&");
 							String merchantOrderSn = order.getMerchantOrderSn();
