@@ -34,7 +34,7 @@ public class DlDonationRechargeCardService extends AbstractService<DlDonationRec
 			Integer effectiveDay = donationRechargeCard.getEffectiveDay();
 			Integer currentTime = DateUtils.getCurrentTimeLong();
 			//有效期 + 开始时间 = 结束时间
-			Integer endTime = effectiveDay * 24*60 * 60 * 1000 + addTime;
+			Integer endTime = effectiveDay * 24 * 60 * 60 + addTime;
 			log.info("当前时间："+currentTime+"-结束时间："+endTime+"="+(currentTime-endTime));
 			if (currentTime > endTime ) {
 				userBonusIdList.add(donationRechargeCard.getRechargeCardId());
