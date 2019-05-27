@@ -48,11 +48,10 @@ public class LotteryRewardService {
 		//查询订单状态是待开奖的，查询是否每笔订单锁包含的彩票都已经比对完成
 		List<String> orderSnList = orderMapper.queryOrderSnListUnOpenReward();
 		
-//		log.info("待开奖数据： size="+orderSnList.size());
+		log.info("updateOrderAfterOpenReward待开奖数据： size="+orderSnList.size());
 		if(CollectionUtils.isEmpty(orderSnList)) {
 			return "待开奖数据： size="+orderSnList.size();
 		}
-		log.info("updateOrderAfterOpenReward");
 		while(orderSnList.size() > 0) {
 			int num = orderSnList.size()>20?20:orderSnList.size();
 			List<String> subList = orderSnList.subList(0, num);
