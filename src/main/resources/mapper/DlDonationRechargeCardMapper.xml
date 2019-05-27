@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dl.task.dao.DlDonationRechargeCardMapper">
+   <resultMap id="BaseResultMap" type="com.dl.task.model.DlDonationRechargeCard">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="recharge_card_id" jdbcType="INTEGER" property="rechargeCardId" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="img_url" jdbcType="VARCHAR" property="imgUrl" />
+    <result column="status" jdbcType="INTEGER" property="status" />
+    <result column="add_user" jdbcType="VARCHAR" property="addUser" />
+    <result column="add_time" jdbcType="INTEGER" property="addTime" />
+    <result column="description" jdbcType="VARCHAR" property="description" />
+    <result column="is_delete" jdbcType="INTEGER" property="isDelete" />
+    <result column="real_value" jdbcType="DECIMAL" property="realValue" />
+    <result column="type" jdbcType="INTEGER" property="type" />
+    <result column="max_donation" jdbcType="INTEGER" property="maxDonation" />
+    <result column="limit_recharge_money" jdbcType="INTEGER" property="limitRechargeMoney" />
+    <result column="effective_day" jdbcType="INTEGER" property="effectiveDay" />
+  </resultMap>
+      
+   <update id ="updateRechargeCardExpire" parameterType="java.util.List">
+      update  dl_donation_recharge_card set status = 1 where recharge_card_id in 
+          <foreach collection="list" index="index" item="item" open="(" separator="," close=")"> 
+			#{item}  
+          </foreach >
+   </update > 
+  
+</mapper>
