@@ -25,10 +25,8 @@ public class DlDonationRechargeCardService extends AbstractService<DlDonationRec
 	private DlDonationRechargeCardMapper dlDonationRechargeCardMapper;
  
 	public void updateRechargeCardExpire() {
-		Condition condition = new Condition(DlDonationRechargeCard.class);
-		Criteria criteria = condition.createCriteria();
-		criteria.andCondition("status=", 0);
-		List<DlDonationRechargeCard> donationRechargeCardList = dlDonationRechargeCardMapper.selectByCondition(condition);
+		Integer status = 0;
+		List<DlDonationRechargeCard> donationRechargeCardList = dlDonationRechargeCardMapper.selectByRechargeCardStatus(status);
 		log.info("*****可用的大礼包列表" + donationRechargeCardList);
 		List<Integer> userBonusIdList =new ArrayList<Integer>();
 		for (int i = 0; i < donationRechargeCardList.size(); i++) {

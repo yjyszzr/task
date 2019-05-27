@@ -26,5 +26,7 @@
 			#{item}  
           </foreach >
    </update > 
-  
+  <select id="selectByRechargeCardStatus"  resultMap="BaseResultMap">
+  select * from dl_donation_recharge_card where status = #{status}
+  </select>
 </mapper>
