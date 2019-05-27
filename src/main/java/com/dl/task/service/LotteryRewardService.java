@@ -52,16 +52,18 @@ public class LotteryRewardService {
 		if(CollectionUtils.isEmpty(orderSnList)) {
 			return "待开奖数据： size="+orderSnList.size();
 		}
-		
+		log.info("updateOrderAfterOpenReward");
 		while(orderSnList.size() > 0) {
 			int num = orderSnList.size()>20?20:orderSnList.size();
 			List<String> subList = orderSnList.subList(0, num);
 			List<DlPrintLottery> dlOrderDataDTOs = dlPrintLotteryMapper.getPrintLotteryListByGoOpenRewardOrderSns(subList);
 //			log.info("获取可开奖彩票信息："+dlOrderDataDTOs.size());
 			if(CollectionUtils.isNotEmpty(dlOrderDataDTOs)) {
+				log.info("updateOrderAfterOpenReward--1");
 				Map<String, Double> map = new HashMap<String, Double>();
 				Set<String> unOrderSns = new HashSet<String>();
 				for(DlPrintLottery dto: dlOrderDataDTOs) {
+					log.info("updateOrderAfterOpenReward--2");
 					String orderSn = dto.getOrderSn();
 					String compareStatus = dto.getCompareStatus();
 					Integer thirdRewardStatus = dto.getThirdRewardStatus();
@@ -90,6 +92,7 @@ public class LotteryRewardService {
 //				log.info("*********8可开奖订单及资金数："+map.size());
 				List<OrderDataParam> dtos = new ArrayList<OrderDataParam>(map.size());
 				for(String orderSn: map.keySet()) {
+					log.info("updateOrderAfterOpenReward--3");
 					OrderDataParam dlOrderDataDTO = new OrderDataParam();
 					dlOrderDataDTO.setOrderSn(orderSn);
 					BigDecimal realReward = BigDecimal.valueOf(map.get(orderSn));
@@ -110,6 +113,7 @@ public class LotteryRewardService {
 				}
 //				log.info("%%%%%%准备执行开奖订单数："+dtos.size());
 				if(dtos.size() > 0) {
+					log.info("updateOrderAfterOpenReward--4");
 					int n = 0;
 					for (OrderDataParam orderDataParam : dtos) {
 						Order updateOrder = new Order();
@@ -121,8 +125,9 @@ public class LotteryRewardService {
 
 						//若是商户订单,主动通知商户中奖信息
 						Order order = orderMapper.getOrderInfoByOrderSn(orderDataParam.getOrderSn());
+						log.info("updateOrderAfterOpenReward:order="+order.getMerchantOrderSn());
 						if(!StringUtils.isEmpty(order.getMerchantOrderSn())){
-							log.info("&&&&&&商户订单,开始通知商户是否中奖&&&&&&&&&");
+							log.info("updateOrderAfterOpenReward&&&&&&商户订单,开始通知商户是否中奖&&&&&&&&&");
 							String merchantOrderSn = order.getMerchantOrderSn();
 							NotifyParam qParam = new NotifyParam();
 							qParam.setMerchantOrderSn(merchantOrderSn);
