@@ -16,7 +16,7 @@ public class DlDonationRechargeCard {
     @Id
     @Column(name = "recharge_card_id")
     private Integer rechargeCardId;
-
+ 
     /**
      * 充值卡名称
      */
