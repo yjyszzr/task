@@ -30,12 +30,12 @@ public class DlDonationRechargeCardService extends AbstractService<DlDonationRec
 		for (int i = 0; i < donationRechargeCardList.size(); i++) {
 			DlDonationRechargeCard donationRechargeCard =new DlDonationRechargeCard();
 			donationRechargeCard = donationRechargeCardList.get(i);
-			Integer addTime = donationRechargeCard.getAddTime();
+			Integer onlineTime = donationRechargeCard.getOnlineTime();
 			Integer effectiveDay = donationRechargeCard.getEffectiveDay();
 			Integer currentTime = DateUtils.getCurrentTimeLong();
-			//有效期 + 开始时间 = 结束时间
-			log.info("***大礼包创建时间{}======有效期***{}",addTime,effectiveDay);
-			Integer endTime = effectiveDay * 24 * 60 * 60 + addTime;
+			//上线时间 + 有效期 = 结束时间
+			log.info("***大礼包上线时间{}======有效期***{}",onlineTime,effectiveDay);
+			Integer endTime = effectiveDay * 24 * 60 * 60 + onlineTime;
 			log.info("当前时间："+currentTime+"-结束时间："+endTime+"="+(currentTime-endTime));
 			if (currentTime > endTime ) {
 				userBonusIdList.add(donationRechargeCard.getRechargeCardId());

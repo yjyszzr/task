@@ -41,6 +41,12 @@ public class DlDonationRechargeCard {
      */
     @Column(name = "add_time")
     private Integer addTime;
+    
+    /**
+     * 上线时间
+     */
+    @Column(name = "online_time")
+    private Integer onlineTime;
 
     private String description;
 
