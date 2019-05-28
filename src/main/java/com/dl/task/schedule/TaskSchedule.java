@@ -57,7 +57,7 @@ public class TaskSchedule {
 	 * 给中奖用户派奖
 	 */
 	@Scheduled(cron = "${task.schedule.member.reward.money}")
-	public void addRewardMoneyToUsers() {
+	public synchronized  void addRewardMoneyToUsers() {
 		log.info("更新中奖用户的账户，派奖开始");
 		orderService.addRewardMoneyToUsers();//球多多派奖
 		orderService.addRewardMoneyToUsersTwo();//圣和彩店派奖
