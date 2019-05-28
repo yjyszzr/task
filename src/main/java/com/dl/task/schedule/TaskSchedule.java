@@ -68,12 +68,12 @@ public class TaskSchedule {
 	/**
 	 * 给中奖用户派奖
 	 */
-	@Scheduled(cron = "${task.schedule.lotto.openPrize}")
-	public void openPrizeForSupperLotto() {
-		log.info("※※※※※※※※※※※※※※SuperLotto※※※※※※※※※※※※※※超级大乐透开奖开始");
-		orderService.openPrizeForSupperLotto();
-		log.info("※※※※※※※※※※※※※※SuperLotto※※※※※※※※※※※※※※超级大乐透开奖结束");
-	}
+//	@Scheduled(cron = "${task.schedule.lotto.openPrize}")
+//	public void openPrizeForSupperLotto() {
+//		log.info("※※※※※※※※※※※※※※SuperLotto※※※※※※※※※※※※※※超级大乐透开奖开始");
+//		orderService.openPrizeForSupperLotto();
+//		log.info("※※※※※※※※※※※※※※SuperLotto※※※※※※※※※※※※※※超级大乐透开奖结束");
+//	}
 	
 
 	

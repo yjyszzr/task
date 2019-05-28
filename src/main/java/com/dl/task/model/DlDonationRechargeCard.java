@@ -16,7 +16,7 @@ public class DlDonationRechargeCard {
     @Id
     @Column(name = "recharge_card_id")
     private Integer rechargeCardId;
-
+ 
     /**
      * 充值卡名称
      */
@@ -78,5 +78,5 @@ public class DlDonationRechargeCard {
      * real_value
      */
     @Column(name = "real_value")
-    private BigDecimal real_value;
+    private BigDecimal realValue;
 }

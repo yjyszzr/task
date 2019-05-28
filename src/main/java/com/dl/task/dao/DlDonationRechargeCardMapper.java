@@ -12,5 +12,7 @@ public interface DlDonationRechargeCardMapper extends Mapper<DlDonationRechargeC
 	
 
 	void updateRechargeCardExpire(@Param("list") List<Integer> rechargeCardIdList);
+
+	List<DlDonationRechargeCard> selectByRechargeCardStatus(@Param("status") Integer status);
 	
 }
