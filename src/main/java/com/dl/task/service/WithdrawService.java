@@ -1,19 +1,5 @@
 package com.dl.task.service;
 
-import java.math.BigDecimal;
-import java.text.MessageFormat;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.annotation.Resource;
-
-import lombok.extern.slf4j.Slf4j;
-
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
-
 import com.dl.base.constant.CommonConstants;
 import com.dl.base.enums.SNBusinessCodeEnum;
 import com.dl.base.util.DateUtil;
@@ -26,6 +12,17 @@ import com.dl.task.model.UserAccount;
 import com.dl.task.model.UserWithdraw;
 import com.dl.task.param.AddMessageParam;
 import com.dl.task.param.MessageAddParam;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
+
+import javax.annotation.Resource;
+import java.math.BigDecimal;
+import java.text.MessageFormat;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @Slf4j
@@ -94,7 +91,7 @@ public class WithdrawService {
 				userAccount.setNote("提现回滚" + withdrawAmount);
 				int rst = userAccountMapper.insertUserAccountBySelective(userAccount);
 				log.info("生成回滚账户流水返回值" + rst);
-//		发送提现失败通知
+                //发送提现失败通知
 				sendWithdrawFailMessage(userWithdraw,userUpdated);
 			}
 		}
@@ -132,7 +129,7 @@ public class WithdrawService {
 		dlMessageService.add(addParam);
 	}
 	private String getTimeStr(Integer addTime) {
-		if(addTime <= 0) {
+		if(addTime == null || addTime <= 0) {
 			return "";
 		}
 		String addTimeStr = DateUtil.getCurrentTimeString(Long.valueOf(addTime), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:dd"));
