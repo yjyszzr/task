@@ -119,7 +119,7 @@ public class OrderService extends AbstractService<Order> {
      */
     public void dealBeyondTimeOrderOut() {
     	log.info("开始执行超时订单任务");
-    	SysConfigDTO sysConfigDTO = sysConfigService.querySysConfig(45);
+    	SysConfigDTO sysConfigDTO = sysConfigService.querySysConfig(71);//圣和彩电订单超时时间
     	Integer orderExpireTime = sysConfigDTO.getValue().intValue();
 		List<Order> orderList = orderMapper.queryOrderListByOrder20minOut(DateUtil.getCurrentTimeLong(),orderExpireTime);
     	

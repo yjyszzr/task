@@ -291,7 +291,7 @@
 	        dl_order
 	   where    pay_status = 0
 		        AND is_delete = 0
-		        AND (#{nowTime}-add_time) &gt; 1200
+		        AND (((#{nowTime}-add_time) &gt; #{expireTime} and app_code_name=11) or ((#{nowTime}-add_time) &gt; 1200 and app_code_name=10))
 	     order by add_time limit 80
   </select>
   
