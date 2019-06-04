@@ -54,6 +54,26 @@ public class TaskSchedule {
 	private DlDonationRechargeCardService dlDonationRechargeCardService;
 	
 	/**
+	 * 隐藏赛事信息（周一——周五执行）
+	 */
+	@Scheduled(cron = "${task.schedule.match.monfri.isShowOrdel}")
+	public synchronized  void updateMatchShowOrDel() {
+		log.info("MON-FRI隐藏当天比赛开始");
+		dlPrintLotteryService.updateMatchShowOrdel();//隐藏赛事信息
+		log.info("MON-FRI隐藏当天比赛结束");
+	}
+	
+	/**
+	 * 隐藏赛事信息（周末执行）
+	 */
+	@Scheduled(cron = "${task.schedule.match.satsun.isShowOrdel}")
+	public synchronized  void updateMatchDelOrShow() {
+		log.info("SAT-SUN隐藏当天比赛开始");
+		dlPrintLotteryService.updateMatchShowOrdel();//隐藏赛事信息
+		log.info("SAT-SUN隐藏当天比赛结束");
+	}
+	
+	/**
 	 * 给中奖用户派奖
 	 */
 	@Scheduled(cron = "${task.schedule.member.reward.money}")

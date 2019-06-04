@@ -86,6 +86,21 @@ public class DlPrintLotteryService {
 	@Value("${print.ticket.merchant}")
 	private String merchant;
 	
+	
+	/**
+	 * 隐藏赛事信息
+	 */
+	public void updateMatchShowOrdel() {
+		try {
+			List<LotteryMatch> lotteryMatchs = lotteryMatchMapper.getMatchShowOrDel();//获取当天比赛
+			if(lotteryMatchs!=null && lotteryMatchs.size()>0) {
+				lotteryMatchMapper.updateMatchShowOrDel(lotteryMatchs);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+	}
 	/**
 	 * 更新赛果信息
 	 */

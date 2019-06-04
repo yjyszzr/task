@@ -160,7 +160,19 @@
         set first_half = #{firstHalf}, whole=#{whole}, status=#{status}
         where match_id=#{matchId}
 	</update>
-	
+<!-- 	查询需要隐藏当天比赛 -->
+	<select id="getMatchShowOrDel" resultMap="BaseResultMap">	
+		select match_id from dl_match
+        where DATE_FORMAT(show_time,'%Y-%m-%d')=DATE_FORMAT(curdate(),'%Y-%m-%d')
+    </select>
+<!-- 	隐藏当天比赛 -->
+	<update id="updateMatchShowOrDel" >
+        update dl_match set is_show = 0, is_del=1 where 
+        match_id in 
+		<foreach collection="lotteryMatchs" item="i" open="(" close=")" separator=",">
+  	 		#{i.matchId}
+  	 	</foreach>
+	</update>
 	
 	<select id="getByChangciId" resultMap="BaseResultMap">
 		select * from dl_match where changci_id=#{changciId}

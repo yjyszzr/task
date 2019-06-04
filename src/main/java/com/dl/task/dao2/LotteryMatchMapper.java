@@ -13,17 +13,9 @@ public interface LotteryMatchMapper extends Mapper<LotteryMatch> {
 	//获取取消的赛事编码
 	public List<String> getCancelMatches(@Param("playCodes") List<String> playCodes);
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+	//隐藏当天赛事
+	public void updateMatchShowOrDel(@Param("lotteryMatchs") List<LotteryMatch> lotteryMatchs);
+	public List<LotteryMatch> getMatchShowOrDel();
 	
 	//------------------------
 	/**
