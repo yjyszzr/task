@@ -390,6 +390,11 @@ public class TaskSchedule {
 	 * 提现失败定时任务处理回退用户信息
 	 */
 	@Scheduled(cron = "${task.schedule.withdraw.fail}")
+	public void closeMatch() {
+		log.info("周一之周五9:40关闭比赛");
+	}
+	
+	@Scheduled(cron = "${task.schedule.withdraw.fail}")
 	public void withdrawFail() {
 		log.info("提现失败定时处理订单");
 		List<UserWithdraw> userWithdrawFailRefundigList = withdrawService.queryUserWithdrawRefundings();
