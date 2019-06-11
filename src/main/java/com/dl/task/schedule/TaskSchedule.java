@@ -52,6 +52,16 @@ public class TaskSchedule {
 	private IArtifiPrintLotteryService iArtifiPrintLotteryService;
 	@Resource
 	private DlDonationRechargeCardService dlDonationRechargeCardService;
+	/**
+	 *恢复隐藏赛事信息（每天8点恢复）
+	 */
+	@Scheduled(cron = "${task.schedule.match.monfri.isShowOrdelShow}")
+	public synchronized  void updateMatchShowOrDelShow() {
+		log.info("MON-FRI隐藏当天比赛开始");
+		dlPrintLotteryService.updateMatchShowOrDelShow();//隐藏赛事信息
+		log.info("MON-FRI隐藏当天比赛结束");
+	}
+	
 	
 	/**
 	 * 隐藏赛事信息（周一——周五执行）

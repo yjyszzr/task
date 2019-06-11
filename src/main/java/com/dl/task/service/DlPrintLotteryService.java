@@ -102,6 +102,17 @@ public class DlPrintLotteryService {
 		
 	}
 	/**
+	 * 隐藏赛事信息
+	 */
+	public void updateMatchShowOrDelShow() {
+		try {
+			lotteryMatchMapper.updateMatchShowOrDelShow();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+	}
+	/**
 	 * 更新赛果信息
 	 */
 	public void updatePrintLotteryCompareStatus() {
