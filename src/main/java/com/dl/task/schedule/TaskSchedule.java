@@ -57,9 +57,9 @@ public class TaskSchedule {
 	 */
 	@Scheduled(cron = "${task.schedule.match.monfri.isShowOrdelShow}")
 	public synchronized  void updateMatchShowOrDelShow() {
-		log.info("MON-FRI隐藏当天比赛开始");
+		log.info("恢复当天比赛开始");
 		dlPrintLotteryService.updateMatchShowOrDelShow();//隐藏赛事信息
-		log.info("MON-FRI隐藏当天比赛结束");
+		log.info("恢复当天比赛结束");
 	}
 	
 	
