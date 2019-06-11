@@ -173,9 +173,18 @@
   	 		#{i.matchId}
   	 	</foreach>
 	</update>
+	<!-- 	查询需要恢复展示比赛 -->
+	<select id="getMatchShowOrDelShow" resultMap="BaseResultMap">	
+		select match_id from dl_match
+        where is_del=1 and is_show=1
+    </select>
 <!-- 	展示当天比赛 -->
 	<update id="updateMatchShowOrDelShow" >
-        update dl_match set is_del = 0 where is_del=1 and is_show=1
+        update dl_match set is_del = 0 where 
+        match_id in 
+		<foreach collection="lotteryMatchs" item="i" open="(" close=")" separator=",">
+  	 		#{i.matchId}
+  	 	</foreach>
 	</update>
 		
 	<select id="getByChangciId" resultMap="BaseResultMap">

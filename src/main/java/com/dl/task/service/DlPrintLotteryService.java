@@ -106,7 +106,10 @@ public class DlPrintLotteryService {
 	 */
 	public void updateMatchShowOrDelShow() {
 		try {
-			lotteryMatchMapper.updateMatchShowOrDelShow();
+			List<LotteryMatch> lotteryMatchs = lotteryMatchMapper.getMatchShowOrDelShow();//获取当天比赛
+			if(lotteryMatchs!=null && lotteryMatchs.size()>0) {
+				lotteryMatchMapper.updateMatchShowOrDelShow(lotteryMatchs);
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

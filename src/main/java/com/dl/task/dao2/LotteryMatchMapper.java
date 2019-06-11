@@ -16,9 +16,9 @@ public interface LotteryMatchMapper extends Mapper<LotteryMatch> {
 	//隐藏当天赛事
 	public void updateMatchShowOrDel(@Param("lotteryMatchs") List<LotteryMatch> lotteryMatchs);
 	//显示隐藏赛事
-	public void updateMatchShowOrDelShow();
+	public void updateMatchShowOrDelShow(@Param("lotteryMatchs") List<LotteryMatch> lotteryMatchs);
 	public List<LotteryMatch> getMatchShowOrDel();
-	
+	public List<LotteryMatch> getMatchShowOrDelShow();
 	//------------------------
 	/**
 	 * 插入赛事数据，返回赛事id
