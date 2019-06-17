@@ -30,4 +30,7 @@ public class SysConfigService extends AbstractService<SysConfig> {
 		return sysConfigDTO;
     }
 
+    public void updateSysConfig(Integer value) {
+    	sysConfigMapper.updateConfigByBusinessId(value);
+    }
 }

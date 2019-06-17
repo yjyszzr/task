@@ -52,14 +52,18 @@ public class TaskSchedule {
 	private IArtifiPrintLotteryService iArtifiPrintLotteryService;
 	@Resource
 	private DlDonationRechargeCardService dlDonationRechargeCardService;
+	@Resource
+	private SysConfigService sysConfigService;
+	
 	/**
-	 *恢复隐藏赛事信息（每天8点恢复）
+	 *恢复购彩（每天9点恢复）
 	 */
 	@Scheduled(cron = "${task.schedule.match.monfri.isShowOrdelShow}")
 	public synchronized  void updateMatchShowOrDelShow() {
-		log.info("恢复当天比赛开始");
-		dlPrintLotteryService.updateMatchShowOrDelShow();//隐藏赛事信息
-		log.info("恢复当天比赛结束");
+		log.info("恢复比赛开始");
+//		dlPrintLotteryService.updateMatchShowOrDelShow();
+		sysConfigService.updateSysConfig(0);
+		log.info("恢复比赛结束");
 	}
 	
 	
@@ -68,9 +72,10 @@ public class TaskSchedule {
 	 */
 	@Scheduled(cron = "${task.schedule.match.monfri.isShowOrdel}")
 	public synchronized  void updateMatchShowOrDel() {
-		log.info("MON-FRI隐藏当天比赛开始");
-		dlPrintLotteryService.updateMatchShowOrdel();//隐藏赛事信息
-		log.info("MON-FRI隐藏当天比赛结束");
+		log.info("MON-FRI停售比赛开始");
+//		dlPrintLotteryService.updateMatchShowOrdel();
+		sysConfigService.updateSysConfig(2);
+		log.info("MON-FRI停售比赛结束");
 	}
 	
 	/**
@@ -78,9 +83,10 @@ public class TaskSchedule {
 	 */
 	@Scheduled(cron = "${task.schedule.match.satsun.isShowOrdel}")
 	public synchronized  void updateMatchDelOrShow() {
-		log.info("SAT-SUN隐藏当天比赛开始");
-		dlPrintLotteryService.updateMatchShowOrdel();//隐藏赛事信息
-		log.info("SAT-SUN隐藏当天比赛结束");
+		log.info("SAT-SUN停售比赛开始");
+//		dlPrintLotteryService.updateMatchShowOrdel();
+		sysConfigService.updateSysConfig(3);
+		log.info("SAT-SUN停售比赛结束");
 	}
 	
 	/**
