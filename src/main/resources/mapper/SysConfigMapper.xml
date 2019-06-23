@@ -13,7 +13,7 @@
   <select id="selectConfigByBusinessId" resultMap="BaseResultMap">
   		select * from dl_sys_config where business_id=#{businessId}
   </select>
-  <update id="updateConfigByBusinessId" resultMap="BaseResultMap">
+  <update id="updateConfigByBusinessId">
        update dl_sys_config set value=#{value} where business_id=1
   </update>
 </mapper>
