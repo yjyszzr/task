@@ -199,7 +199,8 @@ public class DlPrintLotteryService {
 			return;
 		}
 		log.info("updatePrintLotteryCompareStatus 准备获取赛事结果的场次数：" + playCodes.size() + " 获取到相应的赛事结果信息数：" + matchResults.size() + "  已取消赛事" + canCelPlayCodes.size());
-		
+
+
 		Map<String,List<BasketMatchOneResultDTO>> resultMap = new HashMap<>();
 		List<BasketMatchOneResultDTO> matchOneResult = new ArrayList<>();
 		for(DlResultBasketball basketBallResult:matchResults) {
@@ -1360,11 +1361,11 @@ public class DlPrintLotteryService {
 		List<DlPrintLottery> models = lotteryPrints.stream().map(dto->{
 			DlPrintLottery lotteryPrint = new DlPrintLottery();
 			if (lotteryClassifyId == 1 ) {
-				lotteryPrint.setGame("1");//足彩
+				lotteryPrint.setGame("T51");//足彩
 			}else	if (lotteryClassifyId == 2 ) {
 				lotteryPrint.setGame("2");//大乐透
 			}else if (lotteryClassifyId == 3 ){
-				lotteryPrint.setGame("3");//蓝彩
+				lotteryPrint.setGame("T52");//蓝彩
 			}else{
                 lotteryPrint.setGame("");//其他彩种先空着
             }
