@@ -64,7 +64,21 @@ public class PayMent {
      */
     @Column(name = "pay_desc")
     private String payDesc;
-
+    /**
+     * 是否固额
+     */
+    @Column(name = "is_readonly")
+    private String isReadonly;
+    /**
+     * 固定额度
+     */
+    @Column(name = "read_money")
+    private String readMoney;
+    /**
+     * 是否H5展示
+     */
+    @Column(name = "is_h5")
+    private String isH5;
     /**
      * 获取编号
      *
@@ -254,4 +268,30 @@ public class PayMent {
     public void setPayDesc(String payDesc) {
         this.payDesc = payDesc;
     }
+
+	public String getIsReadonly() {
+		return isReadonly;
+	}
+
+	public void setIsReadonly(String isReadonly) {
+		this.isReadonly = isReadonly;
+	}
+
+	public String getReadMoney() {
+		return readMoney;
+	}
+
+	public void setReadMoney(String readMoney) {
+		this.readMoney = readMoney;
+	}
+
+	public String getIsH5() {
+		return isH5;
+	}
+
+	public void setIsH5(String isH5) {
+		this.isH5 = isH5;
+	}
+    
+    
 }

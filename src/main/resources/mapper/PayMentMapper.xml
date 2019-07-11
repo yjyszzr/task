@@ -16,5 +16,13 @@
     <result column="pay_img" jdbcType="VARCHAR" property="payImg" />
     <result column="pay_config" jdbcType="LONGVARCHAR" property="payConfig" />
     <result column="pay_desc" jdbcType="LONGVARCHAR" property="payDesc" />
+    <result column="is_readonly" jdbcType="INTEGER" property="isReadonly" />
+    <result column="read_money" jdbcType="VARCHAR" property="readMoney" />
+    <result column="is_h5" jdbcType="VARCHAR" property="isH5" />
   </resultMap>
+  
+  <update id="updateReadMoneyByPayCode">
+       update dl_payment set read_money=#{value} where pay_code='app_rkwap'
+  </update>
+  
 </mapper>
