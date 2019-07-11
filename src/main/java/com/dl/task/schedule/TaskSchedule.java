@@ -192,7 +192,7 @@ public class TaskSchedule {
 		log.info("更新彩票信息，彩票对奖开始");
 		dlPrintLotteryService.updatePrintLotteryCompareStatus();
 		dlPrintLotteryService.updatePrintLotteryCompareStatusJz();
-//		dlPrintLotteryService.updatePrintLotteryCompareStatusJl();
+		dlPrintLotteryService.updatePrintLotteryCompareStatusJl();
 		log.info("更新彩票信息，彩票对奖结束");
 
 	}
@@ -227,7 +227,7 @@ public class TaskSchedule {
 	public void updateOrderMatchResult() {
 		log.info("开始执行更新订单详情赛果任务");
 		orderService.updateOrderMatchResult();
-//		orderService.updateOrderBasketMatchResult();
+		orderService.updateOrderBasketMatchResult();
 		log.info("结束执行更新订单详情赛果任务");
 	}
 
