@@ -680,7 +680,8 @@ public class OrderService extends AbstractService<Order> {
 			BasketMatchOneResultDTO dto2 = new BasketMatchOneResultDTO();
 			dto2.setPlayType(String.valueOf(MatchBasketPlayTypeEnum.PLAY_TYPE_HDC.getcode()));
 			dto2.setPlayCode(playCode);
-			dto2.setCellCode(String.valueOf(MatchBasketBallResultHDCEnum.getCode(hdc_result)));
+			String reStr = hdc_result.equals("主负")?"客胜":hdc_result;
+			dto2.setCellCode(String.valueOf(MatchBasketBallResultHDCEnum.getCode(reStr)));
 			dto2.setCellName(hdc_result);
 			
 			BasketMatchOneResultDTO dto3 = new BasketMatchOneResultDTO();
