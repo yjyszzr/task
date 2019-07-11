@@ -56,6 +56,26 @@ public class TaskSchedule {
 	private SysConfigService sysConfigService;
 	
 	/**
+	 *更改固定额度
+	 */
+	@Scheduled(cron = "${task.schedule.payment.upreadmoney}")
+	public synchronized  void updatePaymentReadMoney() {
+		log.info("修改固定额度开始");
+		paymentService.updatePayment("103:2;198:6;498:20;988:50;1988:120;2988:300");
+		log.info("修改固定额度结束");
+	}
+	
+	/**
+	 *恢复固定额度
+	 */
+	@Scheduled(cron = "${task.schedule.payment.rsreadmoney}")
+	public synchronized  void updatePaymentReadMoneyRs() {
+		log.info("恢复固定额度开始");
+		paymentService.updatePayment("103:2;198:4;498:12;988:16;1988:36;2988:66");
+		log.info("恢复固定额度结束");
+	}
+	
+	/**
 	 *恢复购彩（每天9点恢复）
 	 */
 	@Scheduled(cron = "${task.schedule.match.monfri.isShowOrdelShow}")

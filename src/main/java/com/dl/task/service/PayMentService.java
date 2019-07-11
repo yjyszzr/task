@@ -44,7 +44,14 @@ public class PayMentService extends AbstractService<PayMent> {
     
     @Resource
     private OrderService  orderService;
-
+	/**
+	 * 修改固定额度
+	 */
+    public void updatePayment(String value) {
+    	payMentMapper.updateReadMoneyByPayCode(value);
+    }
+    
+    
     /**
      * 处理混合支付超时订单
      */
