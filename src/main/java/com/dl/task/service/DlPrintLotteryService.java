@@ -213,16 +213,25 @@ public class DlPrintLotteryService {
 			String mnl_result = dataOdj.getString("mnl_result");
 			String wnm_result = dataOdj.getString("wnm_result");
 			BasketMatchOneResultDTO dto1 = new BasketMatchOneResultDTO();
-			dto1.setPlayType("0"+String.valueOf(MatchBasketPlayTypeEnum.PLAY_TYPE_MNL.getcode()));
-			dto1.setPlayCode(playCode);
-			dto1.setCellCode(String.valueOf(MatchBasketResultHdEnum.getCode(mnl_result)));
-			dto1.setCellName(mnl_result);			
-			
-			BasketMatchOneResultDTO dto2 = new BasketMatchOneResultDTO();
-			dto2.setPlayType("0"+String.valueOf(MatchBasketPlayTypeEnum.PLAY_TYPE_HDC.getcode()));
-			dto2.setPlayCode(playCode);
-			dto2.setCellCode(String.valueOf(MatchBasketBallResultHDCEnum.getCode(hdc_result)));
-			dto2.setCellName(hdc_result);
+            dto1.setPlayType(String.valueOf(MatchBasketPlayTypeEnum.PLAY_TYPE_MNL.getcode()));
+            dto1.setPlayCode(playCode);
+            mnl_result = mnl_result.replaceAll(" ", "");
+            if(mnl_result.equals("主负")){
+                mnl_result = "客胜";
+            }
+            dto1.setCellCode(String.valueOf(MatchBasketBallResultHDCEnum.getCode(mnl_result)));
+            dto1.setCellName(mnl_result);
+
+            BasketMatchOneResultDTO dto2 = new BasketMatchOneResultDTO();
+            dto2.setPlayType(String.valueOf(MatchBasketPlayTypeEnum.PLAY_TYPE_HDC.getcode()));
+            dto2.setPlayCode(playCode);
+            if(hdc_result.equals("主胜")){
+                hdc_result = "让分主胜";
+            }else if(hdc_result.equals("主负") || hdc_result.equals("让分主负")){
+                hdc_result = "让分客胜";
+            }
+            dto2.setCellCode(String.valueOf(MatchBasketResultHdEnum.getCode(hdc_result)));
+            dto2.setCellName(hdc_result);
 			
 			BasketMatchOneResultDTO dto3 = new BasketMatchOneResultDTO();
 			dto3.setPlayType("0"+String.valueOf(MatchBasketPlayTypeEnum.PLAY_TYPE_WNM.getcode()));
@@ -290,7 +299,7 @@ public class DlPrintLotteryService {
 							} else {
 								// 比赛结果获取中奖信息
 								for (BasketMatchOneResultDTO rst : matchResultList) {
-									if (rst.getPlayType().equals(playTypeStr)) {
+									if (rst.getPlayType().equals(String.valueOf(Integer.valueOf(playTypeStr)))) {
 										playTypehaveResult = Boolean.TRUE;
 										String cellCode = rst.getCellCode();
 										if (cellCodes.contains(cellCode)) {

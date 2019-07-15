@@ -66,9 +66,6 @@ public class LotteryRewardService {
 					Integer thirdRewardStatus = dto.getThirdRewardStatus();
 					Boolean caiXiaoMiIsNotRewardEnd = StringUtils.isBlank(compareStatus) || !"1".equals(compareStatus);
 					String game = dto.getGame();
-					if("2019071016001731340040".equals(dto.getOrderSn())){
-					    System.out.print("123");
-                    }
 
 					if("T01".equals(game)){
 						caiXiaoMiIsNotRewardEnd = caiXiaoMiIsNotRewardEnd||!Integer.valueOf(3).equals(thirdRewardStatus);
