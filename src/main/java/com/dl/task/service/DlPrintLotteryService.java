@@ -307,7 +307,7 @@ public class DlPrintLotteryService {
 											String key = rst.getPlayCode() + "|" + rst.getCellCode();
 											String odds = aa.get(key);
 											if (StringUtils.isNotBlank(odds)) {
-												sbuf.append(";").append("0").append(rst.getPlayType()).append("|").append(key).append("@").append(odds);
+												sbuf.append(";").append(rst.getPlayType()).append("|").append(key).append("@").append(odds);
 												break;
 											}
 										}
