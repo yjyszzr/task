@@ -243,7 +243,7 @@ public class DlPrintLotteryService {
 			dto4.setPlayType(String.valueOf(MatchBasketPlayTypeEnum.PLAY_TYPE_HILO.getcode()));
 			dto4.setPlayCode(playCode);
 			dto4.setCellCode(MatchBasketBallResultHILOEnum.getCode(hilo_result+"分"));
-			dto4.setCellName(hdc_result);
+			dto4.setCellName(hilo_result);
 			
 			matchOneResult.add(dto1);
 			matchOneResult.add(dto2);
@@ -264,7 +264,10 @@ public class DlPrintLotteryService {
 				continue;
 			}
 			for (DlPrintLottery print : lotteryPrints) {
-				Boolean playTypehaveResult = Boolean.FALSE;
+				if(print.getOrderSn().equals("2019071511058531330047")){
+				    System.out.print("112233");
+                }
+			    Boolean playTypehaveResult = Boolean.FALSE;
 				String stakes = print.getStakes();
 				String comparedStakes = print.getComparedStakes() == null ? "" : print.getComparedStakes();
 				// 判断是否对比过
@@ -304,7 +307,7 @@ public class DlPrintLotteryService {
 										String cellCode = rst.getCellCode();
 										if (cellCodes.contains(cellCode)) {
 											Map<String, String> aa = this.aa(print.getPrintSp());
-											String key = rst.getPlayCode() + "|" + rst.getCellCode();
+											String key = playCode + "|" + rst.getCellCode();
 											String odds = aa.get(key);
 											if (StringUtils.isNotBlank(odds)) {
 												sbuf.append(";").append(rst.getPlayType()).append("|").append(key).append("@").append(odds);
