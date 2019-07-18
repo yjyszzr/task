@@ -718,28 +718,60 @@ public class DlPrintLotteryService {
 			String[] tickets = ticketData.split(";");
 			String playCode = null;
 			List<MatchBetCellDTO> matchBetCells = new ArrayList<MatchBetCellDTO>(tickets.length);
-			for(String tikcket: tickets) {
-				String[] split = tikcket.split("\\|");
-				if(split.length != 3) {
-					log.error("getBetInfoByOrderInfo ticket has error, orderSn="+orderSn+ " ticket="+tikcket);
-					continue;
-				}
-				String playType = split[0];
-				if(null == playCode) {
-					playCode = split[1];
-				}
-				String[] split2 = split[2].split(",");
-				List<DlJcZqMatchCellDTO> betCells = Arrays.asList(split2).stream().map(str->{
-					String[] split3 = str.split("@");
-					String matchResult = getCathecticData(split[0], split3[0]);
-					DlJcZqMatchCellDTO dto = new DlJcZqMatchCellDTO(split3[0], matchResult, split3[1]);
-					return dto;
-				}).collect(Collectors.toList());
-				MatchBetCellDTO matchBetCell = new MatchBetCellDTO();
-				matchBetCell.setPlayType(playType);
-				matchBetCell.setBetCells(betCells);
-				matchBetCells.add(matchBetCell);
-			}
+			Integer lotteryClassifyId = detail.getLotteryClassifyId();
+
+			if(1 == lotteryClassifyId ){
+                for(String tikcket: tickets) {
+                    String[] split = tikcket.split("\\|");
+                    if(split.length != 3) {
+                        log.error("getBetInfoByOrderInfo ticket has error, orderSn="+orderSn+ " ticket="+tikcket);
+                        continue;
+                    }
+                    String playType = split[0];
+                    if(null == playCode) {
+                        playCode = split[1];
+                    }
+                    String[] split2 = split[2].split(",");
+
+                    List<DlJcZqMatchCellDTO> betCells = Arrays.asList(split2).stream().map(str->{
+                        String[] split3 = str.split("@");
+                        String matchResult = getCathecticData(split[0], split3[0]);
+                        DlJcZqMatchCellDTO dto = new DlJcZqMatchCellDTO(split3[0], matchResult, split3[1]);
+                        return dto;
+                    }).collect(Collectors.toList());
+
+                    MatchBetCellDTO matchBetCell = new MatchBetCellDTO();
+                    matchBetCell.setPlayType(playType);
+                    matchBetCell.setBetCells(betCells);
+                    matchBetCells.add(matchBetCell);
+                }
+            }else if(3 == lotteryClassifyId ){
+                for(String tikcket: tickets) {
+                    String[] split = tikcket.split("\\|");
+                    if(split.length != 3) {
+                        log.error("getBetInfoByOrderInfo ticket has error, orderSn="+orderSn+ " ticket="+tikcket);
+                        continue;
+                    }
+                    String playType = split[0];
+                    if(null == playCode) {
+                        playCode = split[1];
+                    }
+                    String[] split2 = split[2].split(",");
+
+                    List<DlJcZqMatchCellDTO> betCells = Arrays.asList(split2).stream().map(str->{
+                        String[] split3 = str.split("@");
+                        String matchResult = getBasketCathecticData(split[0], split3[0]);
+                        DlJcZqMatchCellDTO dto = new DlJcZqMatchCellDTO(split3[0], matchResult, split3[1]);
+                        return dto;
+                    }).collect(Collectors.toList());
+
+                    MatchBetCellDTO matchBetCell = new MatchBetCellDTO();
+                    matchBetCell.setPlayType(playType);
+                    matchBetCell.setBetCells(betCells);
+                    matchBetCells.add(matchBetCell);
+                }
+            }
+
 			matchBetDto.setPlayCode(playCode);
 			matchBetDto.setMatchBetCells(matchBetCells);
 			return matchBetDto;
@@ -1026,8 +1058,9 @@ public class DlPrintLotteryService {
 		}
 		return indexMap;
 	}
+
 	/**
-     * 通过玩法code与投注内容，进行转换
+     * 足球通过玩法code与投注内容，进行转换
      * @param playCode
      * @param cathecticStr
      * @return
@@ -1046,6 +1079,35 @@ public class DlPrintLotteryService {
     		cathecticData = MatchResultHafuEnum.getName(cathecticStr);
     	}
     	return cathecticData;
+    }
+
+    /**
+     * 篮球通过玩法code与投注内容，进行转换
+     * @param playCode
+     * @param cathecticStr
+     * @return
+     */
+    private String getBasketCathecticData(String playTypeStr, String cathecticStr) {
+        int playType = Integer.parseInt(playTypeStr);
+        String cathecticData = "";
+        if (MatchBasketPlayTypeEnum.PLAY_TYPE_MNL.getcode() == playType || MatchBasketPlayTypeEnum.PLAY_TYPE_HDC.getcode() == playType) {
+            if (!cathecticStr.equals("null")) {
+                cathecticData = MatchBasketBallResultHDCEnum.getName(Integer.valueOf(cathecticStr));
+            }
+        } else if (MatchBasketPlayTypeEnum.PLAY_TYPE_HDC.getcode() == playType) {
+            if (!cathecticStr.equals("null")) {
+                cathecticData = MatchBasketBallResultHDCEnum.getName(Integer.valueOf(cathecticStr));
+            }
+        } else if (MatchBasketPlayTypeEnum.PLAY_TYPE_HILO.getcode() == playType) {
+            if (!cathecticStr.equals("null")) {
+                cathecticData = MatchBasketBallResultHILOEnum.getName(cathecticStr);
+            }
+        } else if (MatchBasketPlayTypeEnum.PLAY_TYPE_WNM.getcode() == playType) {
+            if (!cathecticStr.equals("null")) {
+                cathecticData = BasketBallHILOLeverlEnum.getName(cathecticStr);
+            }
+        }
+        return cathecticData;
     }
     /**
 	 * 
