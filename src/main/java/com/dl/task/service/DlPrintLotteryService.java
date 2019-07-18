@@ -863,7 +863,7 @@ public class DlPrintLotteryService {
 				
 				Set<Integer> collect = subList.stream().map(cdto->Integer.parseInt(cdto.getPlayType())).collect(Collectors.toSet());
 				String playType = param.getPlayType();
-				if(Integer.parseInt(playType) == 6 && collect.size() == 1) {
+				if(Integer.parseInt(playType) == 6) {
 					playType = "0"+collect.toArray(new Integer[1])[0].toString();
 				}
 				String issue = subList.get(0).getPlayCode();
