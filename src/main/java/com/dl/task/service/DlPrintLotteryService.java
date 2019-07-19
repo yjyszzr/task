@@ -264,9 +264,6 @@ public class DlPrintLotteryService {
 				continue;
 			}
 			for (DlPrintLottery print : lotteryPrints) {
-				if(print.getOrderSn().equals("2019071511058531330047")){
-				    System.out.print("112233");
-                }
 			    Boolean playTypehaveResult = Boolean.FALSE;
 				String stakes = print.getStakes();
 				String comparedStakes = print.getComparedStakes() == null ? "" : print.getComparedStakes();
@@ -301,20 +298,23 @@ public class DlPrintLotteryService {
 								}
 							} else {
 								// 比赛结果获取中奖信息
-								for (BasketMatchOneResultDTO rst : matchResultList) {
-									if (rst.getPlayType().equals(String.valueOf(Integer.valueOf(playTypeStr)))) {
-										playTypehaveResult = Boolean.TRUE;
-										String cellCode = rst.getCellCode();
-										if (cellCodes.contains(cellCode)) {
-											Map<String, String> aa = this.aa(print.getPrintSp());
-											String key = playCode + "|" + rst.getCellCode();
-											String odds = aa.get(key);
-											if (StringUtils.isNotBlank(odds)) {
-												sbuf.append(";").append(rst.getPlayType()).append("|").append(key).append("@").append(odds);
-												break;
-											}
-										}
-									}
+                                List<BasketMatchOneResultDTO> matchResultListNew = matchResultList.stream().filter(s->s.getPlayCode().equals(split[1])).collect(Collectors.toList());
+								for (BasketMatchOneResultDTO rst : matchResultListNew) {
+
+                                        if (rst.getPlayType().equals(String.valueOf(Integer.valueOf(playTypeStr)))) {
+                                            playTypehaveResult = Boolean.TRUE;
+                                            String cellCode = rst.getCellCode();
+                                            if (cellCodes.contains(cellCode)) {
+                                                Map<String, String> aa = this.aa(print.getPrintSp());
+                                                String key = rst.getPlayCode() + "|" + rst.getCellCode();
+                                                String odds = aa.get(key);
+                                                if (StringUtils.isNotBlank(odds)) {
+                                                    sbuf.append(";").append("0").append(String.valueOf(Integer.valueOf(playTypeStr))).append("|").append(key).append("@").append(odds);
+                                                    break;
+                                                }
+                                            }
+                                        }
+
 								}
 							}
 						}
@@ -863,7 +863,7 @@ public class DlPrintLotteryService {
 				
 				Set<Integer> collect = subList.stream().map(cdto->Integer.parseInt(cdto.getPlayType())).collect(Collectors.toSet());
 				String playType = param.getPlayType();
-				if(Integer.parseInt(playType) == 6) {
+				if(Integer.parseInt(playType) == 6 && collect.size() == 1) {
 					playType = "0"+collect.toArray(new Integer[1])[0].toString();
 				}
 				String issue = subList.get(0).getPlayCode();
