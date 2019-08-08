@@ -61,7 +61,7 @@ public class TaskSchedule {
 	@Scheduled(cron = "${task.schedule.payment.upreadmoney}")
 	public synchronized  void updatePaymentReadMoney() {
 		log.info("修改固定额度开始");
-//		paymentService.updatePayment("103:2;198:6;498:20;988:50;1988:120;2988:300"); 
+		paymentService.updatePayment("103:6;198:12;498:30;988:60;1988:120;2988:180"); 
 		log.info("修改固定额度结束");
 	}
 	
@@ -71,7 +71,7 @@ public class TaskSchedule {
 	@Scheduled(cron = "${task.schedule.payment.rsreadmoney}")
 	public synchronized  void updatePaymentReadMoneyRs() {
 		log.info("恢复固定额度开始");
-//		paymentService.updatePayment("103:2;198:4;498:12;988:16;1988:36;2988:66");
+		paymentService.updatePayment("103:2;198:4;498:12;988:16;1988:36;2988:66");
 		log.info("恢复固定额度结束");
 	}
 	
