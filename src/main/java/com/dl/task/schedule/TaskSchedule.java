@@ -82,7 +82,7 @@ public class TaskSchedule {
 	public synchronized  void updateMatchShowOrDelShow() {
 		log.info("恢复比赛开始");
 //		dlPrintLotteryService.updateMatchShowOrDelShow();
-//		sysConfigService.updateSysConfig(0);
+		sysConfigService.updateSysConfig(0);
 		log.info("恢复比赛结束");
 	}
 	
@@ -94,7 +94,7 @@ public class TaskSchedule {
 	public synchronized  void updateMatchShowOrDel() {
 		log.info("MON-FRI停售比赛开始");
 //		dlPrintLotteryService.updateMatchShowOrdel();
-//		sysConfigService.updateSysConfig(2);
+		sysConfigService.updateSysConfig(2);
 		log.info("MON-FRI停售比赛结束");
 	}
 	
@@ -105,7 +105,7 @@ public class TaskSchedule {
 	public synchronized  void updateMatchDelOrShow() {
 		log.info("SAT-SUN停售比赛开始");
 //		dlPrintLotteryService.updateMatchShowOrdel();
-//		sysConfigService.updateSysConfig(3);
+		sysConfigService.updateSysConfig(3);
 		log.info("SAT-SUN停售比赛结束");
 	}
 	
