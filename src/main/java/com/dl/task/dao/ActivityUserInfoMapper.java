@@ -5,7 +5,11 @@ import com.dl.task.model.ActivityUserInfo;
 
 public interface ActivityUserInfoMapper extends Mapper<ActivityUserInfo> {
 	
-	Integer updateActivityUserInfo();
+	Integer insertHisToUserInfo();
+	
+	Integer updateActivityUserInfoByBl();
+	
+	Integer updateActivityUserInfoByRy();
 
 
 }

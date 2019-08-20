@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dl.task.dao.ActivityMapper">
+  <resultMap id="BaseResultMap" type="com.dl.task.model.Activity">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="act_id" jdbcType="INTEGER" property="act_id" />
+    <result column="act_name" jdbcType="VARCHAR" property="act_name" />
+    <result column="act_title" jdbcType="VARCHAR" property="act_title" />
+    <result column="act_type" jdbcType="INTEGER" property="act_type" />
+    <result column="act_img" jdbcType="VARCHAR" property="act_img" />
+    <result column="act_url" jdbcType="VARCHAR" property="act_url" />
+    <result column="start_time" jdbcType="INTEGER" property="start_time" />
+    <result column="end_time" jdbcType="INTEGER" property="end_time" />
+    <result column="is_finish" jdbcType="INTEGER" property="is_finish" />
+    <result column="purchase_num" jdbcType="INTEGER" property="purchase_num" />
+    <result column="status" jdbcType="INTEGER" property="status" />
+    <result column="use_range" jdbcType="INTEGER" property="use_range" />
+    <result column="reward_money" jdbcType="DOUBLE" property="reward_money" />
+    <result column="number" jdbcType="INTEGER" property="number" />
+    <result column="is_del" jdbcType="VARCHAR" property="is_del" />
+  </resultMap>
+
+  <select id ="queryActivityList"  resultMap="BaseResultMap" parameterType="Integer">
+  	select * from dl_activity where act_type=#{act_type} is_finish=1 and is_del=0 order by end_time desc
+  </select>
+
+</mapper>
