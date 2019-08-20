@@ -23,7 +23,7 @@
   </resultMap>
 
   <select id ="queryActivityList"  resultMap="BaseResultMap" parameterType="Integer">
-  	select * from dl_activity where act_type=#{act_type} is_finish=1 and is_del=0 order by end_time desc
+  	select * from dl_activity where act_type=#{act_type} and is_finish=1 and is_del=0 order by end_time desc
   </select>
 
 </mapper>

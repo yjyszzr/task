@@ -1,5 +1,6 @@
 package com.dl.task.service;
 
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import javax.annotation.Resource;
@@ -27,7 +28,7 @@ public class ActivityUserInfoService extends AbstractService<ActivityUserInfo> {
 		Integer copynum=0;
 		Integer thisnum=0;
 		for (Activity activity : activityList) {
-			if(DateUtil.getCurrentTimeLong()>activity.getEnd_time()) {
+			if(this.getDay(DateUtil.getCurrentTimeLong())==this.getDay(activity.getEnd_time())) {
 				copynum = activityUserInfoMapper.insertHisToUserInfo();//将现有数据备份到历史表
 				thisnum = activityUserInfoMapper.updateActivityUserInfoByBl();//清楚此次活动数据
 				break;
@@ -41,12 +42,17 @@ public class ActivityUserInfoService extends AbstractService<ActivityUserInfo> {
 		Integer copynum=0;
 		Integer thisnum=0;
 		for (Activity activity : activityList) {
-			if(DateUtil.getCurrentTimeLong()>activity.getEnd_time()) {
+			if(this.getDay(DateUtil.getCurrentTimeLong())==this.getDay(activity.getEnd_time())) {
 				copynum = activityUserInfoMapper.insertHisToUserInfo();//将现有数据备份到历史表
 				thisnum = activityUserInfoMapper.updateActivityUserInfoByRy();//清楚此次活动数据
 				break;
 			}
 		}
 		return "荣耀奖备份"+copynum+"条数据，修改"+thisnum+"条数据";
+	}
+	
+	public int getDay(Integer time) {
+		String day = DateUtil.getTimeString(DateUtil.getCurrentTimeLong(), DateTimeFormatter.ofPattern("dd"));
+		return day==null?0:Integer.valueOf(day);
 	}
 }
