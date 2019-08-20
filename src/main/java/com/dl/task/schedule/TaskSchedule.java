@@ -42,6 +42,9 @@ public class TaskSchedule {
 	private IpaymentService ipaymentService;
 
 	@Resource
+	private ActivityUserInfoService activityUserInfoService;
+	
+	@Resource
 	private DlOldBeltNewService dlOldBeltNewService;
 
 	@Resource
@@ -54,6 +57,26 @@ public class TaskSchedule {
 	private DlDonationRechargeCardService dlDonationRechargeCardService;
 	@Resource
 	private SysConfigService sysConfigService;
+	
+	/**
+	 * 伯乐奖活动结束清理
+	 */
+	@Scheduled(cron = "${task.schedule.activity.clearactivity}")
+	public synchronized void updateActivityUserInfoBl() {
+		log.info("伯乐奖活动结束，数据清零操作开始");
+		String note = activityUserInfoService.timeUpdateActityUserInfoBl();
+		log.info("伯乐奖活动结束，本次操作结果："+note);
+	}
+	
+	/**
+	 * 荣耀奖活动结束清理
+	 */
+	@Scheduled(cron = "${task.schedule.activity.clearactivity}")
+	public synchronized void updateActivityUserInfoRy() {
+		log.info("荣耀奖活动结束，数据清零操作开始");
+		String note = activityUserInfoService.timeUpdateActityUserInfoRy();
+		log.info("荣耀奖活动结束，本次操作结果："+note);
+	}
 	
 	/**
 	 *更改固定额度
