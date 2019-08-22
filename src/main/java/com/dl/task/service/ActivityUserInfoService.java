@@ -16,7 +16,7 @@ import com.dl.task.model.Activity;
 import com.dl.task.model.ActivityUserInfo;
 
 @Service
-@Transactional
+@Transactional(value="transactionManager1")
 public class ActivityUserInfoService extends AbstractService<ActivityUserInfo> {
 	@Resource
 	private ActivityUserInfoMapper activityUserInfoMapper;
