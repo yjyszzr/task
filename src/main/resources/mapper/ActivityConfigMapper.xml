@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dl.task.dao.ActivityConfigMapper">
+  <resultMap id="BaseResultMap" type="com.dl.task.model.ActivityConfig">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="act_id" jdbcType="INTEGER" property="act_id" />
+  </resultMap>
+
+  <select id ="queryActivityConfigList"  resultMap="String" parameterType="Integer">
+  	select * from dl_activity_config where act_id=#{act_id}
+  </select>
+	<delete id="deleteConfigRecByConfigId" parameterType="String">
+		delete from dl_activity_config_user_receive where config_id in
+		<foreach collection="configIdArr" item="configId" index="index" open="(" close=")" separator=",">
+  	 		#{configId}
+  	 	</foreach>
+	</delete>
+	
+
+</mapper>
