@@ -42,7 +42,7 @@ public class ActivityUserInfoService extends AbstractService<ActivityUserInfo> {
 				break;
 			}
 		}
-		return "伯乐奖备份"+copynum+"条数据，修改"+thisnum+"条数据";
+		return "伯乐奖备份"+copynum+"条数据，修改"+thisnum+"条数据，清除出档位领取数据"+delnum+"条";
 	}
 	
 	public String timeUpdateActityUserInfoRy() {
@@ -62,7 +62,7 @@ public class ActivityUserInfoService extends AbstractService<ActivityUserInfo> {
 				break;
 			}
 		}
-		return "荣耀奖备份"+copynum+"条数据，修改"+thisnum+"条数据";
+		return "荣耀奖备份"+copynum+"条数据，修改"+thisnum+"条数据，清除出档位领取数据"+delnum+"条";
 	}
 	
 	public int getDay(Integer time) {
