@@ -9,8 +9,8 @@
     <result column="act_id" jdbcType="INTEGER" property="act_id" />
   </resultMap>
 
-  <select id ="queryActivityConfigList"  resultMap="String" parameterType="Integer">
-  	select * from dl_activity_config where act_id=#{act_id}
+  <select id ="queryActivityConfigList"  resultType="String" parameterType="Integer">
+  	select id from dl_activity_config where act_id=#{act_id}
   </select>
 	<delete id="deleteConfigRecByConfigId" parameterType="String">
 		delete from dl_activity_config_user_receive where config_id in
