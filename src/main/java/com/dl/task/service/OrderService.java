@@ -695,7 +695,7 @@ public class OrderService extends AbstractService<Order> {
 			BasketMatchOneResultDTO dto3 = new BasketMatchOneResultDTO();
 			dto3.setPlayType(String.valueOf(MatchBasketPlayTypeEnum.PLAY_TYPE_WNM.getcode()));
 			dto3.setPlayCode(playCode);
-			dto3.setCellCode(reHVMNLCode(mnl_result));
+			dto3.setCellCode(reHVMNLCode(wnm_result));
 			dto3.setCellName(wnm_result);
 			
 			BasketMatchOneResultDTO dto4 = new BasketMatchOneResultDTO();
@@ -758,7 +758,7 @@ public class OrderService extends AbstractService<Order> {
      * @return
      */
 	public String reHVMNLCode(String wnmResult){
-        String hRst = BasketBallHILOLeverlEnum.getCode(wnm_result.substring(2)+"分");
+        String hRst = BasketBallHILOLeverlEnum.getCode(wnmResult.substring(2)+"分");
 	    if(wnmResult.contains("客胜")){
             hRst = String.valueOf(Integer.valueOf(hRst) + 6);
         }
