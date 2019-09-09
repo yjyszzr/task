@@ -1,12 +1,11 @@
 package com.dl.task.dao;
 
-import java.util.List;
-
-import org.apache.ibatis.annotations.Param;
-
 import com.dl.base.mapper.Mapper;
 import com.dl.task.model.OrderDetail;
 import com.dl.task.param.SupperLottoOrderDetailParam;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 public interface OrderDetailMapper extends Mapper<OrderDetail> {
 	
@@ -15,6 +14,9 @@ public interface OrderDetailMapper extends Mapper<OrderDetail> {
 	
 	//获取 没有赛事结果 的篮彩订单详情
 	public List<OrderDetail> unBasketMatchResultOrderDetails();
+
+    //根据多个订单号获取 的多个篮彩订单详情
+    public List<OrderDetail> getOrderDetailsByOrderSns(@Param("orderSns") List<String> orderSnList);
 	
 	//更新订单详情的比赛结果
 	public int updateMatchResult(OrderDetail detail);

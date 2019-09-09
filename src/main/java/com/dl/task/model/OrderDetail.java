@@ -1,13 +1,12 @@
 package com.dl.task.model;
 
-import java.util.Date;
+import lombok.Data;
 
 import javax.persistence.Column;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Transient;
-
-import lombok.Data;
+import java.util.Date;
 @Data
 @Table(name = "dl_order_detail")
 public class OrderDetail {
@@ -23,6 +22,14 @@ public class OrderDetail {
      */
     @Column(name = "user_id")
     private Integer userId;
+
+
+    /**
+     * 预设总分
+     */
+    @Column(name = "forecast_score")
+    private String forecastScore;
+
 
     /**
      * 订单编号

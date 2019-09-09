@@ -1,12 +1,11 @@
 package com.dl.task.dao2;
 
-import java.util.List;
-
-import org.apache.ibatis.annotations.Param;
-
 import com.dl.base.mapper.Mapper;
 import com.dl.task.dto.BasketBallLeagueInfoDTO;
 import com.dl.task.model.DlMatchBasketball;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 public interface DlMatchBasketballMapper extends Mapper<DlMatchBasketball> {
 	/**
@@ -22,6 +21,14 @@ public interface DlMatchBasketballMapper extends Mapper<DlMatchBasketball> {
 	 * @return
 	 */
 	public List<DlMatchBasketball> getChangciIdsFromBasketMatchByPlayCodes(@Param("playCodes") List<String> playCodes);
+
+
+    /**
+     * 根据多个play_code查询结束的DlMatchBasketball集合
+     * @param playCodes
+     * @return
+     */
+    public List<DlMatchBasketball> getEndBasketMatchByPlayCodes(@Param("playCodes") List<String> playCodes);
 	/**
 	 * 
 	 * @param leagueId 

@@ -1,7 +1,5 @@
 package com.dl.task.service;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.dl.base.constant.CommonConstants;
 import com.dl.base.enums.*;
 import com.dl.base.exception.ServiceException;
@@ -623,7 +621,102 @@ public class OrderService extends AbstractService<Order> {
 		}
 	}
 
-	//更新订单的比赛结果
+    /**
+     * 构造篮球的matchResult
+     */
+    public List<JsonResultBasketball> generateBasketResult(List<CountBasketBaseInfo> countBasketBaseInfoList){
+        List<JsonResultBasketball> jsonResultBasketballList = new ArrayList<>();
+        for(CountBasketBaseInfo s:countBasketBaseInfoList) {
+            JsonResultBasketball jsonResultBasketball = new JsonResultBasketball();
+            jsonResultBasketball.setOrderDetailId(s.getOrderDetailId());
+            jsonResultBasketball.setOrderSn(s.getOrderSn());
+            jsonResultBasketball.setTicketData(s.getTicketData());
+            Integer changCiId = s.getChangCiId();
+            jsonResultBasketball.setChangciId(changCiId);
+            jsonResultBasketball.setPlayCode(s.getPlayCode());
+            String score = s.getScore();//客队：主队
+            if (StringUtils.isNotEmpty(score)) {
+                String[] VHArr = score.split(":");
+                if (Integer.valueOf(VHArr[0]) > Integer.valueOf(VHArr[1])) {
+                    jsonResultBasketball.setMnlResult("客胜");
+                } else if (Integer.valueOf(VHArr[0]) < Integer.valueOf(VHArr[1])) {
+                    jsonResultBasketball.setMnlResult("主胜");
+                }
+
+                if (StringUtils.isNotEmpty(s.getRangFen())) {
+                    if (Double.valueOf(VHArr[1]) + Double.valueOf(s.getRangFen()) > Double.valueOf(VHArr[0])) {
+                        jsonResultBasketball.setHdcResult("主胜");
+                    } else if (Double.valueOf(VHArr[1]) + Double.valueOf(s.getRangFen()) < Double.valueOf(VHArr[0])) {
+                        jsonResultBasketball.setHdcResult("主负");
+                    }
+                }else{
+                    continue;
+                }
+
+                Integer vnmScore = Integer.valueOf(VHArr[0]) - Integer.valueOf(VHArr[1]);
+                jsonResultBasketball.setWnmResult(whichWNMPeriod(vnmScore));
+
+                if (StringUtils.isNotEmpty(s.getForecastScore())) {
+                    if (Double.valueOf(VHArr[0]) + Double.valueOf(VHArr[1]) > Double.valueOf(s.getForecastScore())) {
+                        jsonResultBasketball.setHiloResult("大");
+                    } else if (Double.valueOf(VHArr[0]) + Double.valueOf(VHArr[1]) < Double.valueOf(s.getForecastScore())) {
+                        jsonResultBasketball.setHiloResult("小");
+                    }
+                }else{
+                    continue;
+                }
+
+            }
+            jsonResultBasketballList.add(jsonResultBasketball);
+        }
+
+        return jsonResultBasketballList;
+    }
+
+    /**
+     * 不包含差值得于0的情况
+     * @param vnmScore
+     * @return
+     */
+    public static String whichWNMPeriod(Integer vnmScore){
+        if(vnmScore >= 1 && vnmScore <= 5){
+            return "客胜1-5";
+        }else if(vnmScore >= 6 && vnmScore <= 10){
+            return "客胜6-10";
+        }else if(vnmScore >= 11 && vnmScore <= 15){
+            return "客胜11-15";
+        }else if(vnmScore >= 16 && vnmScore <= 20){
+            return "客胜16-20";
+        }else if(vnmScore >= 21 && vnmScore <= 25){
+            return "客胜21-25";
+        }else if(vnmScore >= 26){
+            return "客胜26+";
+        }else if(vnmScore >= -5 && vnmScore <= -1){
+            return "主胜1-5";
+        }else if(vnmScore >= -10 && vnmScore <= -6){
+            return "主胜6-10";
+        }else if(vnmScore >= -15 && vnmScore <= -11){
+            return "主胜11-15";
+        }else if(vnmScore >= -20 && vnmScore <= -16){
+            return "主胜16-20";
+        }else if(vnmScore >= -25 && vnmScore <= -21){
+            return "主胜21-25";
+        }else if( vnmScore <= -26){
+            return "主胜26+";
+        }
+
+        return "";
+    }
+
+
+    public static void main(String[] args) {
+        String rst = whichWNMPeriod(-6);
+        System.out.print(rst);
+    }
+
+	/*
+	 *更新订单的比赛结果,主体为订单详情（订单详情对应的每一场比赛进行更新赛果）
+	 */
 	public void updateOrderBasketMatchResult() {
 		List<OrderDetail> orderDetails = orderDetailMapper.unBasketMatchResultOrderDetails();
 		if (CollectionUtils.isEmpty(orderDetails)) {
@@ -634,15 +727,38 @@ public class OrderService extends AbstractService<Order> {
 		playCodes.addAll(playCodesSet);
 		log.info("updateOrderMatchResult 准备获取赛事结果的场次数：" + playCodes.size());
 		List<String> cancelMatches = dlMatchBasketballMapper.getCancelMatches(playCodes);
-		List<DlMatchBasketball> matchBasketBallList = dlMatchBasketballMapper.getChangciIdsFromBasketMatchByPlayCodes(playCodes);
-		Map<Integer,String> pcodeAndCIdMap = matchBasketBallList.stream().collect(Collectors.toMap(DlMatchBasketball::getChangciId,DlMatchBasketball::getMatchSn));
-		List<Integer> changciIds = matchBasketBallList.stream().map(s->s.getChangciId()).collect(Collectors.toList());
-		List<DlResultBasketball> matchResults = dlResultBasketballMapper.queryMatchResultsByChangciIds(changciIds);
-		if (CollectionUtils.isEmpty(matchResults) && CollectionUtils.isEmpty(cancelMatches)) {
+		List<DlMatchBasketball> matchBasketBallList = dlMatchBasketballMapper.getEndBasketMatchByPlayCodes(playCodes);
+
+		//转换
+        List<CountBasketBaseInfo> countBasketBaseInfoList = new ArrayList<CountBasketBaseInfo>();
+
+        for(OrderDetail s:orderDetails) {
+            String issue = s.getIssue();
+            CountBasketBaseInfo countBasketBaseInfo = new CountBasketBaseInfo();
+            for(DlMatchBasketball ss:matchBasketBallList) {
+                if (s.getIssue().equals(ss.getMatchSn())) {
+                    countBasketBaseInfo.setOrderDetailId(s.getOrderDetailId());
+                    countBasketBaseInfo.setOrderSn(s.getOrderSn());
+                    countBasketBaseInfo.setTicketData(s.getTicketData());
+                    countBasketBaseInfo.setChangCiId(ss.getChangciId());
+                    countBasketBaseInfo.setPlayCode(s.getIssue());//issue 就是playcode
+                    countBasketBaseInfo.setScore(ss.getWhole());//比分
+                    countBasketBaseInfo.setForecastScore(s.getForecastScore());//订单详情中预设总分
+                    countBasketBaseInfo.setRangFen(s.getFixedodds());//让分
+                    countBasketBaseInfoList.add(countBasketBaseInfo);
+                    break;
+                }
+            }
+        }
+
+        List<JsonResultBasketball> jsonResultBasketballList = generateBasketResult(countBasketBaseInfoList);
+        //转换
+
+		if (CollectionUtils.isEmpty(jsonResultBasketballList) && CollectionUtils.isEmpty(cancelMatches)) {
 			log.info("updateOrderMatchResult 准备获取赛事结果的场次数：" + playCodes.size() + " 没有获取到相应的赛事结果信息及没有取消赛事");
 			return;
 		}
-		log.info("updateOrderMatchResult 准备获取赛事结果的场次数：" + playCodes.size() + " 获取到相应的赛事结果信息数：" + matchResults.size() + " 取消赛事数：" + cancelMatches.size());
+		log.info("updateOrderMatchResult 准备获取赛事结果的场次数：" + playCodes.size() + " 获取到相应的赛事结果信息数：" + jsonResultBasketballList.size() + " 取消赛事数：" + cancelMatches.size());
 		Map<String, List<OrderDetail>> detailMap = new HashMap<String, List<OrderDetail>>();
 		List<OrderDetail> cancelList = new ArrayList<OrderDetail>(orderDetails.size());
 		for (OrderDetail orderDetail : orderDetails) {
@@ -660,87 +776,104 @@ public class OrderService extends AbstractService<Order> {
 			}
 		}
 		log.info("取消赛事对应订单详情数：cancelList。si'ze" + cancelList.size() + "  detailMap.size=" + detailMap.size());
-		Map<String,List<BasketMatchOneResultDTO>> resultMap = new HashMap<>();
-		for(DlResultBasketball basketBallResult:matchResults) {
+		Map<Integer,List<BasketMatchOneResultDTO>> resultMap = new HashMap<>();
+		for(JsonResultBasketball basketBallResult:jsonResultBasketballList) {//每个订单详情对应一场比赛的4种赛果
+		    Integer orderDetailId = basketBallResult.getOrderDetailId();
 			List<BasketMatchOneResultDTO> matchOneResult = new ArrayList<>();
-			String jsonData = basketBallResult.getDataJson();
-			JSONObject dataOdj = JSON.parseObject(jsonData);
 			Integer changciId = basketBallResult.getChangciId();
-			String playCode = pcodeAndCIdMap.get(changciId);
-			String hdc_result = dataOdj.getString("hdc_result");
-			String hilo_result = dataOdj.getString("hilo_result");
-			String mnl_result = dataOdj.getString("mnl_result");
-			String wnm_result = dataOdj.getString("wnm_result");
+			String playCode = basketBallResult.getPlayCode();
+			String hdc_result = basketBallResult.getHdcResult();
+			String hilo_result = basketBallResult.getHiloResult();
+			String mnl_result = basketBallResult.getMnlResult();
+			String wnm_result = basketBallResult.getWnmResult();
 			BasketMatchOneResultDTO dto1 = new BasketMatchOneResultDTO();
-			dto1.setPlayType(String.valueOf(MatchBasketPlayTypeEnum.PLAY_TYPE_MNL.getcode()));
-			dto1.setPlayCode(playCode);
-            mnl_result = mnl_result.replaceAll(" ", "");
-			if(mnl_result.equals("主负")){
-                mnl_result = "客胜";
+
+			if(StringUtils.isNotEmpty(mnl_result)){
+                dto1.setPlayType(String.valueOf(MatchBasketPlayTypeEnum.PLAY_TYPE_MNL.getcode()));
+                dto1.setPlayCode(playCode);
+                mnl_result = mnl_result.replaceAll(" ", "");
+                if(mnl_result.equals("主负")){
+                    mnl_result = "客胜";
+                }
+                dto1.setCellCode(String.valueOf(MatchBasketBallResultHDCEnum.getCode(mnl_result)));
+                dto1.setCellName(mnl_result);
+            }else{
+                continue;
             }
-			dto1.setCellCode(String.valueOf(MatchBasketBallResultHDCEnum.getCode(mnl_result)));
-			dto1.setCellName(mnl_result);
+
 			
 			BasketMatchOneResultDTO dto2 = new BasketMatchOneResultDTO();
-			dto2.setPlayType(String.valueOf(MatchBasketPlayTypeEnum.PLAY_TYPE_HDC.getcode()));
-			dto2.setPlayCode(playCode);
-			if(hdc_result.equals("主胜")){
-                hdc_result = "让分主胜";
-            }else if(hdc_result.equals("主负") || hdc_result.equals("让分主负")){
-                hdc_result = "让分客胜";
+			if(StringUtils.isNotEmpty(hdc_result)){
+                dto2.setPlayType(String.valueOf(MatchBasketPlayTypeEnum.PLAY_TYPE_HDC.getcode()));
+                dto2.setPlayCode(playCode);
+                if(hdc_result.equals("主胜")){
+                    hdc_result = "让分主胜";
+                }else if(hdc_result.equals("主负") || hdc_result.equals("让分主负")){
+                    hdc_result = "让分客胜";
+                }
+                dto2.setCellCode(String.valueOf(MatchBasketResultHdEnum.getCode(hdc_result)));
+                dto2.setCellName(hdc_result);
+            }else{
+                continue;
             }
-			dto2.setCellCode(String.valueOf(MatchBasketResultHdEnum.getCode(hdc_result)));
-			dto2.setCellName(hdc_result);
+
 			
 			BasketMatchOneResultDTO dto3 = new BasketMatchOneResultDTO();
-			dto3.setPlayType(String.valueOf(MatchBasketPlayTypeEnum.PLAY_TYPE_WNM.getcode()));
-			dto3.setPlayCode(playCode);
-			dto3.setCellCode(reHVMNLCode(wnm_result));
-			dto3.setCellName(wnm_result);
-			
+			if(StringUtils.isNotEmpty(wnm_result)){
+                dto3.setPlayType(String.valueOf(MatchBasketPlayTypeEnum.PLAY_TYPE_WNM.getcode()));
+                dto3.setPlayCode(playCode);
+                dto3.setCellCode(reHVMNLCode(wnm_result));
+                dto3.setCellName(wnm_result);
+            }else{
+                continue;
+            }
+
 			BasketMatchOneResultDTO dto4 = new BasketMatchOneResultDTO();
-			dto4.setPlayType(String.valueOf(MatchBasketPlayTypeEnum.PLAY_TYPE_HILO.getcode()));
-			dto4.setPlayCode(playCode);
-			dto4.setCellCode(MatchBasketBallResultHILOEnum.getCode(hilo_result+"分"));
-			dto4.setCellName(hilo_result);
-			
+			if(StringUtils.isNotEmpty(hilo_result)){
+                dto4.setPlayType(String.valueOf(MatchBasketPlayTypeEnum.PLAY_TYPE_HILO.getcode()));
+                dto4.setPlayCode(playCode);
+                dto4.setCellCode(MatchBasketBallResultHILOEnum.getCode(hilo_result+"分"));
+                dto4.setCellName(hilo_result);
+
+            }else{
+                continue;
+            }
+
 			matchOneResult.add(dto1);
 			matchOneResult.add(dto2);
 			matchOneResult.add(dto3);
 			matchOneResult.add(dto4);
 			
-			resultMap.put(playCode, matchOneResult);
+			resultMap.put(orderDetailId, matchOneResult);
 		}
-		
-		
+
 		log.info("resultMap size=" + resultMap.size());
 		List<OrderDetail> orderDetailList = new ArrayList<OrderDetail>(orderDetails.size());
-		for (String playCode : resultMap.keySet()) {
-			List<BasketMatchOneResultDTO> resultDTOs = resultMap.get(playCode);
-			List<OrderDetail> details = detailMap.get(playCode);
-			for (OrderDetail orderDetail : details) {
-				String ticketDataStr = orderDetail.getTicketData();
-				String[] split = ticketDataStr.split(";");
-				OrderDetail od = new OrderDetail();
-				od.setOrderDetailId(orderDetail.getOrderDetailId());
-				StringBuffer sbuf = new StringBuffer();
-				for (String ticketData : split) {
-					if (StringUtils.isBlank(ticketData) || !ticketData.contains("|")) {
-						continue;
-					}
-					Integer playType = Integer.valueOf(ticketData.substring(0, ticketData.indexOf("|")));
-					for (BasketMatchOneResultDTO dto : resultDTOs) {
-						if (playType.equals(Integer.valueOf(dto.getPlayType()))) {
-							sbuf.append("0").append(dto.getPlayType()).append("|").append(playCode).append("|").append(dto.getCellCode()).append(";");
-						}
-					}
-				}
-				if (sbuf.length() > 0) {
-					od.setMatchResult(sbuf.substring(0, sbuf.length() - 1));
-					orderDetailList.add(od);
-				}
-			}
-		}
+
+        for (JsonResultBasketball orderDetail : jsonResultBasketballList) {
+            String ticketDataStr = orderDetail.getTicketData();
+            List<BasketMatchOneResultDTO> resultDTOs = resultMap.get(orderDetail.getOrderDetailId());
+            String[] split = ticketDataStr.split(";");
+            OrderDetail od = new OrderDetail();
+            od.setOrderDetailId(orderDetail.getOrderDetailId());
+            StringBuffer sbuf = new StringBuffer();
+            for (String ticketData : split) {
+                if (StringUtils.isBlank(ticketData) || !ticketData.contains("|")) {
+                    continue;
+                }
+                Integer playType = Integer.valueOf(ticketData.substring(0, ticketData.indexOf("|")));
+                for (BasketMatchOneResultDTO dto : resultDTOs) {
+                    if (playType.equals(Integer.valueOf(dto.getPlayType()))) {
+                        sbuf.append("0").append(dto.getPlayType()).append("|").append(dto.getPlayCode()).append("|").append(dto.getCellCode()).append(";");
+                    }
+                }
+            }
+            if (sbuf.length() > 0) {
+                od.setMatchResult(sbuf.substring(0, sbuf.length() - 1));
+                orderDetailList.add(od);
+            }
+        }
+
 		log.info("updateOrderMatchResult 准备去执行数据库更新操作：size=" + orderDetailList.size());
 		for(OrderDetail detail: orderDetailList) {
 			orderDetailMapper.updateMatchResult(detail);

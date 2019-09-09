@@ -99,6 +99,19 @@
 	  	 	</foreach>
 	  	 order by match_time
     </select>
+
+
+    <select id="getEndBasketMatchByPlayCodes" resultMap="BaseResultMap">
+        select
+        *
+        from
+        dl_match_basketball
+        where status = '1' and match_sn in
+        <foreach collection="playCodes" item="playCode" open="(" close=")" separator=",">
+            #{playCode}
+        </foreach>
+        order by match_time
+    </select>
   
   
   	<select id="getByChangciId" resultMap="BaseResultMap">

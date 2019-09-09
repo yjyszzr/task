@@ -1,7 +1,5 @@
 package com.dl.task.service;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.dl.base.enums.*;
 import com.dl.base.result.BaseResult;
 import com.dl.base.result.ResultGenerator;
@@ -148,6 +146,89 @@ public class DlPrintLotteryService {
 		}
 	}
 
+    /**
+     * 不包含差值得于0的情况
+     * @param vnmScore
+     * @return
+     */
+    public static String whichWNMPeriod(Integer vnmScore){
+        if(vnmScore >= 1 && vnmScore <= 5){
+            return "客胜1-5";
+        }else if(vnmScore >= 6 && vnmScore <= 10){
+            return "客胜6-10";
+        }else if(vnmScore >= 11 && vnmScore <= 15){
+            return "客胜11-15";
+        }else if(vnmScore >= 16 && vnmScore <= 20){
+            return "客胜16-20";
+        }else if(vnmScore >= 21 && vnmScore <= 25){
+            return "客胜21-25";
+        }else if(vnmScore >= 26){
+            return "客胜26+";
+        }else if(vnmScore >= -5 && vnmScore <= -1){
+            return "主胜1-5";
+        }else if(vnmScore >= -10 && vnmScore <= -6){
+            return "主胜6-10";
+        }else if(vnmScore >= -15 && vnmScore <= -11){
+            return "主胜11-15";
+        }else if(vnmScore >= -20 && vnmScore <= -16){
+            return "主胜16-20";
+        }else if(vnmScore >= -25 && vnmScore <= -21){
+            return "主胜21-25";
+        }else if( vnmScore <= -26){
+            return "主胜26+";
+        }
+
+        return "";
+    }
+
+    /**
+     * 构造篮球的matchResult
+     */
+    public List<JsonResultBasketball> generateBasketResult(List<CountBasketBaseInfo> countBasketBaseInfoList){
+        List<JsonResultBasketball> jsonResultBasketballList = new ArrayList<>();
+        countBasketBaseInfoList.stream().forEach(s->{
+            JsonResultBasketball jsonResultBasketball = new JsonResultBasketball();
+            jsonResultBasketball.setOrderDetailId(s.getOrderDetailId());
+            jsonResultBasketball.setOrderSn(s.getOrderSn());
+            jsonResultBasketball.setTicketData(s.getTicketData());
+            Integer changCiId =  s.getChangCiId();
+            jsonResultBasketball.setChangciId(changCiId);
+            jsonResultBasketball.setPlayCode(s.getPlayCode());
+            String score = s.getScore();//客队：主队
+            if(org.apache.commons.lang3.StringUtils.isNotEmpty(score)){
+                String[] VHArr = score.split(":");
+                if(Integer.valueOf(VHArr[0]) > Integer.valueOf(VHArr[1])){
+                    jsonResultBasketball.setMnlResult("客胜");
+                }else if(Integer.valueOf(VHArr[0]) < Integer.valueOf(VHArr[1])){
+                    jsonResultBasketball.setMnlResult("主胜");
+                }
+
+                if(org.apache.commons.lang3.StringUtils.isNotEmpty(s.getRangFen())){
+                    if(Double.valueOf(VHArr[1]) + Double.valueOf(s.getRangFen()) > Double.valueOf(VHArr[0])){
+                        jsonResultBasketball.setHdcResult("主胜");
+                    }else if(Double.valueOf(VHArr[1]) + Double.valueOf(s.getRangFen()) < Double.valueOf(VHArr[0])){
+                        jsonResultBasketball.setHdcResult("主负");
+                    }
+                }
+
+                Integer vnmScore = Integer.valueOf(VHArr[0]) - Integer.valueOf(VHArr[1]);
+                jsonResultBasketball.setWnmResult(whichWNMPeriod(vnmScore));
+
+                if(org.apache.commons.lang3.StringUtils.isNotEmpty(s.getForecastScore())){
+                    if(Double.valueOf(VHArr[0]) + Double.valueOf(VHArr[1]) > Double.valueOf(s.getForecastScore())){
+                        jsonResultBasketball.setHiloResult("大");
+                    }else if(Double.valueOf(VHArr[0])+ Double.valueOf(VHArr[1]) < Double.valueOf(s.getForecastScore())){
+                        jsonResultBasketball.setHiloResult("小");
+                    }
+                }
+
+            }
+            jsonResultBasketballList.add(jsonResultBasketball);
+        });
+
+        return jsonResultBasketballList;
+    }
+
 	/**
 	 * 适用于竞彩篮球
 	 */
@@ -194,24 +275,50 @@ public class DlPrintLotteryService {
 		Map<Integer,String> pcodeAndCIdMap = matchBasketBallList.stream().collect(Collectors.toMap(DlMatchBasketball::getChangciId,DlMatchBasketball::getMatchSn));
 		List<Integer> changciIds = matchBasketBallList.stream().map(s->s.getChangciId()).collect(Collectors.toList());
 		List<DlResultBasketball> matchResults = dlResultBasketballMapper.queryMatchResultsByChangciIds(changciIds);
+
+
+		List<String> orderSnList = lotteryPrints.stream().map(s->s.getOrderSn()).collect(Collectors.toList());
+        List<OrderDetail> orderDetails = orderDetailMapper.getOrderDetailsByOrderSns(orderSnList);
+
+        //转换
+        List<CountBasketBaseInfo> countBasketBaseInfoList = new ArrayList<CountBasketBaseInfo>();
+        for(OrderDetail s:orderDetails) {
+            String issue = s.getIssue();
+            CountBasketBaseInfo countBasketBaseInfo = new CountBasketBaseInfo();
+            for(DlMatchBasketball ss:matchBasketBallList) {
+                if (s.getIssue().equals(ss.getMatchSn())) {
+                    countBasketBaseInfo.setOrderDetailId(s.getOrderDetailId());
+                    countBasketBaseInfo.setOrderSn(s.getOrderSn());
+                    countBasketBaseInfo.setTicketData(s.getTicketData());
+                    countBasketBaseInfo.setChangCiId(ss.getChangciId());
+                    countBasketBaseInfo.setPlayCode(s.getIssue());//issue 就是playcode
+                    countBasketBaseInfo.setScore(ss.getWhole());//比分
+                    countBasketBaseInfo.setForecastScore(s.getForecastScore());//订单详情中预设总分
+                    countBasketBaseInfo.setRangFen(s.getFixedodds());//让分
+                    countBasketBaseInfoList.add(countBasketBaseInfo);
+                    break;
+                }
+            }
+        }
+        List<JsonResultBasketball> jsonResultBasketballList = generateBasketResult(countBasketBaseInfoList);
+        //转换
+
 		if (CollectionUtils.isEmpty(matchResults) && Collections.isEmpty(canCelPlayCodes)) {
 			log.info("updatePrintLotteryCompareStatus 准备获取赛事结果的场次数：" + playCodes.size() + " 没有获取到相应的赛事结果信息也没有取消的赛事");
 			return;
 		}
 		log.info("updatePrintLotteryCompareStatus 准备获取赛事结果的场次数：" + playCodes.size() + " 获取到相应的赛事结果信息数：" + matchResults.size() + "  已取消赛事" + canCelPlayCodes.size());
 
-
-		Map<String,List<BasketMatchOneResultDTO>> resultMap = new HashMap<>();
+		Map<Integer,List<BasketMatchOneResultDTO>> resultMap = new HashMap<>();
 		List<BasketMatchOneResultDTO> matchOneResult = new ArrayList<>();
-		for(DlResultBasketball basketBallResult:matchResults) {
-			String jsonData = basketBallResult.getDataJson();
-			JSONObject dataOdj = JSON.parseObject(jsonData);
+		for(JsonResultBasketball basketBallResult:jsonResultBasketballList) {
 			Integer changciId = basketBallResult.getChangciId();
+			Integer orderDetailId = basketBallResult.getOrderDetailId();
 			String playCode = pcodeAndCIdMap.get(changciId);
-			String hdc_result = dataOdj.getString("hdc_result");
-			String hilo_result = dataOdj.getString("hilo_result");
-			String mnl_result = dataOdj.getString("mnl_result");
-			String wnm_result = dataOdj.getString("wnm_result");
+			String hdc_result = basketBallResult.getHdcResult();
+			String hilo_result = basketBallResult.getHiloResult();
+			String mnl_result = basketBallResult.getMnlResult();
+			String wnm_result = basketBallResult.getWnmResult();
 			BasketMatchOneResultDTO dto1 = new BasketMatchOneResultDTO();
             dto1.setPlayType(String.valueOf(MatchBasketPlayTypeEnum.PLAY_TYPE_MNL.getcode()));
             dto1.setPlayCode(playCode);
@@ -250,56 +357,59 @@ public class DlPrintLotteryService {
 			matchOneResult.add(dto3);
 			matchOneResult.add(dto4);
 			
-			resultMap.put(playCode, matchOneResult);
+			resultMap.put(orderDetailId, matchOneResult);
 		}
 	
 		List<DlPrintLottery> updates = new ArrayList<DlPrintLottery>(lotteryPrints.size());
-		for (String playCode : playCodes) {
-			boolean isCancel = false;
-			if (canCelPlayCodes.contains(playCode)) {
-				isCancel = true;
-			}
-			List<BasketMatchOneResultDTO> matchResultList = resultMap.get(playCode);
-			if (!isCancel && CollectionUtils.isEmpty(matchResultList)) {
-				continue;
-			}
-			for (DlPrintLottery print : lotteryPrints) {
-			    Boolean playTypehaveResult = Boolean.FALSE;
-				String stakes = print.getStakes();
-				String comparedStakes = print.getComparedStakes() == null ? "" : print.getComparedStakes();
-				// 判断是否对比过
-				if (stakes.contains(playCode) && !comparedStakes.contains(playCode)) {
-					if (comparedStakes.length() > 0) {
-						comparedStakes += ",";
-					}
-					comparedStakes += playCode;
-					DlPrintLottery updatePrint = new DlPrintLottery();
-					updatePrint.setPrintLotteryId(print.getPrintLotteryId());
-					updatePrint.setComparedStakes(comparedStakes);
-					String[] stakesarr = stakes.split(";");
-					StringBuffer sbuf = new StringBuffer();
-					Set<String> stakePlayCodes = new HashSet<String>(stakesarr.length);
-					// 彩票的每一场次分析
-					for (String stake : stakesarr) {
-						String[] split = stake.split("\\|");
-						stakePlayCodes.add(split[1]);
-						if (stake.contains(playCode)) {
-							String playTypeStr = split[0];
-							List<String> cellCodes = Arrays.asList(split[2].split(","));
-							if (isCancel) {
-								playTypehaveResult = Boolean.TRUE;
-								sbuf.append(";").append(playTypeStr).append("|").append(playCode).append("|");
-								for (int i = 0; i < cellCodes.size(); i++) {
-									if (i > 0) {
-										sbuf.append(",");
-									}
-									String cellCode = cellCodes.get(i);
-									sbuf.append(cellCode).append("@").append("1.00");
-								}
-							} else {
-								// 比赛结果获取中奖信息
-                                List<BasketMatchOneResultDTO> matchResultListNew = matchResultList.stream().filter(s->s.getPlayCode().equals(split[1])).collect(Collectors.toList());
-								for (BasketMatchOneResultDTO rst : matchResultListNew) {
+		for (JsonResultBasketball basketBallResult : jsonResultBasketballList) {//循环订单详情的赛果构成的集合
+            Integer orderDetailId = basketBallResult.getOrderDetailId();
+            String playCode = basketBallResult.getPlayCode();
+            boolean isCancel = false;
+            if (canCelPlayCodes.contains(playCode)) {
+                isCancel = true;
+            }
+            List<BasketMatchOneResultDTO> matchResultList = resultMap.get(orderDetailId);
+            if (!isCancel && CollectionUtils.isEmpty(matchResultList)) {
+                continue;
+            }
+            for (DlPrintLottery print : lotteryPrints) {
+                if (basketBallResult.getOrderSn().equals(print.getOrderSn()) && print.getStakes().contains(basketBallResult.getPlayCode())) {
+                    Boolean playTypehaveResult = Boolean.FALSE;
+                    String stakes = print.getStakes();
+                    String comparedStakes = print.getComparedStakes() == null ? "" : print.getComparedStakes();
+                    // 判断是否对比过
+                    if (stakes.contains(playCode) && !comparedStakes.contains(playCode)) {
+                        if (comparedStakes.length() > 0) {
+                            comparedStakes += ",";
+                        }
+                        comparedStakes += playCode;
+                        DlPrintLottery updatePrint = new DlPrintLottery();
+                        updatePrint.setPrintLotteryId(print.getPrintLotteryId());
+                        updatePrint.setComparedStakes(comparedStakes);
+                        String[] stakesarr = stakes.split(";");
+                        StringBuffer sbuf = new StringBuffer();
+                        Set<String> stakePlayCodes = new HashSet<String>(stakesarr.length);
+                        // 彩票的每一场次分析
+                        for (String stake : stakesarr) {
+                            String[] split = stake.split("\\|");
+                            stakePlayCodes.add(split[1]);
+                            if (stake.contains(playCode)) {
+                                String playTypeStr = split[0];
+                                List<String> cellCodes = Arrays.asList(split[2].split(","));
+                                if (isCancel) {
+                                    playTypehaveResult = Boolean.TRUE;
+                                    sbuf.append(";").append(playTypeStr).append("|").append(playCode).append("|");
+                                    for (int i = 0; i < cellCodes.size(); i++) {
+                                        if (i > 0) {
+                                            sbuf.append(",");
+                                        }
+                                        String cellCode = cellCodes.get(i);
+                                        sbuf.append(cellCode).append("@").append("1.00");
+                                    }
+                                } else {
+                                    // 比赛结果获取中奖信息
+                                    List<BasketMatchOneResultDTO> matchResultListNew = matchResultList.stream().filter(s -> s.getPlayCode().equals(split[1])).collect(Collectors.toList());
+                                    for (BasketMatchOneResultDTO rst : matchResultListNew) {
 
                                         if (rst.getPlayType().equals(String.valueOf(Integer.valueOf(playTypeStr)))) {
                                             playTypehaveResult = Boolean.TRUE;
@@ -315,65 +425,68 @@ public class DlPrintLotteryService {
                                             }
                                         }
 
-								}
-							}
-						}
-					}
-					if(!playTypehaveResult){//没有赛果时，跳出该处理等待下次循环
-						continue;
-					}
-					// 中奖记录
-					String reward = print.getRewardStakes();
-					if (sbuf.length() > 0) {
-						reward = StringUtils.isBlank(reward) ? sbuf.substring(1, sbuf.length()) : (reward + sbuf.toString());
-					}
-					updatePrint.setRewardStakes(reward);
-					updatePrint.setRealRewardMoney(print.getRealRewardMoney());
-					updatePrint.setCompareStatus(print.getCompareStatus());
+                                    }
+                                }
+                            }
+                        }
+                        if (!playTypehaveResult) {//没有赛果时，跳出该处理等待下次循环
+                            continue;
+                        }
+                        // 中奖记录
+                        String reward = print.getRewardStakes();
+                        if (sbuf.length() > 0) {
+                            reward = StringUtils.isBlank(reward) ? sbuf.substring(1, sbuf.length()) : (reward + sbuf.toString());
+                        }
+                        updatePrint.setRewardStakes(reward);
+                        updatePrint.setRealRewardMoney(print.getRealRewardMoney());
+                        updatePrint.setCompareStatus(print.getCompareStatus());
 
-					// 彩票对票结束
-					if (stakePlayCodes.size() == comparedStakes.split(",").length) {
-						updatePrint.setCompareStatus(ProjectConstant.FINISH_COMPARE);
-						if (StringUtils.isNotBlank(reward)) {
-							// 彩票中奖金额
-							// log.info(reward);
-							List<String> spList = Arrays.asList(reward.split(";"));
-							List<List<Double>> winSPList = spList.stream().map(s -> {
-								String cells = s.split("\\|")[2];
-								String[] split = cells.split(",");
-								List<Double> list = new ArrayList<Double>(split.length);
-								for (String str : split) {
-									list.add(Double.valueOf(str.substring(str.indexOf("@") + 1)));
-								}
-								return list;
-							}).collect(Collectors.toList());
-							List<Double> rewardList = new ArrayList<Double>();
-							// 2018-06-04计算税
-							this.groupByRewardList(2.0, Integer.valueOf(print.getBetType()) / 10, winSPList, rewardList);
-							Double oneTimeReward = rewardList.stream().reduce(0.00, Double::sum);
-							BigDecimal allTimesReward = new BigDecimal(oneTimeReward).multiply(new BigDecimal(print.getTimes()));
-							updatePrint.setRealRewardMoney(allTimesReward.setScale(2, RoundingMode.HALF_EVEN));
-							// 保存第三方给计算的单张彩票的价格
-							/*
-							 * PeriodRewardDetail periodRewardDetail = new
-							 * PeriodRewardDetail();
-							 * periodRewardDetail.setTicketId
-							 * (print.getTicketId()); List<PeriodRewardDetail>
-							 * tickets = periodRewardDetailMapper.
-							 * queryPeriodRewardDetailBySelective
-							 * (periodRewardDetail); if
-							 * (!CollectionUtils.isEmpty(tickets)) { BigDecimal
-							 * thirdPartRewardMoney =
-							 * BigDecimal.valueOf(tickets.get(0).getReward());
-							 * updatePrint
-							 * .setThirdPartRewardMoney(thirdPartRewardMoney); }
-							 */
-						}
-					}
-					// 添加
-					updates.add(updatePrint);
-				}// 判断是否对比过over
-			}// over prints for
+                        // 彩票对票结束
+                        if (stakePlayCodes.size() == comparedStakes.split(",").length) {
+                            updatePrint.setCompareStatus(ProjectConstant.FINISH_COMPARE);
+                            if (StringUtils.isNotBlank(reward)) {
+                                // 彩票中奖金额
+                                // log.info(reward);
+                                List<String> spList = Arrays.asList(reward.split(";"));
+                                List<List<Double>> winSPList = spList.stream().map(s -> {
+                                    String cells = s.split("\\|")[2];
+                                    String[] split = cells.split(",");
+                                    List<Double> list = new ArrayList<Double>(split.length);
+                                    for (String str : split) {
+                                        list.add(Double.valueOf(str.substring(str.indexOf("@") + 1)));
+                                    }
+                                    return list;
+                                }).collect(Collectors.toList());
+                                List<Double> rewardList = new ArrayList<Double>();
+                                // 2018-06-04计算税
+                                this.groupByRewardList(2.0, Integer.valueOf(print.getBetType()) / 10, winSPList, rewardList);
+                                Double oneTimeReward = rewardList.stream().reduce(0.00, Double::sum);
+                                BigDecimal allTimesReward = new BigDecimal(oneTimeReward).multiply(new BigDecimal(print.getTimes()));
+                                updatePrint.setRealRewardMoney(allTimesReward.setScale(2, RoundingMode.HALF_EVEN));
+                                // 保存第三方给计算的单张彩票的价格
+                                /*
+                                 * PeriodRewardDetail periodRewardDetail = new
+                                 * PeriodRewardDetail();
+                                 * periodRewardDetail.setTicketId
+                                 * (print.getTicketId()); List<PeriodRewardDetail>
+                                 * tickets = periodRewardDetailMapper.
+                                 * queryPeriodRewardDetailBySelective
+                                 * (periodRewardDetail); if
+                                 * (!CollectionUtils.isEmpty(tickets)) { BigDecimal
+                                 * thirdPartRewardMoney =
+                                 * BigDecimal.valueOf(tickets.get(0).getReward());
+                                 * updatePrint
+                                 * .setThirdPartRewardMoney(thirdPartRewardMoney); }
+                                 */
+                            }
+                        }
+                        // 添加
+                        updates.add(updatePrint);
+                    }// 判断是否对比过over
+                }else{
+                    continue;
+                }// over prints for
+            }
 		}// over playcode for
 		log.info("updateBatchLotteryPrint 准备更新彩票信息到数据库：size" + updates.size());
 		if(updates.size() > 0) {
