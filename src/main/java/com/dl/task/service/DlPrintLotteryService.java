@@ -277,8 +277,8 @@ public class DlPrintLotteryService {
 		List<String> canCelPlayCodes = dlMatchBasketballMapper.getCancelMatches(playCodes);
 		List<DlMatchBasketball> matchBasketBallList = dlMatchBasketballMapper.getChangciIdsFromBasketMatchByPlayCodes(playCodes);
 		Map<Integer,String> pcodeAndCIdMap = matchBasketBallList.stream().collect(Collectors.toMap(DlMatchBasketball::getChangciId,DlMatchBasketball::getMatchSn));
-		//List<Integer> changciIds = matchBasketBallList.stream().map(s->s.getChangciId()).collect(Collectors.toList());
-		//List<DlResultBasketball> matchResults = dlResultBasketballMapper.queryMatchResultsByChangciIds(changciIds);
+//		List<Integer> changciIds = matchBasketBallList.stream().map(s->s.getChangciId()).collect(Collectors.toList());
+//		List<DlResultBasketball> matchResults = dlResultBasketballMapper.queryMatchResultsByChangciIds(changciIds);
 		List<String> orderSnList = lotteryPrints.stream().map(s->s.getOrderSn()).collect(Collectors.toList());
         List<OrderDetail> orderDetails = orderDetailMapper.getOrderDetailsByOrderSns(orderSnList);
 
@@ -309,7 +309,6 @@ public class DlPrintLotteryService {
 			log.info("updatePrintLotteryCompareStatus 准备获取赛事结果的场次数：" + playCodes.size() + " 没有获取到相应的赛事结果信息也没有取消的赛事");
 			return;
 		}
-		log.info("updatePrintLotteryCompareStatus 准备获取赛事结果的场次数：" + playCodes.size() + " 获取到相应的赛事结果信息数：" + matchResults.size() + "  已取消赛事" + canCelPlayCodes.size());
 
 		Map<Integer,List<BasketMatchOneResultDTO>> resultMap = new HashMap<>();
 		List<BasketMatchOneResultDTO> matchOneResult = new ArrayList<>();
