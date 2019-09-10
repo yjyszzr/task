@@ -736,7 +736,7 @@ public class OrderService extends AbstractService<Order> {
             String issue = s.getIssue();
             CountBasketBaseInfo countBasketBaseInfo = new CountBasketBaseInfo();
             for(DlMatchBasketball ss:matchBasketBallList) {
-                if (s.getIssue().equals(ss.getMatchSn())) {
+                if (s.getTicketData().contains(ss.getMatchSn())) {
                     countBasketBaseInfo.setOrderDetailId(s.getOrderDetailId());
                     countBasketBaseInfo.setOrderSn(s.getOrderSn());
                     countBasketBaseInfo.setTicketData(s.getTicketData());

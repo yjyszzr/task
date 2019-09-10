@@ -186,51 +186,55 @@ public class DlPrintLotteryService {
      */
     public List<JsonResultBasketball> generateBasketResult(List<CountBasketBaseInfo> countBasketBaseInfoList){
         List<JsonResultBasketball> jsonResultBasketballList = new ArrayList<>();
-        countBasketBaseInfoList.stream().forEach(s->{
+        for(CountBasketBaseInfo s:countBasketBaseInfoList){
             JsonResultBasketball jsonResultBasketball = new JsonResultBasketball();
             jsonResultBasketball.setOrderDetailId(s.getOrderDetailId());
             jsonResultBasketball.setOrderSn(s.getOrderSn());
             jsonResultBasketball.setTicketData(s.getTicketData());
-            Integer changCiId =  s.getChangCiId();
+            Integer changCiId = s.getChangCiId();
             jsonResultBasketball.setChangciId(changCiId);
             jsonResultBasketball.setPlayCode(s.getPlayCode());
             String score = s.getScore();//客队：主队
-            if(org.apache.commons.lang3.StringUtils.isNotEmpty(score)){
+            if (org.apache.commons.lang3.StringUtils.isNotEmpty(score)) {
                 String[] VHArr = score.split(":");
-                if(Integer.valueOf(VHArr[0]) > Integer.valueOf(VHArr[1])){
+                if (Integer.valueOf(VHArr[0]) > Integer.valueOf(VHArr[1])) {
                     jsonResultBasketball.setMnlResult("客胜");
-                }else if(Integer.valueOf(VHArr[0]) < Integer.valueOf(VHArr[1])){
+                } else if (Integer.valueOf(VHArr[0]) < Integer.valueOf(VHArr[1])) {
                     jsonResultBasketball.setMnlResult("主胜");
                 }
 
-                if(org.apache.commons.lang3.StringUtils.isNotEmpty(s.getRangFen())){
-                    if(Double.valueOf(VHArr[1]) + Double.valueOf(s.getRangFen()) > Double.valueOf(VHArr[0])){
+                if (org.apache.commons.lang3.StringUtils.isNotEmpty(s.getRangFen())) {
+                    if (Double.valueOf(VHArr[1]) + Double.valueOf(s.getRangFen()) > Double.valueOf(VHArr[0])) {
                         jsonResultBasketball.setHdcResult("主胜");
-                    }else if(Double.valueOf(VHArr[1]) + Double.valueOf(s.getRangFen()) < Double.valueOf(VHArr[0])){
+                    } else if (Double.valueOf(VHArr[1]) + Double.valueOf(s.getRangFen()) < Double.valueOf(VHArr[0])) {
                         jsonResultBasketball.setHdcResult("主负");
                     }
+                } else {
+                    continue;
                 }
 
                 Integer vnmScore = Integer.valueOf(VHArr[0]) - Integer.valueOf(VHArr[1]);
                 jsonResultBasketball.setWnmResult(whichWNMPeriod(vnmScore));
 
-                if(org.apache.commons.lang3.StringUtils.isNotEmpty(s.getForecastScore())){
-                    if(Double.valueOf(VHArr[0]) + Double.valueOf(VHArr[1]) > Double.valueOf(s.getForecastScore())){
+                if (org.apache.commons.lang3.StringUtils.isNotEmpty(s.getForecastScore())) {
+                    if (Double.valueOf(VHArr[0]) + Double.valueOf(VHArr[1]) > Double.valueOf(s.getForecastScore())) {
                         jsonResultBasketball.setHiloResult("大");
-                    }else if(Double.valueOf(VHArr[0])+ Double.valueOf(VHArr[1]) < Double.valueOf(s.getForecastScore())){
+                    } else if (Double.valueOf(VHArr[0]) + Double.valueOf(VHArr[1]) < Double.valueOf(s.getForecastScore())) {
                         jsonResultBasketball.setHiloResult("小");
                     }
+                } else {
+                    continue;
                 }
 
             }
             jsonResultBasketballList.add(jsonResultBasketball);
-        });
+        }
 
         return jsonResultBasketballList;
     }
 
 	/**
-	 * 适用于竞彩篮球
+	 * 适用于竞彩篮球,原先是由赛果来开每张彩票的奖，现在由订单详情和比赛的比分计算是否中奖
 	 */
 	// ※※※※※※※※※※※※※※※※※
 	// ※※※※※※※※※※※※※※※※※
@@ -273,10 +277,8 @@ public class DlPrintLotteryService {
 		List<String> canCelPlayCodes = dlMatchBasketballMapper.getCancelMatches(playCodes);
 		List<DlMatchBasketball> matchBasketBallList = dlMatchBasketballMapper.getChangciIdsFromBasketMatchByPlayCodes(playCodes);
 		Map<Integer,String> pcodeAndCIdMap = matchBasketBallList.stream().collect(Collectors.toMap(DlMatchBasketball::getChangciId,DlMatchBasketball::getMatchSn));
-		List<Integer> changciIds = matchBasketBallList.stream().map(s->s.getChangciId()).collect(Collectors.toList());
-		List<DlResultBasketball> matchResults = dlResultBasketballMapper.queryMatchResultsByChangciIds(changciIds);
-
-
+		//List<Integer> changciIds = matchBasketBallList.stream().map(s->s.getChangciId()).collect(Collectors.toList());
+		//List<DlResultBasketball> matchResults = dlResultBasketballMapper.queryMatchResultsByChangciIds(changciIds);
 		List<String> orderSnList = lotteryPrints.stream().map(s->s.getOrderSn()).collect(Collectors.toList());
         List<OrderDetail> orderDetails = orderDetailMapper.getOrderDetailsByOrderSns(orderSnList);
 
@@ -303,7 +305,7 @@ public class DlPrintLotteryService {
         List<JsonResultBasketball> jsonResultBasketballList = generateBasketResult(countBasketBaseInfoList);
         //转换
 
-		if (CollectionUtils.isEmpty(matchResults) && Collections.isEmpty(canCelPlayCodes)) {
+		if (CollectionUtils.isEmpty(jsonResultBasketballList) && Collections.isEmpty(canCelPlayCodes)) {
 			log.info("updatePrintLotteryCompareStatus 准备获取赛事结果的场次数：" + playCodes.size() + " 没有获取到相应的赛事结果信息也没有取消的赛事");
 			return;
 		}
@@ -503,7 +505,7 @@ public class DlPrintLotteryService {
 			log.info("updateBatchLotteryPrint 更新彩票信息到数据库：size" + updates.size() + "  入库返回：size=" + num);
 		}
 	}
-	
+
 	
 	/**
 	 * 仅适用于竞彩足球
