@@ -36,8 +36,7 @@ public class ActivityUserInfoService extends AbstractService<ActivityUserInfo> {
 				thisnum = activityUserInfoMapper.updateActivityUserInfoByBl();//清楚此次活动数据
 				List<String> aclist = activityConfigMapper.queryActivityConfigList(activity.getAct_id());//查询当前活动档位
 				if(aclist!=null && aclist.size()>0) {
-					String[] configIdArr = (String[]) aclist.toArray();
-					delnum = activityConfigMapper.deleteConfigRecByConfigId(configIdArr);//删除挡位领取记录
+					delnum = activityConfigMapper.deleteConfigRecByConfigId(aclist);//删除挡位领取记录
 				}
 				break;
 			}
@@ -56,8 +55,7 @@ public class ActivityUserInfoService extends AbstractService<ActivityUserInfo> {
 				thisnum = activityUserInfoMapper.updateActivityUserInfoByRy();//清楚此次活动数据
 				List<String> aclist = activityConfigMapper.queryActivityConfigList(activity.getAct_id());//查询当前活动档位
 				if(aclist!=null && aclist.size()>0) {
-					String[] configIdArr = (String[]) aclist.toArray();
-					delnum = activityConfigMapper.deleteConfigRecByConfigId(configIdArr);//删除挡位领取记录
+					delnum = activityConfigMapper.deleteConfigRecByConfigId(aclist);//删除挡位领取记录
 				}
 				break;
 			}

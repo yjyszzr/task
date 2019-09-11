@@ -11,5 +11,5 @@ public interface ActivityConfigMapper extends Mapper<ActivityConfig> {
 
 	List<String> queryActivityConfigList(@Param("act_id") Integer act_id);
 	
-	int deleteConfigRecByConfigId(@Param("configIdArr") String[] configId);
+	int deleteConfigRecByConfigId(List<String> configId);
 }

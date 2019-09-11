@@ -81,10 +81,22 @@ public class TaskSchedule {
 	/**
 	 *更改固定额度
 	 */
+	@Scheduled(cron = "${task.schedule.payment.upreadmoneyzero}")
+	public synchronized  void updatePaymentReadMoneyZero() {
+		log.info("修改固定额度开始");
+		paymentService.updatePayment("103:0;198:0;498:0;988:0;1988:0;2988:0","app_rkwap"); 
+		paymentService.updatePayment("3988:0;5988:0;8888:0;12988:0;15988:0;19888:0","app_yunpay"); 
+		log.info("修改固定额度结束");
+	}
+	
+	
+	/**
+	 *更改固定额度
+	 */
 	@Scheduled(cron = "${task.schedule.payment.upreadmoney}")
 	public synchronized  void updatePaymentReadMoney() {
 		log.info("修改固定额度开始");
-		paymentService.updatePayment("103:6;198:12;498:30;988:60;1988:120;2988:180"); 
+		paymentService.updatePayment("103:6;198:12;498:30;988:60;1988:120;2988:180","app_rkwap"); 
 		log.info("修改固定额度结束");
 	}
 	
@@ -94,7 +106,7 @@ public class TaskSchedule {
 	@Scheduled(cron = "${task.schedule.payment.rsreadmoney}")
 	public synchronized  void updatePaymentReadMoneyRs() {
 		log.info("恢复固定额度开始");
-		paymentService.updatePayment("103:2;198:4;498:12;988:16;1988:36;2988:66");
+		paymentService.updatePayment("103:2;198:4;498:12;988:16;1988:36;2988:66","app_rkwap");
 		log.info("恢复固定额度结束");
 	}
 	

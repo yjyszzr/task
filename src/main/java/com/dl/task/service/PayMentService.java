@@ -47,8 +47,8 @@ public class PayMentService extends AbstractService<PayMent> {
 	/**
 	 * 修改固定额度
 	 */
-    public void updatePayment(String value) {
-    	payMentMapper.updateReadMoneyByPayCode(value);
+    public void updatePayment(String value,String pay_code) {
+    	payMentMapper.updateReadMoneyByPayCode(value,pay_code);
     }
     
     

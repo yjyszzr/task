@@ -14,9 +14,9 @@
   </select>
 	<delete id="deleteConfigRecByConfigId" parameterType="String">
 		delete from dl_activity_config_user_receive where config_id in
-		<foreach collection="configIdArr" item="configId" index="index" open="(" close=")" separator=",">
-  	 		#{configId}
-  	 	</foreach>
+		<foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+                 #{item}
+		</foreach>
 	</delete>
 	
 

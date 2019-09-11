@@ -22,7 +22,7 @@
   </resultMap>
   
   <update id="updateReadMoneyByPayCode">
-       update dl_payment set read_money=#{value} where pay_code='app_rkwap'
+       update dl_payment set read_money=#{readMoney} where pay_code=#{payCode}
   </update>
   
 </mapper>
