@@ -344,7 +344,7 @@ public class DlPrintLotteryService {
 			BasketMatchOneResultDTO dto3 = new BasketMatchOneResultDTO();
 			dto3.setPlayType(String.valueOf(MatchBasketPlayTypeEnum.PLAY_TYPE_WNM.getcode()));
 			dto3.setPlayCode(playCode);
-			dto3.setCellCode(BasketBallHILOLeverlEnum.getCode(wnm_result.substring(2)+"分"));
+			dto3.setCellCode(reHVMNLCode(wnm_result));
 			dto3.setCellName(wnm_result);			
 			
 			BasketMatchOneResultDTO dto4 = new BasketMatchOneResultDTO();
@@ -505,7 +505,20 @@ public class DlPrintLotteryService {
 		}
 	}
 
-	
+    /**
+     * 获取胜分差的code
+     * @param wnm_result
+     * @return
+     */
+    public String reHVMNLCode(String wnmResult){
+        String hRst = BasketBallHILOLeverlEnum.getCode(wnmResult.substring(2)+"分");
+        if(wnmResult.contains("客胜")){
+            hRst = String.valueOf(Integer.valueOf(hRst) + 6);
+        }
+        return hRst;
+    }
+
+
 	/**
 	 * 仅适用于竞彩足球
 	 */

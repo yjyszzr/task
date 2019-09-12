@@ -649,8 +649,6 @@ public class OrderService extends AbstractService<Order> {
                     } else if (Double.valueOf(VHArr[1]) + Double.valueOf(s.getRangFen()) < Double.valueOf(VHArr[0])) {
                         jsonResultBasketball.setHdcResult("主负");
                     }
-                }else{
-                    continue;
                 }
 
                 Integer vnmScore = Integer.valueOf(VHArr[0]) - Integer.valueOf(VHArr[1]);
@@ -662,8 +660,6 @@ public class OrderService extends AbstractService<Order> {
                     } else if (Double.valueOf(VHArr[0]) + Double.valueOf(VHArr[1]) < Double.valueOf(s.getForecastScore())) {
                         jsonResultBasketball.setHiloResult("小");
                     }
-                }else{
-                    continue;
                 }
 
             }
@@ -709,10 +705,7 @@ public class OrderService extends AbstractService<Order> {
     }
 
 
-    public static void main(String[] args) {
-        String rst = whichWNMPeriod(-6);
-        System.out.print(rst);
-    }
+
 
 	/*
 	 *更新订单的比赛结果,主体为订单详情（订单详情对应的每一场比赛进行更新赛果）
@@ -797,8 +790,6 @@ public class OrderService extends AbstractService<Order> {
                 }
                 dto1.setCellCode(String.valueOf(MatchBasketBallResultHDCEnum.getCode(mnl_result)));
                 dto1.setCellName(mnl_result);
-            }else{
-                continue;
             }
 
 			
@@ -813,8 +804,6 @@ public class OrderService extends AbstractService<Order> {
                 }
                 dto2.setCellCode(String.valueOf(MatchBasketResultHdEnum.getCode(hdc_result)));
                 dto2.setCellName(hdc_result);
-            }else{
-                continue;
             }
 
 			
@@ -824,8 +813,6 @@ public class OrderService extends AbstractService<Order> {
                 dto3.setPlayCode(playCode);
                 dto3.setCellCode(reHVMNLCode(wnm_result));
                 dto3.setCellName(wnm_result);
-            }else{
-                continue;
             }
 
 			BasketMatchOneResultDTO dto4 = new BasketMatchOneResultDTO();
@@ -835,8 +822,6 @@ public class OrderService extends AbstractService<Order> {
                 dto4.setCellCode(MatchBasketBallResultHILOEnum.getCode(hilo_result+"分"));
                 dto4.setCellName(hilo_result);
 
-            }else{
-                continue;
             }
 
 			matchOneResult.add(dto1);
@@ -853,6 +838,9 @@ public class OrderService extends AbstractService<Order> {
         for (JsonResultBasketball orderDetail : jsonResultBasketballList) {
             String ticketDataStr = orderDetail.getTicketData();
             List<BasketMatchOneResultDTO> resultDTOs = resultMap.get(orderDetail.getOrderDetailId());
+            if(CollectionUtils.isEmpty(resultDTOs)){
+                continue;
+            }
             String[] split = ticketDataStr.split(";");
             OrderDetail od = new OrderDetail();
             od.setOrderDetailId(orderDetail.getOrderDetailId());
@@ -863,6 +851,9 @@ public class OrderService extends AbstractService<Order> {
                 }
                 Integer playType = Integer.valueOf(ticketData.substring(0, ticketData.indexOf("|")));
                 for (BasketMatchOneResultDTO dto : resultDTOs) {
+                   if(dto.getPlayType() == null){
+                       continue;
+                   }
                     if (playType.equals(Integer.valueOf(dto.getPlayType()))) {
                         sbuf.append("0").append(dto.getPlayType()).append("|").append(dto.getPlayCode()).append("|").append(dto.getCellCode()).append(";");
                     }
