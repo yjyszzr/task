@@ -14,6 +14,6 @@
   		select * from dl_sys_config where business_id=#{businessId}
   </select>
   <update id="updateConfigByBusinessId">
-       update dl_sys_config set value=#{value} where business_id=1
+       update dl_sys_config set value=#{value} where business_id=1 and value!=1
   </update>
 </mapper>
