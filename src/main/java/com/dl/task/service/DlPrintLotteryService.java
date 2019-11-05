@@ -209,8 +209,6 @@ public class DlPrintLotteryService {
                     } else if (Double.valueOf(VHArr[1]) + Double.valueOf(s.getRangFen()) < Double.valueOf(VHArr[0])) {
                         jsonResultBasketball.setHdcResult("主负");
                     }
-                } else {
-                    continue;
                 }
 
                 Integer vnmScore = Integer.valueOf(VHArr[0]) - Integer.valueOf(VHArr[1]);
@@ -222,8 +220,6 @@ public class DlPrintLotteryService {
                     } else if (Double.valueOf(VHArr[0]) + Double.valueOf(VHArr[1]) < Double.valueOf(s.getForecastScore())) {
                         jsonResultBasketball.setHiloResult("小");
                     }
-                } else {
-                    continue;
                 }
 
             }
