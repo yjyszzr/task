@@ -93,7 +93,7 @@
 			*
 		from
 		dl_match_basketball 
-		where match_sn in
+		where status = 1 and match_sn in
 	  	 	<foreach collection="playCodes" item="playCode" open="(" close=")" separator=",">
 	  	 		#{playCode}
 	  	 	</foreach>
