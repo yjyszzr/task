@@ -317,38 +317,46 @@ public class DlPrintLotteryService {
 			String mnl_result = basketBallResult.getMnlResult();
 			String wnm_result = basketBallResult.getWnmResult();
 			BasketMatchOneResultDTO dto1 = new BasketMatchOneResultDTO();
-            dto1.setPlayType(String.valueOf(MatchBasketPlayTypeEnum.PLAY_TYPE_MNL.getcode()));
-            dto1.setPlayCode(playCode);
-            mnl_result = mnl_result.replaceAll(" ", "");
-            if(mnl_result.equals("主负")){
-                mnl_result = "客胜";
+            if(org.apache.commons.lang3.StringUtils.isNotEmpty(mnl_result)) {
+                dto1.setPlayType(String.valueOf(MatchBasketPlayTypeEnum.PLAY_TYPE_MNL.getcode()));
+                dto1.setPlayCode(playCode);
+                mnl_result = mnl_result.replaceAll(" ", "");
+                if (mnl_result.equals("主负")) {
+                    mnl_result = "客胜";
+                }
+                dto1.setCellCode(String.valueOf(MatchBasketBallResultHDCEnum.getCode(mnl_result)));
+                dto1.setCellName(mnl_result);
             }
-            dto1.setCellCode(String.valueOf(MatchBasketBallResultHDCEnum.getCode(mnl_result)));
-            dto1.setCellName(mnl_result);
 
             BasketMatchOneResultDTO dto2 = new BasketMatchOneResultDTO();
-            dto2.setPlayType(String.valueOf(MatchBasketPlayTypeEnum.PLAY_TYPE_HDC.getcode()));
-            dto2.setPlayCode(playCode);
-            if(hdc_result.equals("主胜")){
-                hdc_result = "让分主胜";
-            }else if(hdc_result.equals("主负") || hdc_result.equals("让分主负")){
-                hdc_result = "让分客胜";
+            if(org.apache.commons.lang3.StringUtils.isNotEmpty(hdc_result)) {
+                dto2.setPlayType(String.valueOf(MatchBasketPlayTypeEnum.PLAY_TYPE_HDC.getcode()));
+                dto2.setPlayCode(playCode);
+                if (hdc_result.equals("主胜")) {
+                    hdc_result = "让分主胜";
+                } else if (hdc_result.equals("主负") || hdc_result.equals("让分主负")) {
+                    hdc_result = "让分客胜";
+                }
+                dto2.setCellCode(String.valueOf(MatchBasketResultHdEnum.getCode(hdc_result)));
+                dto2.setCellName(hdc_result);
             }
-            dto2.setCellCode(String.valueOf(MatchBasketResultHdEnum.getCode(hdc_result)));
-            dto2.setCellName(hdc_result);
-			
+
 			BasketMatchOneResultDTO dto3 = new BasketMatchOneResultDTO();
-			dto3.setPlayType(String.valueOf(MatchBasketPlayTypeEnum.PLAY_TYPE_WNM.getcode()));
-			dto3.setPlayCode(playCode);
-			dto3.setCellCode(reHVMNLCode(wnm_result));
-			dto3.setCellName(wnm_result);			
-			
+            if(org.apache.commons.lang3.StringUtils.isNotEmpty(wnm_result)) {
+                dto3.setPlayType(String.valueOf(MatchBasketPlayTypeEnum.PLAY_TYPE_WNM.getcode()));
+                dto3.setPlayCode(playCode);
+                dto3.setCellCode(reHVMNLCode(wnm_result));
+                dto3.setCellName(wnm_result);
+            }
+
 			BasketMatchOneResultDTO dto4 = new BasketMatchOneResultDTO();
-			dto4.setPlayType(String.valueOf(MatchBasketPlayTypeEnum.PLAY_TYPE_HILO.getcode()));
-			dto4.setPlayCode(playCode);
-			dto4.setCellCode(MatchBasketBallResultHILOEnum.getCode(hilo_result+"分"));
-			dto4.setCellName(hilo_result);
-			
+            if(org.apache.commons.lang3.StringUtils.isNotEmpty(hilo_result)) {
+                dto4.setPlayType(String.valueOf(MatchBasketPlayTypeEnum.PLAY_TYPE_HILO.getcode()));
+                dto4.setPlayCode(playCode);
+                dto4.setCellCode(MatchBasketBallResultHILOEnum.getCode(hilo_result + "分"));
+                dto4.setCellName(hilo_result);
+            }
+
 			matchOneResult.add(dto1);
 			matchOneResult.add(dto2);
 			matchOneResult.add(dto3);
