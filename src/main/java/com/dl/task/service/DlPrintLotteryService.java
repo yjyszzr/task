@@ -413,6 +413,7 @@ public class DlPrintLotteryService {
                                     }
                                 } else {
                                     // 比赛结果获取中奖信息
+                                    matchResultList.stream().filter(s->StringUtils.isEmpty(s.getPlayCode()));
                                     List<BasketMatchOneResultDTO> matchResultListNew = matchResultList.stream().filter(s -> s.getPlayCode().equals(split[1])).collect(Collectors.toList());
                                     for (BasketMatchOneResultDTO rst : matchResultListNew) {
 
