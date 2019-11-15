@@ -26,12 +26,8 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="Maven: com.dl:member-api:1.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: com.dl:lottery-api:1.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: com.dl:storeH5-api:1.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: com.dl:base:1.0-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: com.ucf:ucf-java-sdk:1.0.6" level="project" />
-    <orderEntry type="module" module-name="base" />
+    <orderEntry type="library" name="Maven: com.dl:base:1.0-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: com.netflix.servo:servo-apache:0.7.4" level="project" />
     <orderEntry type="library" name="Maven: com.google.code.findbugs:annotations:2.0.0" level="project" />
     <orderEntry type="library" name="Maven: com.netflix.servo:servo-core:0.10.1" level="project" />
@@ -68,16 +64,18 @@
     <orderEntry type="library" name="Maven: org.aspectj:aspectjweaver:1.8.10" level="project" />
     <orderEntry type="library" name="Maven: io.swagger:swagger-annotations:1.5.10" level="project" />
     <orderEntry type="library" name="Maven: com.belerweb:pinyin4j:2.5.0" level="project" />
-    <orderEntry type="module" module-name="payment-api" />
-    <orderEntry type="module" module-name="member-api" />
-    <orderEntry type="module" module-name="lottery-api" />
-    <orderEntry type="module" module-name="storeH5-api" />
+    <orderEntry type="library" name="Maven: com.getsentry.raven:raven-logback:8.0.2" level="project" />
+    <orderEntry type="library" name="Maven: com.getsentry.raven:raven:8.0.2" level="project" />
+    <orderEntry type="library" name="Maven: ch.qos.logback:logback-core:1.1.11" level="project" />
+    <orderEntry type="library" name="Maven: ch.qos.logback:logback-classic:1.1.11" level="project" />
+    <orderEntry type="library" name="Maven: com.dl:payment-api:1.0-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: com.dl:member-api:1.0-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: com.dl:lottery-api:1.0-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: com.dl:storeH5-api:1.0-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.boot:spring-boot-starter-web:1.5.7.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.boot:spring-boot-starter:1.5.7.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.boot:spring-boot:1.5.7.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.boot:spring-boot-starter-logging:1.5.7.RELEASE" level="project" />
-    <orderEntry type="library" name="Maven: ch.qos.logback:logback-classic:1.1.11" level="project" />
-    <orderEntry type="library" name="Maven: ch.qos.logback:logback-core:1.1.11" level="project" />
     <orderEntry type="library" name="Maven: org.slf4j:jul-to-slf4j:1.7.25" level="project" />
     <orderEntry type="library" name="Maven: org.slf4j:log4j-over-slf4j:1.7.25" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: org.yaml:snakeyaml:1.17" level="project" />
@@ -204,7 +202,7 @@
     <orderEntry type="module-library">
       <library name="Maven: com.alibaba:jconsole:1.8.0">
         <CLASSES>
-          <root url="jar:///Library/Java/JavaVirtualMachines/jdk1.8.0_181.jdk/Contents/Home/lib/jconsole.jar!/" />
+          <root url="jar://D:/software/java/jdk1.8/lib/jconsole.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -213,7 +211,7 @@
     <orderEntry type="module-library">
       <library name="Maven: com.alibaba:tools:1.8.0">
         <CLASSES>
-          <root url="jar:///Library/Java/JavaVirtualMachines/jdk1.8.0_181.jdk/Contents/Home/lib/tools.jar!/" />
+          <root url="jar://D:/software/java/jdk1.8/lib/tools.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
