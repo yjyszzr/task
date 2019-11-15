@@ -26,6 +26,7 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="Maven: commons-lang:commons-lang:2.6" level="project" />
     <orderEntry type="library" name="Maven: com.ucf:ucf-java-sdk:1.0.6" level="project" />
     <orderEntry type="library" name="Maven: com.dl:payment-api:1.0-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: com.dl:member-api:1.0-SNAPSHOT" level="project" />
